@@ -1,0 +1,14 @@
+openapi: 3.0.0
+info:
+  version: 1.0.0
+  title: Real Estate API!
+  description: A Real Estate Web API for my 6003CEM Portfolio coursework.
+  contact:
+    name: Mohammed Fardhin Masud
+    email: masudm6@coventry.ac.uk
+servers:
+  - url: "https://PART1-PART2-PORT.codio-box.uk/route"
+    description: Codio Development Server
+tags:
+  - name: Users
+    description: API endpoints for user management.
