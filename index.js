@@ -4,7 +4,7 @@ require('dotenv').config()
 const Koa = require('koa');
 const app = new Koa();
 
-//const database = require('./helpers/database.js');
+const database = require('./helpers/database.js');
 
 const special = require('./routes/special.js');
 
@@ -14,6 +14,10 @@ let port = process.env.PORT;
 
 async function startServer(app, port) {
   try {
+    // reset dummy db
+    database.connectDB(true);
+    database.initDB();
+
     // start koa server
     app.listen(port, () => {
       console.log('Server running on port', port);
