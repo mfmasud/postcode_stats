@@ -31,7 +31,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  avatarURL: String,
   role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
 });
 
