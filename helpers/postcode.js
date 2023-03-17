@@ -3,7 +3,7 @@ const axios = require('axios');
 async function getRandomPostcode() {
     try {
       const response = await axios.get('https://api.postcodes.io/random/postcodes');
-      console.log(response);
+      return response.data.result;
     } catch (error) {
       console.error(error);
     }
