@@ -1,0 +1,177 @@
+From https://publish.bus-data.dft.gov.uk/org/2/dataset/timetable/41/report/34/incorrect-stop-type/
+
+For the API, I need only bus stops so that would be "BCT" - "On-street Bus / Coach / Tram Stop". Exclude anything else.
+
+<table class="govuk-table">
+  <tbody class="govuk-table__body">
+    
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        BCT
+      </td>
+      <td class="govuk-table__cell">
+        On-street Bus / Coach / Tram Stop
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        TXR
+      </td>
+      <td class="govuk-table__cell">
+        Taxi Rank (head of)
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        STR
+      </td>
+      <td class="govuk-table__cell">
+        Shared Taxi Rank (head of)
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        AIR
+      </td>
+      <td class="govuk-table__cell">
+        Airport Entrance
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        GAT
+      </td>
+      <td class="govuk-table__cell">
+        Airport Interchange Area
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        FTD
+      </td>
+      <td class="govuk-table__cell">
+        Ferry Terminal / Dock Entrance
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        FBT
+      </td>
+      <td class="govuk-table__cell">
+        Ferry or Port Berth
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        FER
+      </td>
+      <td class="govuk-table__cell">
+        Ferry or Port Interchange Area
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        RSE
+      </td>
+      <td class="govuk-table__cell">
+        Rail Station Entrance
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        RLY
+      </td>
+      <td class="govuk-table__cell">
+        Railway Interchange Area
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        RPL
+      </td>
+      <td class="govuk-table__cell">
+        Railway Platform
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        TMU
+      </td>
+      <td class="govuk-table__cell">
+        Tram / Metro / Underground Entrance
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        MET
+      </td>
+      <td class="govuk-table__cell">
+        Underground or Metro Interchange Area
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        PLT
+      </td>
+      <td class="govuk-table__cell">
+        Underground or Metro platform
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        BCE
+      </td>
+      <td class="govuk-table__cell">
+        Bus / Coach Station Entrance
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        BST
+      </td>
+      <td class="govuk-table__cell">
+        Bus Coach Station Access Area
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        BCS
+      </td>
+      <td class="govuk-table__cell">
+        Bus / Coach bay / stand / stance within Bus / Coach Stations
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        BCQ
+      </td>
+      <td class="govuk-table__cell">
+        Bus Coach Station Variable Bay
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        LCE
+      </td>
+      <td class="govuk-table__cell">
+        Lift or Cable Car Entrance
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        LCB
+      </td>
+      <td class="govuk-table__cell">
+        Lift or Cable Car Access Area
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell govuk-!-font-weight-bold">
+        LPL
+      </td>
+      <td class="govuk-table__cell">
+        Lift or Cable Car Platform
+      </td>
+    </tr>
+    </tbody>
+</table>
