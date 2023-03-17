@@ -8,8 +8,14 @@ try {
 
     codes.forEach(code => {
     console.log(code);
-  })
+    })
   });
+
+  // code 420 is for Warwickshire / West Midlands:
+  atco.queryAtco("csv", 420).then(csvdata => {
+    //console.log(csvdata)
+  })
+
 } catch (error) {
   console.error(error);
 }

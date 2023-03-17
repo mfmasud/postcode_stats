@@ -29,6 +29,30 @@ async function getAtcoCodes() {
 
 }
 
+// API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
+// example api call: https://naptan.api.dft.gov.uk/v1/access-nodes?dataFormat=csv&atcoAreaCodes=420
+// 420 is Warwickshire.
+
+async function queryAtco(format, code) {
+    // no validation - needs to be implemented.
+    format = format.toString();
+    code = code.toString();
+
+    const api = "https://naptan.api.dft.gov.uk/v1/access-nodes";
+    const query = `dataFormat=${format}&atcoAreaCodes=${code}`;
+
+    try {
+        const response = await axios.get(`${api}?${query}`);
+        // response is raw csv data, not an object should be cached and parsed into json
+        //const parsed = await processCSV(response);
+        //return parsed;
+        return response.data;
+    } catch (error) {
+        console.error(error);
+    }
+}
+
 module.exports = {
-    getAtcoCodes
+    getAtcoCodes,
+    queryAtco
 }
