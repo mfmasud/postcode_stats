@@ -5,6 +5,10 @@ mongoose.set("strictQuery", true);
 const User = require("../models/User");
 const Role = require("../models/Role");
 
+const Atco = require("../models/Atco")
+const BusStop = require("../models/BusStop")
+const Postcode = require("../models/Postcode")
+
 const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file
 
 // Connect MongoDB database
@@ -38,10 +42,10 @@ async function disconnectDB(output = false) {
   }
 }
 
-// Initialise + reset dummy db
-async function initDB() {
+// Initialise + reset dummy user db
+async function initUserDB() {
 
-  console.log("Resetting database...");
+  console.log("Resetting User data...");
 
   try {
     // Delete all documents in each collection
@@ -97,11 +101,29 @@ async function initDB() {
       role: AdminRole,
     });
 
-    console.log("Reset database successfully!");
+    console.log("Reset user data successfully!");
 
   } catch (error) {
-    console.error(`Error resetting database:\n\n${error.message}`);
+    console.error(`Error resetting user data:\n\n${error.message}`);
   }
 }
 
-module.exports = { connectDB, disconnectDB, initDB };
+// Reset location data cache
+async function resetDataDB() {
+
+  console.log("Resetting location data...");
+
+  try {
+    // Delete all documents in each collection
+    await Atco.deleteMany();
+    await BusStop.deleteMany();
+    await Postcode.deleteMany();
+    
+    console.log('Rest location data successfully!')
+    
+  } catch (error) {
+    console.error(`Error resetting location data:\n\n${error.message}`);
+  }
+}
+
+module.exports = { connectDB, disconnectDB, initUserDB, resetDataDB };
