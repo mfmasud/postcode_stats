@@ -8,7 +8,7 @@ docs/notes/atco_codes.txt
 
 const axios = require('axios');
 const JSDOM = require('jsdom').JSDOM;
-const csv = require('csvtojson');
+const csvtojson = require('csvtojson');
 
 // URL has a dropdown with all the local authorities and ATCO codes
 const url = "https://beta-naptan.dft.gov.uk/download/la";
@@ -31,6 +31,21 @@ async function getAtcoCodes() {
     return codes;
 
 }
+
+// process atco codes as atco:{location, region}
+function processAtco(data) {
+    // example string: Aberdeenshire / Scotland (630)
+    // result: {630: {location: Aberdeenshire, region: Scotland}}
+  
+    const location = data.split('/')[0];
+    const region = data.split('/')[1].split('(')[0];
+    const atco = data.split('/')[1].split('(')[1].split(')')[0];
+  
+    const processedData = {}
+    processedData[atco] = {location, region};
+
+    return processedData;
+  }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
 // example api call: https://naptan.api.dft.gov.uk/v1/access-nodes?dataFormat=csv&atcoAreaCodes=420
@@ -55,7 +70,7 @@ async function queryAtco(format, code) {
 
 async function processCSV(code, rawdata) {
     // parse csv using csvtojson
-    const data = await csv2().fromString(rawdata);
+    const data = await csvtojson().fromString(rawdata);
     //console.log(data);
     // data is an array of objects e.g. dictionary of column:value pairs
 
@@ -85,11 +100,12 @@ async function processCSV(code, rawdata) {
     const json = {};
     //json[code] = filtered.slice(0, 4); // first 4 records as test
     json[code] = filtered;
-    console.log(json);
+    //console.log(json);
     return json;
 }
 
 module.exports = {
     getAtcoCodes,
-    queryAtco
+    queryAtco,
+    processAtco,
 }
