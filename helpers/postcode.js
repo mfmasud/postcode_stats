@@ -20,11 +20,14 @@ async function validatePostcode(postcode) {
       /validate`
     );
 
+    console.log(`${postcodeString} is valid: ${response.data.result}`);
+    
     if (response.data.result === true) {
       return true;
     } else {
       return false;
     }
+
   } catch (error) {
     console.error(error);
   }
@@ -70,7 +73,7 @@ async function processPostcode(postcodeObject) {
 
   try {
     await newPostcode.save();
-    console.log(savedPostcode);
+    console.log("successfully saved postcode: " + postcodeObject.postcode);
   } catch (error) {
     console.error(error);
   }
