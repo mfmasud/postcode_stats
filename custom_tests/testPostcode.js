@@ -5,10 +5,10 @@ const postcode = require('../helpers/postcode');
 // https://stackoverflow.com/a/45609128 - using .then()
 
 try {
-postcode.getRandomPostcode().then(randomPostcode => {
+  postcode.getRandomPostcode().then(randomPostcode => {
   console.log(randomPostcode);
 });
 
 } catch (error) {
-console.error(error);
+  console.error(error);
 }
