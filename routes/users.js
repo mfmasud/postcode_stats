@@ -24,6 +24,13 @@ router.del("/:id([0-9]{1,})", auth, deleteUserById); // admins can delete any st
 async function getAllUsers(cnx, next) {
   console.log("getAllUsers() called");
 
+  if (!cnx.state.user) {
+    cnx.status = 401;
+    console.error("[401] User needs to log in.");
+    cnx.body = { message: "You are not logged in." };
+    return;
+  }
+  
   //console.log("User: " + cnx.state.user);
   const ability = createAbilityFor(cnx.state.user);
   const permission = ability.can("read", "AllUsers");

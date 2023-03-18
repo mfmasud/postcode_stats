@@ -15,29 +15,45 @@ const postcode = require("../helpers/postcode");
 router.get("/", auth, getAllPostcodes); // allows admins to view all the postcodes that have been saved
 router.get("/random", auth, getRandomPostcode); // only authenticated users can access this route
 
-async function getAllPostcodes(ctx) {
+async function getAllPostcodes(cnx) {
 
-    const { user } = ctx.state;
+    const { user } = cnx.state;
+    if (!cnx.state.user) {
+        cnx.status = 401;
+        console.error("[401] User needs to log in.");
+        cnx.body = { message: "You are not logged in." };
+        return;
+      }
     const ability = createAbilityFor(user);
 
     if (ability.can("readAll", "Postcode")) {
         const postcodes = await Postcode.find();
-        ctx.body = postcodes;
+        cnx.body = postcodes;
     } else {
-        ctx.status = 403;
-        ctx.body = "You are not authorised to view this resource";
+        cnx.status = 403;
+        cnx.body = "You are not authorised to view this resource";
     }
 }
 
-async function getRandomPostcode(ctx) {
-    const randompostcode = await postcode.getRandomPostcode();
+async function getRandomPostcode(cnx) {
+    
+    const { user } = cnx.state;
+    if (!cnx.state.user) {
+        cnx.status = 401;
+        console.error("[401] User needs to log in.");
+        cnx.body = { message: "You are not logged in." };
+        return;
+      }
+    const ability = createAbilityFor(user);
 
     if (ability.can("read", "Postcode")) {
-        ctx.status = 200;
-        ctx.body = randompostcode;
+        const randompostcode = await postcode.getRandomPostcode();
+        cnx.status = 200;
+        console.log("returned postcode", randompostcode.postcode)
+        cnx.body = randompostcode;
     } else {
-        ctx.status = 403;
-        ctx.body = "You are not authorised to view this resource";
+        cnx.status = 403;
+        cnx.body = "You are not authorised to view this resource";
     }
 
 }

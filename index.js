@@ -7,8 +7,12 @@ const app = new Koa();
 const database = require('./helpers/database.js');
 
 const special = require('./routes/special.js');
+const postcodes = require('./routes/postcodes');
+const users = require('./routes/users');
 
 app.use(special.routes());
+app.use(postcodes.routes());
+app.use(users.routes());
 
 let port = process.env.PORT;
 
