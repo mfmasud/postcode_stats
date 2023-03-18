@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const busStopSchema = new mongoose.Schema({
     ATCO_long: {
       type: String,
@@ -40,10 +42,12 @@ const busStopSchema = new mongoose.Schema({
     },
   });
   
+  /* commented out because I am now doing this when assigning the document fields in the first place.
   busStopSchema.pre("save", async function (next) {
       this.ATCO_short = this.ATCO_long.slice(0, 3);
       next();
   });
-  
+  */
+
   module.exports = mongoose.model("BusStop", busStopSchema);
   
