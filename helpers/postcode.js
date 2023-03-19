@@ -6,6 +6,19 @@ async function getRandomPostcode() {
     const response = await axios.get(
       "https://api.postcodes.io/random/postcodes"
     );
+    await processPostcode(response.data.result);
+    return response.data.result;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function getPostcode(validPostcodeString) {
+  try {
+    const response = await axios.get(
+      `https://api.postcodes.io/postcodes/${validPostcodeString}`
+    );
+    await processPostcode(response.data.result);
     return response.data.result;
   } catch (error) {
     console.error(error);
@@ -34,9 +47,17 @@ async function validatePostcode(postcodeString) {
 }
 
 async function processPostcode(postcodeObject) {
-  //validate postcode using api call or anyoehre function
+  // check if postcode exists in db
+  const postcodeExists = await Postcode.findOne({
+    postcode: postcodeObject.postcode,
+  });
 
-  console.log(postcodeObject.postcode);
+  if (postcodeExists) {
+    console.log("Postcode already exists in db: " + postcodeObject.postcode);
+    return;
+  }
+
+  console.log("Processing:", postcodeObject.postcode);
 
   // fields to save: postcode, eastings, northings, country, longitude, latitude, region (can be null)
   // parliamentary_constituency, admin_district, admin_ward, parish, admin_county (can be null too)
@@ -73,7 +94,7 @@ async function processPostcode(postcodeObject) {
 
   try {
     await newPostcode.save();
-    console.log("successfully saved postcode: " + postcodeObject.postcode);
+    console.log("Successfully saved postcode: " + postcodeObject.postcode);
   } catch (error) {
     console.error(error);
   }
@@ -81,6 +102,7 @@ async function processPostcode(postcodeObject) {
 
 module.exports = {
   getRandomPostcode,
+  getPostcode,
   validatePostcode,
   processPostcode,
 };
