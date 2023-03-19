@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const atcoSchema = new mongoose.Schema({
+const searchSchema = new mongoose.Schema({
     searchID: {
         type: Number,
     },
@@ -10,12 +10,12 @@ const atcoSchema = new mongoose.Schema({
     longitude: {
         type: Number,
     },
-    postcode: {
+    postcodeString: {
         type: String,
     },
 });
 
-userSchema.pre("save", async function save(next) {
+searchSchema.pre("save", async function save(next) {
     if (this.isNew) {
         // if this is a new search then set the id to the next available id
         const maxId = await this.constructor.find().sort("-searchID").limit(1);
@@ -24,4 +24,4 @@ userSchema.pre("save", async function save(next) {
     next();
 });
 
-module.exports = mongoose.model("Atco", atcoSchema);
+module.exports = mongoose.model("Search", searchSchema);
