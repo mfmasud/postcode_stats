@@ -23,7 +23,7 @@ async function startServer(app, port) {
     // reset dummy db
     database.connectDB(true);
     database.initUserDB();
-    database.resetDataDB();
+    //database.resetDataDB();
 
     // start koa server
     app.listen(port, () => {

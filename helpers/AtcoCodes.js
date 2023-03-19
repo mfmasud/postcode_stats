@@ -37,7 +37,7 @@ async function getAtcoCodes() {
 }
 
 // process atco codes as atco:{location, region}
-function processAtco(data) {
+async function processAtco(data) {
   // example string: Aberdeenshire / Scotland (630)
   // result: {630: {location: Aberdeenshire, region: Scotland}}
 
@@ -47,8 +47,22 @@ function processAtco(data) {
 
   const processedData = {};
   processedData[atco] = { location, region };
+  console.log(atco, processedData[atco]);
 
-  return processedData;
+  const newAtco = await Atco.create({
+    code: atco,
+    region: region,
+    location: location,
+    busstops: []
+  });
+}
+
+async function saveAtcoList() {
+  // run on db initialisation to get a list of searchable ATCOs.
+  const codeList = await getAtcoCodes();
+  for (code of codeList) {
+    await processAtco(code);
+  }
 }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
@@ -71,6 +85,7 @@ async function queryAtco(format = "csv", code) {
     if (format === "csv") {
       // TODO: Can check if already processed here
       await processCSV(code, response.data);
+      console.log("finished processing ATCO:", code)
       return;
     } else {
       console.log("Invalid format");
@@ -82,6 +97,8 @@ async function queryAtco(format = "csv", code) {
 }
 
 async function processCSV(code, rawdata) {
+  const associatedAtco = await Atco.findOne({code: code});
+
   // parse csv using csvtojson
   const data = await csvtojson().fromString(rawdata);
   //console.log(data);
@@ -121,7 +138,8 @@ async function processCSV(code, rawdata) {
   //console.log(filtered);
 
   // store each result in BusStop collection
-  filtered.forEach((row) => {
+  for (const row of filtered) {
+    console.log(row);
     const newBusStop = new BusStop({
       ATCO_long: row.ATCOCode,
       ATCO_short: code,
@@ -135,17 +153,22 @@ async function processCSV(code, rawdata) {
       Status: row.Status,
     });
 
+    associatedAtco.busstops.push(newBusStop);
+    
     try {
-      newBusStop.save();
-      console.log(`Saved ATCO code ${newBusStop.ATCO_long} to BusStop collection`);
+      await newBusStop.save();
+      await associatedAtco.save();
+      //console.log(`Saved ATCO code ${newBusStop.ATCO_long} to BusStop collection`);
+      //console.log(`debug: ${associatedAtco.busstops.length}`)
     } catch (error) {
       console.error(error);
     }
-  });
+  };
 }
 
 module.exports = {
   getAtcoCodes,
   queryAtco,
   processAtco,
+  saveAtcoList,
 };

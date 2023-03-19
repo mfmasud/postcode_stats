@@ -119,7 +119,7 @@ async function resetDataDB() {
     await BusStop.deleteMany();
     await Postcode.deleteMany();
     
-    console.log('Rest location data successfully!')
+    console.log('Reset location data successfully!')
     
   } catch (error) {
     console.error(`Error resetting location data:\n\n${error.message}`);
