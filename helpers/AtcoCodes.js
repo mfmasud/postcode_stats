@@ -47,7 +47,13 @@ async function processAtco(data) {
 
   const processedData = {};
   processedData[atco] = { location, region };
-  console.log(atco, processedData[atco]);
+  //console.log(atco, processedData[atco]);
+
+  const existingAtco = await Atco.findOne({code: atco}); // can filter for e.g. busstops.length === 0 to check for empty codes
+  if (existingAtco) {
+    //console.log(`ATCO ${atco} already exists in db`);
+    return; // skip creating another Atco for no reason.
+  }
 
   const newAtco = await Atco.create({
     code: atco,
@@ -83,10 +89,18 @@ async function queryAtco(format = "csv", code) {
     // response is raw csv data, not an object should be cached and parsed into json
 
     if (format === "csv") {
-      // TODO: Can check if already processed here
-      await processCSV(code, response.data);
-      console.log("finished processing ATCO:", code)
-      return;
+      
+      const AtcoExists = await Atco.findOne({code: code});
+      if (AtcoExists.busstops.length > 1) {
+        console.log(`ATCO ${code} BusStops found, not processing any further.`);
+        return;
+      } else {
+        console.log("processing ATCO code:", code)
+        await processCSV(code, response.data);
+        console.log("finished processing ATCO:", code)
+        return;
+      }
+      
     } else {
       console.log("Invalid format");
       return;
@@ -110,7 +124,7 @@ async function processCSV(code, rawdata) {
   // filter out bus stops that are not active
   const active = busstops.filter((row) => row.Status === "active");
 
-  // filter through columns
+  // filter through columns - can remove NaptanCode later if it remains unused.
   const columns = [
     "ATCOCode",
     "NaptanCode",
@@ -139,7 +153,7 @@ async function processCSV(code, rawdata) {
 
   // store each result in BusStop collection
   for (const row of filtered) {
-    console.log(row);
+    //console.log(row);
     const newBusStop = new BusStop({
       ATCO_long: row.ATCOCode,
       ATCO_short: code,
