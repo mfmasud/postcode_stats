@@ -6,14 +6,30 @@ const searchSchema = new mongoose.Schema({
     },
     latitude: {
         type: Number,
+        required: true,
     },
     longitude: {
         type: Number,
+        required: true,
     },
-    postcodeString: {
-        type: String,
+    reverseLookup: {
+        type: Boolean,
+        default: false,
     },
+    Postcode: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Postcode",
+    },
+
+    queryBusStops: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "BusStop",
+        },
+    ],
 });
+
+// query bus stops - selected bus stops matching a query e.g. within radius of lat and long.
 
 searchSchema.pre("save", async function save(next) {
     if (this.isNew) {

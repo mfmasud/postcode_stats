@@ -6,7 +6,7 @@ function defineAbilitiesFor(user) {
   const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
 
   // non authenticated users
-  can("read", "Listing")
+  can("read", "Search")
 
   // authenticated users
   // standard users
@@ -23,9 +23,6 @@ function defineAbilitiesFor(user) {
   if (user.role.name === "admin") {
     //console.log('admin user role')
     
-    can("create", "Listing");
-    can("update", "Listing");
-    can("delete", "Listing");
   }
 
   return build();
