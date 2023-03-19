@@ -11,6 +11,7 @@ const JSDOM = require("jsdom").JSDOM;
 const csvtojson = require("csvtojson");
 
 const Atco = require("../models/Atco");
+const BusStop = require("../models/BusStop")
 
 // URL has a dropdown with all the local authorities and ATCO codes
 const url = "https://beta-naptan.dft.gov.uk/download/la";
@@ -68,6 +69,7 @@ async function queryAtco(format = "csv", code) {
     // response is raw csv data, not an object should be cached and parsed into json
 
     if (format === "csv") {
+      // TODO: Can check if already processed here
       await processCSV(code, response.data);
       return;
     } else {
@@ -118,9 +120,9 @@ async function processCSV(code, rawdata) {
   //console.log(filtered.slice(0, 4));
   //console.log(filtered);
 
-  // store each result in Atco collection
+  // store each result in BusStop collection
   filtered.forEach((row) => {
-    const newAtco = new Atco({
+    const newBusStop = new BusStop({
       ATCO_long: row.ATCOCode,
       ATCO_short: code,
       NaptanCode: row.NaptanCode,
@@ -134,8 +136,8 @@ async function processCSV(code, rawdata) {
     });
 
     try {
-      newAtco.save();
-      console.log(`Saved ATCO code ${newAtco.ATCO_long} to Atco collection`);
+      newBusStop.save();
+      console.log(`Saved ATCO code ${newBusStop.ATCO_long} to BusStop collection`);
     } catch (error) {
       console.error(error);
     }
