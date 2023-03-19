@@ -22,8 +22,8 @@ function defineAbilitiesFor(user) {
   }
 
   // paid users
-  if (user.role.name === "user") {
-    //console.log('standard user role')
+  if (user.role.name === "paid") {
+    //console.log('paid user role')
 
     can("read", "User", { _id: user._id }); // can read own details except for password/passwordSalt
     cannot("read", "AllUsers"); // cannot read other user's details

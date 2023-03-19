@@ -12,11 +12,11 @@ async function getRandomPostcode() {
   }
 }
 
-async function validatePostcode(postcode) {
+async function validatePostcode(postcodeString) {
   try {
     const response = await axios.get(
-      `api.postcodes.io/postcodes/
-      ${postcode}
+      `https://api.postcodes.io/postcodes/
+      ${postcodeString}
       /validate`
     );
 
