@@ -4,15 +4,17 @@ require('dotenv').config()
 const Koa = require('koa');
 const app = new Koa();
 
-const database = require('./helpers/database.js');
+const database = require('./helpers/database');
 
-const special = require('./routes/special.js');
+const special = require('./routes/special');
 const postcodes = require('./routes/postcodes');
 const users = require('./routes/users');
+const search = require('./routes/search')
 
 app.use(special.routes());
 app.use(postcodes.routes());
 app.use(users.routes());
+app.use(search.routes());
 
 let port = process.env.PORT;
 
