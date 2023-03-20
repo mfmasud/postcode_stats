@@ -11,7 +11,7 @@ const Postcode = require("../models/Postcode");
 const Nptg = require("../models/Nptg");
 const Search = require("../models/Search");
 
-//const {} nptg localities 1 time download
+const {getNptgData} = require("../helpers/search") // nptg localities 1 time download
 
 const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file
 
@@ -122,7 +122,7 @@ async function resetDataDB() {
     await Atco.deleteMany();
     await BusStop.deleteMany();
     await Postcode.deleteMany();
-    await Nptg.deleteMany();
+    // await Nptg.deleteMany();
     await Search.deleteMany();
     
     console.log('Reset location data successfully!')
@@ -134,6 +134,8 @@ async function resetDataDB() {
 
 async function initLocationDB() {
   // 1 time download of NPTG locality database ~ 5mb csv
+  // Takes approximately 10 minutes (*on Codio) to save everything so this should be run on setup only.
+  await getNptgData();
 }
 
-module.exports = { connectDB, disconnectDB, initUserDB, resetDataDB };
+module.exports = { connectDB, disconnectDB, initUserDB, resetDataDB, initLocationDB };

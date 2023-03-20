@@ -20,9 +20,10 @@ let port = process.env.PORT;
 
 async function startServer(app, port) {
   try {
-    // reset dummy db
+    // reset dummy dbs - not awaited yet
     database.connectDB(true);
     database.initUserDB();
+    database.initLocationDB();
     //database.resetDataDB();
 
     // start koa server

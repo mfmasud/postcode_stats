@@ -3,6 +3,7 @@ const BusStop = require("../models/BusStop");
 const Nptg = require("../models/Nptg");
 
 const axios = require("axios");
+const csvtojson = require("csvtojson");
 
 async function getRelatedStops(lat, long, radius=1000) {
     // bus stops around a 1km radius from a given point. maximum returned should be 4 (arbitrary numbers)
@@ -28,6 +29,16 @@ async function getNptgData() {
 }
 
 async function processNptgCSV(rawdata) {
+
+    // check if Nptg collection is empty
+    const count = await Nptg.countDocuments();
+    if (count > 0) {
+        console.log("Nptg data already saved.");
+        return;
+    } else {
+        console.log("Processing Nptg data...");
+    }
+
     // adatped from AtcoCodes.processCSV()
     const data = await csvtojson().fromString(rawdata);
 
@@ -41,7 +52,7 @@ async function processNptgCSV(rawdata) {
         "QualifierName",
     ];
   
-    const filtered = active.map((row) => {
+    const filtered = data.map((row) => {
       const filteredRow = {}; // create empty object to store new filtered records in
       columns.forEach((column) => {
         // for each column in columns
@@ -61,16 +72,21 @@ async function processNptgCSV(rawdata) {
         QualifierName: row.QualifierName,
       });
       
+      // console.log(newNptg);
+
       try {
-        await Nptg.save();
+        await newNptg.save();
         //console.log(`Saved Nptg code ${Nptg.NptgLocalityCode} to Nptg collection`);
       } catch (error) {
         console.error(error);
       }
     };
+
+    console.log("Nptg data saved.");
   }
 
 module.exports = {
     getRelatedStops,
     linkATCO,
+    getNptgData,
 }
