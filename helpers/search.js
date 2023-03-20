@@ -2,6 +2,8 @@ const Search = require("../models/Search");
 const BusStop = require("../models/BusStop");
 const Nptg = require("../models/Nptg");
 
+const {getCrimeData} = require("../helpers/crime"); // can be switched to a model later
+
 const axios = require("axios");
 const csvtojson = require("csvtojson");
 
@@ -25,6 +27,8 @@ async function getRelatedStops(SearchModel, radius=1000) {
 }
 
 async function getRelatedCrimes(SearchModel) {
+    const {latitude, longitude} = SearchModel;
+    await getCrimeData(latitude, longitude);
     return;
 }
 
@@ -105,6 +109,7 @@ async function processNptgCSV(rawdata) {
 
 module.exports = {
     getRelatedStops,
+    getRelatedCrimes,
     linkATCO,
     getNptgData,
 }

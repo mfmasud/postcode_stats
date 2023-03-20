@@ -15,7 +15,7 @@ const createAbilityFor = require("../permissions/search");
 
 // helpers
 const { getPostcode, validatePostcode } = require("../helpers/postcode");
-const { getRelatedStops } = require("../helpers/search");
+const { getRelatedStops, getRelatedCrimes } = require("../helpers/search");
 
 router.post("/", auth, bodyParser(), searchArea); // search for details of a lat and long area
 router.get("/:postcode", auth, searchPostcode); // searches by lat and long internally
@@ -103,6 +103,7 @@ async function searchPostcode(cnx) {
             const SearchModel = await Search.findOne( {latitude: dbPostcode.latitude});
             const body = await SearchModel.populate("Postcode");
             await getRelatedStops(SearchModel);
+            await getRelatedCrimes(SearchModel); // just printing for now
             cnx.status = 200;
             cnx.body = body;
 
