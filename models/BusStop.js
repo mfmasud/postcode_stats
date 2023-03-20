@@ -12,6 +12,10 @@ const busStopSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    NptgLocalityCode: {
+      type: String,
+      required: true,
+    },
     CommonName: {
       type: String,
       required: true,
@@ -32,6 +36,14 @@ const busStopSchema = new mongoose.Schema({
       required: true,
     },
     Latitude: {
+      type: String,
+      required: true,
+    },
+    Northing: {
+      type: String,
+      required: true,
+    },
+    Easting: {
       type: String,
       required: true,
     },

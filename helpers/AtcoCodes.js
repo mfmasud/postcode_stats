@@ -128,6 +128,7 @@ async function processCSV(code, rawdata) {
   const columns = [
     "ATCOCode",
     "NaptanCode",
+    "NptgLocalityCode",
     "CommonName",
     "Street",
     "LocalityName",
@@ -158,12 +159,15 @@ async function processCSV(code, rawdata) {
       ATCO_long: row.ATCOCode,
       ATCO_short: code,
       NaptanCode: row.NaptanCode,
+      NptgLocalityCode: row.NptgLocalityCode,
       CommonName: row.CommonName,
       Street: row.Street,
       LocalityName: row.LocalityName,
       ParentLocalityName: row.ParentLocalityName,
       Longitude: row.Longitude,
       Latitude: row.Latitude,
+      Northing: row.Northing,
+      Easting: row.Easting,
       Status: row.Status,
     });
 

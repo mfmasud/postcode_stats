@@ -1,4 +1,6 @@
 const postcode = require('../helpers/postcode');
+const database = require('../helpers/database')
+database.connectDB();
 
 // promises at the top level:
 // https://stackoverflow.com/a/46515787 - info
