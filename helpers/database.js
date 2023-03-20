@@ -5,9 +5,13 @@ mongoose.set("strictQuery", true);
 const User = require("../models/User");
 const Role = require("../models/Role");
 
-const Atco = require("../models/Atco")
-const BusStop = require("../models/BusStop")
-const Postcode = require("../models/Postcode")
+const Atco = require("../models/Atco");
+const BusStop = require("../models/BusStop");
+const Postcode = require("../models/Postcode");
+const Nptg = require("../models/Nptg");
+const Search = require("../models/Search");
+
+//const {} nptg localities 1 time download
 
 const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file
 
@@ -118,12 +122,18 @@ async function resetDataDB() {
     await Atco.deleteMany();
     await BusStop.deleteMany();
     await Postcode.deleteMany();
+    await Nptg.deleteMany();
+    await Search.deleteMany();
     
     console.log('Reset location data successfully!')
     
   } catch (error) {
     console.error(`Error resetting location data:\n\n${error.message}`);
   }
+}
+
+async function initLocationDB() {
+  // 1 time download of NPTG locality database ~ 5mb csv
 }
 
 module.exports = { connectDB, disconnectDB, initUserDB, resetDataDB };
