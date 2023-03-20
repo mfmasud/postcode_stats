@@ -15,6 +15,7 @@ const createAbilityFor = require("../permissions/search");
 
 // helpers
 const { getPostcode, validatePostcode } = require("../helpers/postcode");
+const { getRelatedStops } = require("../helpers/search");
 
 router.post("/", auth, bodyParser(), searchArea); // search for details of a lat and long area
 router.get("/:postcode", auth, searchPostcode); // searches by lat and long internally
@@ -80,19 +81,28 @@ async function searchPostcode(cnx) {
             const dbPostcode = await Postcode.findOne({
                 postcode: processedPostcode.postcode
             });
-            console.log(dbPostcode)
 
-            // save the search to the database - can be separated / cached in the future.
-            const search = new Search({
-                Postcode: dbPostcode,
-                reverseLookup: true, // since we are deriving the lat and long from the postcode
-                latitude: dbPostcode.latitude,
-                longitude: dbPostcode.longitude,
-            });
-            await search.save();
-
-            const body = await Search.findOne( {latitude: dbPostcode.latitude}).populate("Postcode");
-
+            // check for existing search by comparing latitude
+            const existingSearch = await Search.findOne({latitude: dbPostcode.latitude});
+            if (!existingSearch) {
+                console.log("Saving new Search")
+                // save the search to the database
+                const newSearch = new Search({
+                    Postcode: dbPostcode,
+                    reverseLookup: true,
+                    latitude: dbPostcode.latitude,
+                    longitude: dbPostcode.longitude,
+                    Northing: dbPostcode.northings,
+                    Easting: dbPostcode.eastings,
+                });
+                await newSearch.save();
+            } else {
+                console.log("Existing search found, ID:", existingSearch.searchID)
+            }
+            
+            const SearchModel = await Search.findOne( {latitude: dbPostcode.latitude});
+            const body = await SearchModel.populate("Postcode");
+            await getRelatedStops(SearchModel);
             cnx.status = 200;
             cnx.body = body;
 

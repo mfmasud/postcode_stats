@@ -5,13 +5,31 @@ const Nptg = require("../models/Nptg");
 const axios = require("axios");
 const csvtojson = require("csvtojson");
 
-async function getRelatedStops(lat, long, radius=1000) {
-    // bus stops around a 1km radius from a given point. maximum returned should be 4 (arbitrary numbers)
+async function getRelatedStops(SearchModel, radius=1000) {
+    // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
+    const {longitude, latitude, Northing, Easting} = SearchModel;
+    
+    /*
+    console.log(longitude, postcode.longitude);
+    console.log(latitude, postcode.latitude);
+    console.log(Easting, postcode.eastings);
+    console.log(Northing, postcode.northings);
+    */
+
+    console.log("Going to find related stuff here by looking up postcode details / region name etc")
 
     // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
 
-    // updates related search object with matchin lat/long.
+    // updates related search object with matching lat/long Easting/Northing.
     // Need to find the right ATCO for the given search. LinkATCO function?
+}
+
+async function getRelatedCrimes(SearchModel) {
+    return;
+}
+
+async function getRelatedListings(SearchModel) {
+    return;
 }
 
 async function linkATCO() {

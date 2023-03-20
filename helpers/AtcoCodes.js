@@ -83,6 +83,7 @@ async function queryAtco(format = "csv", code) {
 
   const api = "https://naptan.api.dft.gov.uk/v1/access-nodes";
   const query = `dataFormat=${format}&atcoAreaCodes=${code}`;
+  // Note: If no codes are specified, the download size will be 100Mb - The whole dataset.
 
   try {
     const response = await axios.get(`${api}?${query}`);

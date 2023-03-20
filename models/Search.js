@@ -12,6 +12,14 @@ const searchSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
+    Northing: {
+        type: String,
+        required: true,
+    },
+    Easting: {
+        type: String,
+        required: true,
+    },
     reverseLookup: {
         type: Boolean,
         default: false,
@@ -20,7 +28,6 @@ const searchSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Postcode",
     },
-
     queryBusStops: [
         {
             type: mongoose.Schema.Types.ObjectId,
@@ -35,7 +42,7 @@ searchSchema.pre("save", async function save(next) {
     if (this.isNew) {
         // if this is a new search then set the id to the next available id
         const maxId = await this.constructor.find().sort("-searchID").limit(1);
-        this.searchID = maxId.length ? maxId[0].id + 1 : 1;
+        this.searchID = maxId.length ? maxId[0].searchID + 1 : 1;
     }
     next();
 });
