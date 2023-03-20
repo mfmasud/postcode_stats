@@ -34,6 +34,12 @@ const searchSchema = new mongoose.Schema({
             ref: "BusStop",
         },
     ],
+    queryCrimes: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Crime",
+        }
+    ],
 });
 
 // query bus stops - selected bus stops matching a query e.g. within radius of lat and long.
