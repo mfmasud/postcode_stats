@@ -3,33 +3,63 @@
 
 const axios = require("axios");
 
+const CrimeList = require("../models/CrimeList");
+const Crime = require("../models/Crime");
+
 async function getCrimeData(lat, long) {
     const url = `https://data.police.uk/api/crimes-street/all-crime?lat=${lat}&lng=${long}`;
     const response = await axios.get(url);
 
     // returns the crimes in the most recent month
+    const existingCrimeList = await CrimeList.findOne({latitude: lat});
+    if (existingCrimeList) {
+        console.log("Existing crime list found, ID:", existingCrimeList.crimeListID)
+        return;
+    } else {
+        await processCrimeData(lat, long, response.data);
+    }
 
-    console.log(response.data); // can be modelled later.
-    console.log(response.data.length); // e.g. 294
-
-    /* data to be modelled:
-    response.data - a large JSON array.
-
-    TODO when I wake up:
-    - location JSON - can be split to latitude and longitude
-    - month (2023-01) - can be split up
-    - Can count the number of crimes by taking length:
-    data.length = 294 for LU1 5PP
-    - Maybe categorise / break down for paid users
-    - easy enough to implement using a set and a counter
-    - Calculate the number somewhere else or in another function
-    */
-
-    return await processCrimeData(response.data);
+    return;
 }
 
-async function processCrimeData(rawCrimeData) {
+async function processCrimeData(lat, long, rawCrimeData) {
     // model the Crime and categorise it too for paid / admins.
+    // lat long to differentiate crime lists
+
+    const newCrimeList = new CrimeList({
+        crimeListID: 1,
+        latitude: lat,
+        longitude: long,
+        count: rawCrimeData.length,
+        date: rawCrimeData[0].month,
+    });
+
+    for (const data of rawCrimeData) {
+
+        const existingCrime = await Crime.findOne({crimeID: data.id});
+        if (existingCrime) {
+            continue;
+        }
+
+        //console.log(data);
+        const newCrime = await Crime.create({
+            crimeID: data.id,
+            latitude: data.location.latitude,
+            longitude: data.location.longitude,
+            crime_category: data.category,
+            crime_date: data.month,
+        });
+
+        if (data.outcome_status) {
+            newCrime.outcome_category = data.outcome_status.category;
+            newCrime.outcome_date = data.outcome_status.month;
+        }
+
+        newCrimeList.crimes.push(newCrime);
+    }
+
+    await newCrimeList.save();
+
 }
 
 module.exports = {
