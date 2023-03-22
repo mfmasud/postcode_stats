@@ -71,6 +71,18 @@ async function saveAtcoList() {
   }
 }
 
+async function regionSearch(location) {
+  // Function which tries to match locations/regions to the ones in the ATCO list.
+  // This is troublesome, as region names are not standard - England is split up:
+  // "Aberdeen" -> "639: {location: Aberdeen, region: Scotland" -> 639
+
+  // For now, only exact searches will match: -> "Luton" -> "Luton / South East (029)"
+  // to add to the complexity, Luton's region is returned as "East of England" by the postcodes API.
+  // And using OS Names API, the "REGION" is "Eastern".
+  // so I need to turn "Eastern" or "East of England" into "South East" somehow ...
+
+}
+
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
 // example api call: https://naptan.api.dft.gov.uk/v1/access-nodes?dataFormat=csv&atcoAreaCodes=420
 // 420 is Warwickshire / West Midlands.

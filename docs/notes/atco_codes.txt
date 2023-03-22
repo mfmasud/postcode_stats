@@ -4,6 +4,15 @@ Shows Local Authority names and respective Atco Area codes.
 ATCO code can be used for data here: https://naptan.api.dft.gov.uk/swagger/index.html
 Then data can be edited / formatted to get lat long and other information, which can be used by the API. Significant server side processing and data
 
+Region: East Of England - Subdivision: Luton
+Region: North West - Subdivision: Greater Manchester (place name: Oldham [OL9 9AP])
+
+Region:
+https://en.wikipedia.org/wiki/Regions_of_England
+
+Subdivision:
+https://en.wikipedia.org/wiki/Subdivisions_of_England
+
 <select class="govuk-select" id="localAuthorityName" name="localAuthorityName" aria-describedby=local-authority-name>
             <option value="" disabled selected></option>
                     <option value="Aberdeenshire / Scotland (630)"> Aberdeenshire / Scotland (630)</option>
