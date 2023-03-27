@@ -1,0 +1,40 @@
+Scottish ATCO names can be derived from the local government councils of scotland:
+
+From wikipedia: https://en.wikipedia.org/wiki/Local_government_in_Scotland
+
+<div class="div-col" style="column-width: 500em;">
+<ol>
+<li><a href="/wiki/Inverclyde" title="Inverclyde">Inverclyde</a></li>
+<li><a href="/wiki/Renfrewshire" title="Renfrewshire">Renfrewshire</a></li>
+<li><a href="/wiki/West_Dunbartonshire" title="West Dunbartonshire">West Dunbartonshire</a></li>
+<li><a href="/wiki/East_Dunbartonshire" title="East Dunbartonshire">East Dunbartonshire</a></li>
+<li><a href="/wiki/Glasgow" title="Glasgow">Glasgow</a></li>
+<li><a href="/wiki/East_Renfrewshire" title="East Renfrewshire">East Renfrewshire</a></li>
+<li><a href="/wiki/North_Lanarkshire" title="North Lanarkshire">North Lanarkshire</a></li>
+<li><a href="/wiki/Falkirk_(council_area)" title="Falkirk (council area)">Falkirk</a></li>
+<li><a href="/wiki/West_Lothian" title="West Lothian">West Lothian</a></li>
+<li><a href="/wiki/Edinburgh" title="Edinburgh">Edinburgh</a></li>
+<li><a href="/wiki/Midlothian" title="Midlothian">Midlothian</a></li>
+<li><a href="/wiki/East_Lothian" title="East Lothian">East Lothian</a></li>
+<li><a href="/wiki/Clackmannanshire" title="Clackmannanshire">Clackmannanshire</a></li>
+<li><a href="/wiki/Fife" title="Fife">Fife</a></li>
+<li><a href="/wiki/Dundee" title="Dundee">Dundee</a></li>
+<li><a href="/wiki/Angus,_Scotland" title="Angus, Scotland">Angus</a></li>
+<li><a href="/wiki/Aberdeenshire" title="Aberdeenshire">Aberdeenshire</a></li>
+<li><a href="/wiki/Aberdeen" title="Aberdeen">Aberdeen</a></li>
+<li><a href="/wiki/Moray" title="Moray">Moray</a></li>
+<li><a href="/wiki/Highland_(council_area)" title="Highland (council area)">Highland</a></li>
+<li><a href="/wiki/Comhairle_nan_Eilean_Siar" title="Comhairle nan Eilean Siar">Na h-Eileanan Siar</a></li>
+<li><a href="/wiki/Argyll_and_Bute" title="Argyll and Bute">Argyll and Bute</a></li>
+<li><a href="/wiki/Perth_and_Kinross" title="Perth and Kinross">Perth and Kinross</a></li>
+<li><a href="/wiki/Stirling_(council_area)" title="Stirling (council area)">Stirling</a></li>
+<li><a href="/wiki/North_Ayrshire" title="North Ayrshire">North Ayrshire</a></li>
+<li><a href="/wiki/East_Ayrshire" title="East Ayrshire">East Ayrshire</a></li>
+<li><a href="/wiki/South_Ayrshire" title="South Ayrshire">South Ayrshire</a></li>
+<li><a href="/wiki/Dumfries_and_Galloway" title="Dumfries and Galloway">Dumfries and Galloway</a></li>
+<li><a href="/wiki/South_Lanarkshire" title="South Lanarkshire">South Lanarkshire</a></li>
+<li><a href="/wiki/Scottish_Borders" title="Scottish Borders">Scottish Borders</a></li>
+<li><a href="/wiki/Orkney_Islands_Council" title="Orkney Islands Council">Orkney</a></li>
+<li><a href="/wiki/Shetland_Islands_Council" title="Shetland Islands Council">Shetland</a></li>
+</ol>
+</div>

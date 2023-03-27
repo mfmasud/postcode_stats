@@ -13,6 +13,8 @@ https://en.wikipedia.org/wiki/Regions_of_England
 Subdivision:
 https://en.wikipedia.org/wiki/Subdivisions_of_England
 
+The reason for this discrepancy is it uses legacy "GORs" or "SSRs" - Government office regions and standard statistical regions.
+
 <select class="govuk-select" id="localAuthorityName" name="localAuthorityName" aria-describedby=local-authority-name>
             <option value="" disabled selected></option>
                     <option value="Aberdeenshire / Scotland (630)"> Aberdeenshire / Scotland (630)</option>

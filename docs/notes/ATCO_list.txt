@@ -1,0 +1,147 @@
+630 { location: 'Aberdeenshire', region: 'Scotland' }
+639 { location: 'Aberdeen', region: 'Scotland' }
+649 { location: 'Angus', region: 'Scotland' }
+607 { location: 'Argyll & Bute', region: 'Scotland' }
+018 { location: 'Bath & North East Somerset', region: 'South West' }
+020 { location: 'Bedford', region: 'South East' }
+258 { location: 'Blackburn with Darwen', region: 'North West' }
+259 { location: 'Blackpool', region: 'North West' }
+532 { location: 'Blaenau Gwent', region: 'Wales' }
+129 { location: 'Bournemouth', region: 'South West' }
+038 { location: 'Bracknell Forest', region: 'South East' }
+551 { location: 'Bridgend', region: 'Wales' }
+149 { location: 'Brighton and Hove', region: 'South East' }
+010 { location: 'Bristol', region: 'South West' }
+040 { location: 'Buckinghamshire', region: 'South East' }
+554 { location: 'Caerphilly', region: 'Wales' }
+050 { location: 'Cambridgeshire', region: 'East Anglia' }
+571 { location: 'Cardiff', region: 'Wales' }
+522 { location: 'Carmarthenshire', region: 'Wales' }
+021 { location: 'Central Bedfordshire', region: 'South East' }
+523 { location: 'Ceredigion', region: 'Wales' }
+060 { location: 'Cheshire East', region: 'North West' }
+061 { location: 'Cheshire West & Chester', region: 'North West' }
+668 { location: 'Clackmannanshire', region: 'Scotland' }
+513 { location: 'Conwy', region: 'Wales' }
+080 { location: 'Cornwall', region: 'South West' }
+090 { location: 'Cumbria', region: 'North West' }
+076 { location: 'Darlington', region: 'North East' }
+511 { location: 'Denbighshire', region: 'Wales' }
+109 { location: 'Derby', region: 'East Midlands' }
+100 { location: 'Derbyshire', region: 'East Midlands' }
+110 { location: 'Devon', region: 'South West' }
+120 { location: 'Dorset', region: 'South West' }
+680 { location: 'Dumfries & Galloway', region: 'Scotland' }
+640 { location: 'Dundee', region: 'Scotland' }
+130 { location: 'Durham', region: 'North East' }
+618 { location: 'East Ayrshire', region: 'Scotland' }
+611 { location: 'East Dunbartonshire', region: 'Scotland' }
+627 { location: 'East Lothian', region: 'Scotland' }
+612 { location: 'East Renfrewshire', region: 'Scotland' }
+220 { location: 'East Riding of Yorkshire', region: 'Yorkshire' }
+140 { location: 'East Sussex', region: 'South East' }
+620 { location: 'Edinburgh', region: 'Scotland' }
+150 { location: 'Essex', region: 'South East' }
+669 { location: 'Falkirk', region: 'Scotland' }
+650 { location: 'Fife', region: 'Scotland' }
+512 { location: 'Flintshire', region: 'Wales' }
+609 { location: 'Glasgow', region: 'Scotland' }
+160 { location: 'Gloucestershire', region: 'South West' }
+490 { location: 'Greater London', region: 'London' }
+180 { location: 'Greater Manchester', region: 'North West' }
+540 { location: 'Gwynedd', region: 'Wales' }
+068 { location: 'Halton', region: 'North West' }
+190 { location: 'Hampshire', region: 'South West' }
+075 { location: 'Hartlepool', region: 'North East' }
+209 { location: 'Herefordshire', region: 'West Midlands' }
+210 { location: 'Hertfordshire', region: 'South East' }
+670 { location: 'Highland', region: 'Scotland' }
+613 { location: 'Inverclyde', region: 'Scotland' }
+541 { location: 'Isle of Anglesey', region: 'Wales' }
+230 { location: 'Isle of Wight', region: 'South West' }
+240 { location: 'Kent', region: 'South East' }
+229 { location: 'Kingston upon Hull', region: 'Yorkshire' }
+250 { location: 'Lancashire', region: 'North West' }
+269 { location: 'Leicester', region: 'East Midlands' }
+260 { location: 'Leicestershire', region: 'East Midlands' }
+270 { location: 'Lincolnshire', region: 'East Midlands' }
+029 { location: 'Luton', region: 'South East' }
+249 { location: 'Medway', region: 'South East' }
+280 { location: 'Merseyside', region: 'North West' }
+553 { location: 'Merthyr Tydfil', region: 'Wales' }
+079 { location: 'Middlesbrough', region: 'North East' }
+628 { location: 'Midlothian', region: 'Scotland' }
+049 { location: 'Milton Keynes', region: 'South East' }
+533 { location: 'Monmouthshire', region: 'Wales' }
+638 { location: 'Moray', region: 'Scotland' }
+920 { location: 'National - National Air', region: 'Great Britain' }
+930 { location: 'National - National Ferry', region: 'Great Britain' }
+910 { location: 'National - National Rail', region: 'Great Britain' }
+940 { location: 'National - National Tram', region: 'Great Britain' }
+582 { location: 'Neath Port Talbot', region: 'Wales' }
+531 { location: 'Newport', region: 'Wales' }
+290 { location: 'Norfolk', region: 'East Anglia' }
+617 { location: 'North Ayrshire', region: 'Scotland' }
+228 { location: 'North East Lincolnshire', region: 'East Midlands' }
+616 { location: 'North Lanarkshire', region: 'Scotland' }
+227 { location: 'North Lincolnshire', region: 'East Midlands' }
+019 { location: 'North Somerset', region: 'South West' }
+320 { location: 'North Yorkshire', region: 'Yorkshire' }
+300 { location: 'Northamptonshire', region: 'East Midlands' }
+310 { location: 'Northumberland', region: 'North East' }
+339 { location: 'Nottingham', region: 'East Midlands' }
+330 { location: 'Nottinghamshire', region: 'East Midlands' }
+602 { location: 'Orkney Islands', region: 'Scotland' }
+340 { location: 'Oxfordshire', region: 'South East' }
+521 { location: 'Pembrokeshire', region: 'Wales' }
+648 { location: 'Perth & Kinross', region: 'Scotland' }
+059 { location: 'Peterborough', region: 'East Midlands' }
+118 { location: 'Plymouth', region: 'South West' }
+128 { location: 'Poole', region: 'South West' }
+199 { location: 'Portsmouth', region: 'South West' }
+561 { location: 'Powys', region: 'Wales' }
+039 { location: 'Reading', region: 'South East' }
+078 { location: 'Redcar & Cleveland', region: 'North East' }
+614 { location: 'Renfrewshire', region: 'Scotland' }
+552 { location: 'Rhondda Cynon Taff', region: 'Wales' }
+268 { location: 'Rutland', region: 'East Midlands' }
+690 { location: 'Scottish Borders', region: 'Scotland' }
+603 { location: 'Shetland Islands', region: 'Scotland' }
+350 { location: 'Shropshire', region: 'West Midlands' }
+037 { location: 'Slough', region: 'South East' }
+360 { location: 'Somerset', region: 'South West' }
+619 { location: 'South Ayrshire', region: 'Scotland' }
+017 { location: 'South Gloucestershire', region: 'South West' }
+615 { location: 'South Lanarkshire', region: 'Scotland' }
+370 { location: 'South Yorkshire', region: 'Yorkshire' }
+198 { location: 'Southampton', region: 'South West' }
+158 { location: 'Southend-on-Sea', region: 'South East' }
+380 { location: 'Staffordshire', region: 'West Midlands' }
+660 { location: 'Stirling', region: 'Scotland' }
+077 { location: 'Stockton-on-Tees', region: 'North East' }
+389 { location: 'Stoke-on-Trent', region: 'West Midlands' }
+390 { location: 'Suffolk', region: 'East Anglia' }
+400 { location: 'Surrey', region: 'South East' }
+581 { location: 'Swansea', region: 'Wales' }
+468 { location: 'Swindon', region: 'South West' }
+359 { location: 'Telford & Wrekin', region: 'West Midlands' }
+159 { location: 'Thurrock', region: 'South East' }
+119 { location: 'Torbay', region: 'South West' }
+534 { location: 'Torfaen', region: 'Wales' }
+410 { location: 'Tyne & Wear', region: 'North East' }
+572 { location: 'Vale of Glamorgan', region: 'Wales' }
+069 { location: 'Warrington', region: 'North West' }
+420 { location: 'Warwickshire', region: 'West Midlands' }
+030 { location: 'West Berkshire', region: 'South East' }
+608 { location: 'West Dunbartonshire', region: 'Scotland' }
+629 { location: 'West Lothian', region: 'Scotland' }
+430 { location: 'West Midlands', region: 'West Midlands' }
+440 { location: 'West Sussex', region: 'South East' }
+450 { location: 'West Yorkshire', region: 'Yorkshire' }
+601 { location: 'Western Isles', region: 'Scotland' }
+460 { location: 'Wiltshire', region: 'South West' }
+036 { location: 'Windsor & Maidenhead', region: 'South East' }
+035 { location: 'Wokingham', region: 'South East' }
+200 { location: 'Worcestershire', region: 'West Midlands' }
+514 { location: 'Wrexham', region: 'Wales' }
+329 { location: 'York', region: 'Yorkshire' }

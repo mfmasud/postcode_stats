@@ -1,0 +1,67 @@
+The ATCO dropdown list looks to also use the unitary authorities of England.
+
+Here is a list from https://www.ons.gov.uk/aboutus/transparencyandgovernance/freedomofinformationfoi/alistofunitaryauthoritiesinenglandwithageographicalmap
+
+<table class="table">
+<colgroup><col><col></colgroup>
+<tbody><tr class="table__header-row table__nowrap"><th scope="col" class="align-left">Name</th><th scope="col">Code</th></tr>
+<tr><td class="align-left">Bath and North East Somerset</td><td>E06000022</td></tr>
+<tr><td class="align-left">Bedford</td><td>E06000055</td></tr>
+<tr><td class="align-left">Blackburn with Darwen</td><td>E06000008</td></tr>
+<tr><td class="align-left">Blackpool</td><td>E06000009</td></tr>
+<tr><td class="align-left">Bournemouth, Christchurch and Poole</td><td>E06000058</td></tr>
+<tr><td class="align-left">Bracknell Forest</td><td>E06000036</td></tr>
+<tr><td class="align-left">Brighton and Hove</td><td>E06000043</td></tr>
+<tr><td class="align-left">Bristol, City of</td><td>E06000023</td></tr>
+<tr><td class="align-left">Buckinghamshire</td><td>E06000060</td></tr>
+<tr><td class="align-left">Central Bedfordshire</td><td>E06000056</td></tr>
+<tr><td class="align-left">Cheshire East</td><td>E06000049</td></tr>
+<tr><td class="align-left">Cheshire West and Chester</td><td>E06000050</td></tr>
+<tr><td class="align-left">Cornwall</td><td>E06000052</td></tr>
+<tr><td class="align-left">County Durham</td><td>E06000047</td></tr>
+<tr><td class="align-left">Darlington</td><td>E06000005</td></tr>
+<tr><td class="align-left">Derby</td><td>E06000015</td></tr>
+<tr><td class="align-left">Dorset</td><td>E06000059</td></tr>
+<tr><td class="align-left">East Riding of Yorkshire</td><td>E06000011</td></tr>
+<tr><td class="align-left">Halton</td><td>E06000006</td></tr>
+<tr><td class="align-left">Hartlepool</td><td>E06000001</td></tr>
+<tr><td class="align-left">Herefordshire, County of</td><td>E06000019</td></tr>
+<tr><td class="align-left">Isle of Wight</td><td>E06000046</td></tr>
+<tr><td class="align-left">Isles of Scilly</td><td>E06000053</td></tr>
+<tr><td class="align-left">Kingston upon Hull, City of</td><td>E06000010</td></tr>
+<tr><td class="align-left">Leicester</td><td>E06000016</td></tr>
+<tr><td class="align-left">Luton</td><td>E06000032</td></tr>
+<tr><td class="align-left">Medway</td><td>E06000035</td></tr>
+<tr><td class="align-left">Middlesbrough</td><td>E06000002</td></tr>
+<tr><td class="align-left">Milton Keynes</td><td>E06000042</td></tr>
+<tr><td class="align-left">North East Lincolnshire</td><td>E06000012</td></tr>
+<tr><td class="align-left">North Lincolnshire</td><td>E06000013</td></tr>
+<tr><td class="align-left">North Northamptonshire</td><td>E06000061</td></tr>
+<tr><td class="align-left">North Somerset</td><td>E06000024</td></tr>
+<tr><td class="align-left">Northumberland</td><td>E06000057</td></tr>
+<tr><td class="align-left">Nottingham</td><td>E06000018</td></tr>
+<tr><td class="align-left">Peterborough</td><td>E06000031</td></tr>
+<tr><td class="align-left">Plymouth</td><td>E06000026</td></tr>
+<tr><td class="align-left">Portsmouth</td><td>E06000044</td></tr>
+<tr><td class="align-left">Reading</td><td>E06000038</td></tr>
+<tr><td class="align-left">Redcar and Cleveland</td><td>E06000003</td></tr>
+<tr><td class="align-left">Rutland</td><td>E06000017</td></tr>
+<tr><td class="align-left">Shropshire</td><td>E06000051</td></tr>
+<tr><td class="align-left">Slough</td><td>E06000039</td></tr>
+<tr><td class="align-left">South Gloucestershire</td><td>E06000025</td></tr>
+<tr><td class="align-left">Southampton</td><td>E06000045</td></tr>
+<tr><td class="align-left">Southend-on-Sea</td><td>E06000033</td></tr>
+<tr><td class="align-left">Stockton-on-Tees</td><td>E06000004</td></tr>
+<tr><td class="align-left">Stoke-on-Trent</td><td>E06000021</td></tr>
+<tr><td class="align-left">Swindon</td><td>E06000030</td></tr>
+<tr><td class="align-left">Telford and Wrekin</td><td>E06000020</td></tr>
+<tr><td class="align-left">Thurrock</td><td>E06000034</td></tr>
+<tr><td class="align-left">Torbay</td><td>E06000027</td></tr>
+<tr><td class="align-left">Warrington</td><td>E06000007</td></tr>
+<tr><td class="align-left">West Berkshire</td><td>E06000037</td></tr>
+<tr><td class="align-left">West Northamptonshire</td><td>E06000062</td></tr>
+<tr><td class="align-left">Wiltshire</td><td>E06000054</td></tr>
+<tr><td class="align-left">Windsor and Maidenhead</td><td>E06000040</td></tr>
+<tr><td class="align-left">Wokingham</td><td>E06000041</td></tr>
+<tr><td class="align-left">York</td><td>E06000014</td></tr>
+</tbody></table>
