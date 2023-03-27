@@ -13,10 +13,9 @@ const csvtojson = require("csvtojson");
 const Atco = require("../models/Atco");
 const BusStop = require("../models/BusStop")
 
-// URL has a dropdown with all the local authorities and ATCO codes
-const url = "https://beta-naptan.dft.gov.uk/download/la";
 
 async function getAtcoCodes() {
+  const url = "https://beta-naptan.dft.gov.uk/download/la";
   const response = await axios.get(url);
   const dom = new JSDOM(response.data);
 
@@ -41,9 +40,9 @@ async function processAtco(data) {
   // example string: Aberdeenshire / Scotland (630)
   // result: {630: {location: Aberdeenshire, region: Scotland}}
 
-  const location = data.split("/")[0];
-  const region = data.split("/")[1].split("(")[0];
-  const atco = data.split("/")[1].split("(")[1].split(")")[0];
+  const location = data.split(" / ")[0];
+  const region = data.split(" / ")[1].split(" (")[0];
+  const atco = data.split(" / ")[1].split(" (")[1].split(")")[0];
 
   const processedData = {};
   processedData[atco] = { location, region };
@@ -61,6 +60,10 @@ async function processAtco(data) {
     location: location,
     busstops: []
   });
+}
+
+async function regionCheck(regionName) {
+  // switches region names from ATCO to the ones from those used by Naptan.
 }
 
 async function saveAtcoList() {
