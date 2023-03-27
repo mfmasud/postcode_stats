@@ -1,0 +1,49 @@
+630 { location: 'Aberdeenshire', region: 'Scotland' }
+639 { location: 'Aberdeen', region: 'Scotland' }
+649 { location: 'Angus', region: 'Scotland' }
+607 { location: 'Argyll & Bute', region: 'Scotland' }
+668 { location: 'Clackmannanshire', region: 'Scotland' }
+680 { location: 'Dumfries & Galloway', region: 'Scotland' }
+640 { location: 'Dundee', region: 'Scotland' }
+618 { location: 'East Ayrshire', region: 'Scotland' }
+611 { location: 'East Dunbartonshire', region: 'Scotland' }
+627 { location: 'East Lothian', region: 'Scotland' }
+612 { location: 'East Renfrewshire', region: 'Scotland' }
+620 { location: 'Edinburgh', region: 'Scotland' }
+669 { location: 'Falkirk', region: 'Scotland' }
+650 { location: 'Fife', region: 'Scotland' }
+609 { location: 'Glasgow', region: 'Scotland' }
+670 { location: 'Highland', region: 'Scotland' }
+613 { location: 'Inverclyde', region: 'Scotland' }
+628 { location: 'Midlothian', region: 'Scotland' }
+638 { location: 'Moray', region: 'Scotland' }
+617 { location: 'North Ayrshire', region: 'Scotland' }
+616 { location: 'North Lanarkshire', region: 'Scotland' }
+602 { location: 'Orkney Islands', region: 'Scotland' }
+648 { location: 'Perth & Kinross', region: 'Scotland' }
+614 { location: 'Renfrewshire', region: 'Scotland' }
+690 { location: 'Scottish Borders', region: 'Scotland' }
+603 { location: 'Shetland Islands', region: 'Scotland' }
+619 { location: 'South Ayrshire', region: 'Scotland' }
+615 { location: 'South Lanarkshire', region: 'Scotland' }
+660 { location: 'Stirling', region: 'Scotland' }
+608 { location: 'West Dunbartonshire', region: 'Scotland' }
+629 { location: 'West Lothian', region: 'Scotland' }
+601 { location: 'Western Isles', region: 'Scotland' }
+
+From wikipedia:
+['Aberdeen', 'Aberdeenshire', 'Angus', 'Argyll and Bute',
+ 'Clackmannanshire', 'Dumfries and Galloway', 'Dundee', 'East Ayrshire',
+ 'East Dunbartonshire', 'East Lothian', 'East Renfrewshire',
+ 'Edinburgh', 'Falkirk', 'Fife', 'Glasgow', 'Highland', 'Inverclyde',
+ 'Midlothian', 'Moray', 'Na h-Eileanan Siar', 'North Ayrshire',
+ 'North Lanarkshire', 'Orkney', 'Perth and Kinross', 'Renfrewshire',
+ 'Scottish Borders', 'Shetland', 'South Ayrshire', 'South Lanarkshire',
+ 'Stirling', 'West Dunbartonshire', 'West Lothian']
+
+ Differences: 
+"Orkney" - "Orkney Islands"
+"Shetland" - "Shetland Islands"
+"Na h-Eileanan Siar" - "Western Islands";
+"Argyll and Bute" - "Argyll & Bute";
+"Dumfries and Galloway" - "Dumfries & Galloway";
