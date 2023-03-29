@@ -25,7 +25,6 @@ const postcodeSchema = new mongoose.Schema({
   },
   region: {
     type: String,
-    required: true,
   },
   parliamentary_constituency: {
     type: String,
