@@ -124,7 +124,7 @@ async function resetDataDB() {
         // Delete all documents in each collection
         //await Atco.deleteMany();
         //await BusStop.deleteMany();
-        //await Postcode.deleteMany();
+        await Postcode.deleteMany();
         // await Nptg.deleteMany();
         await Search.deleteMany();
         await Crime.deleteMany();

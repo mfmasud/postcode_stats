@@ -8,36 +8,17 @@ const busStopSchema = new mongoose.Schema({
     ATCO_short: {
       type: String,
     },
-    NaptanCode: {
-      type: String,
-      required: true,
-    },
-    NptgLocalityCode: {
-      type: String,
-      required: true,
-    },
     CommonName: {
       type: String,
-      required: true,
     },
     Street: {
-      type: String,
-      required: true,
-    },
-    LocalityName: {
-      type: String,
-      required: true,
-    },
-    ParentLocalityName: {
       type: String,
     },
     Longitude: {
       type: String,
-      required: true,
     },
     Latitude: {
       type: String,
-      required: true,
     },
     Northing: {
       type: String,
@@ -45,11 +26,6 @@ const busStopSchema = new mongoose.Schema({
     },
     Easting: {
       type: String,
-      required: true,
-    },
-    Status: {
-      type: String,
-      enum: ["active", "inactive"],
       required: true,
     },
   });

@@ -34,6 +34,14 @@ async function getAtcoCodes() {
     return codes;
 }
 
+async function saveAtcoList() {
+    // run on db initialisation to get a list of searchable ATCOs.
+    const codeList = await getAtcoCodes();
+    for (code of codeList) {
+        await processAtco(code);
+    }
+}
+
 // process atco codes as atco:{location, region}
 async function processAtco(data) {
     // example string: Aberdeenshire / Scotland (630)
@@ -63,36 +71,15 @@ async function processAtco(data) {
     //console.log(`ATCO ${newAtco.code} created in database`);
 }
 
-async function regionCheck(regionName) {
-    // switches region names from ATCO to the ones from those used by Naptan.
-}
-
-async function saveAtcoList() {
-    // run on db initialisation to get a list of searchable ATCOs.
-    const codeList = await getAtcoCodes();
-    for (code of codeList) {
-        await processAtco(code);
-    }
-}
-
-async function regionSearch(location) {
-    // Function which tries to match locations/regions to the ones in the ATCO list.
-    // This is troublesome, as region names are not standard - England is split up:
-    // "Aberdeen" -> "639: {location: Aberdeen, region: Scotland" -> 639
-    // For now, only exact searches will match: -> "Luton" -> "Luton / South East (029)"
-    // to add to the complexity, Luton's region is returned as "East of England" by the postcodes API.
-    // And using OS Names API, the "REGION" is "Eastern".
-    // so I need to turn "Eastern" or "East of England" into "South East" somehow ...
-}
-
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
 // example api call: https://naptan.api.dft.gov.uk/v1/access-nodes?dataFormat=csv&atcoAreaCodes=420
 // 420 is Warwickshire / West Midlands.
 
-async function queryAtco(format = "csv", code) {
+async function queryAtco(code) {
     // backend function to query the API for bus stops
+    // run when linking ATCOs to searches (to find bus stops).
     // basic validation - not meant to be complete
-    format = format.toString();
+    format = "csv";
     code = code.toString();
 
     const api = "https://naptan.api.dft.gov.uk/v1/access-nodes";
@@ -126,6 +113,7 @@ async function queryAtco(format = "csv", code) {
 }
 
 async function processCSV(code, rawdata) {
+    // this can take a while, should be run on startup of the server so users use cached mongodb models instead
     const associatedAtco = await Atco.findOne({ code: code });
 
     // parse csv using csvtojson
@@ -133,28 +121,25 @@ async function processCSV(code, rawdata) {
     //console.log(data);
     // data is an array of objects e.g. dictionary of column:value pairs
 
-    // filter out bus stops
-    const busstops = data.filter((row) => row.StopType === "BCT");
+    // filter out data to just bus stops
+    const busstops = data.filter((row) => row.StopType === "BCT" && row.Status === "active" && row.Northing && row.Easting);
+    // can also filter to city level at this stage, by finding the right column. "430" has 15,000 values to process ...
 
-    // filter out bus stops that are not active
-    const active = busstops.filter((row) => row.Status === "active");
+    // BNG can be converted to lat long if needed to simplify calculations.
 
     // filter through columns - can remove NaptanCode later if it remains unused.
     const columns = [
         "ATCOCode",
-        "NaptanCode",
-        "NptgLocalityCode",
         "CommonName",
         "Street",
-        "LocalityName",
-        "ParentLocalityName",
         "Longitude",
         "Latitude",
-        "Status",
+        "Northing",
+        "Easting",
     ];
 
-    const filtered = active.map((row) => {
-        // for each row in the active busstops array
+    const filtered = busstops.map((row) => {
+        // for each row in the filtered busstops array
         const filteredRow = {}; // create empty object to store new filtered records in
         columns.forEach((column) => {
             // for each column in columns
@@ -163,27 +148,24 @@ async function processCSV(code, rawdata) {
         return filteredRow; // add back to filtered array
     });
 
-    // first 4 records as test
-    //console.log(filtered.slice(0, 4));
-    //console.log(filtered);
-
     // store each result in BusStop collection
     for (const row of filtered) {
         //console.log(row);
+
+        const existingBusStop = await BusStop.findOne({ATCO_long: row.ATCOCode});
+        if (existingBusStop) {
+            continue;
+        }
+
         const newBusStop = new BusStop({
             ATCO_long: row.ATCOCode,
             ATCO_short: code,
-            NaptanCode: row.NaptanCode,
-            NptgLocalityCode: row.NptgLocalityCode,
             CommonName: row.CommonName,
             Street: row.Street,
-            LocalityName: row.LocalityName,
-            ParentLocalityName: row.ParentLocalityName,
             Longitude: row.Longitude,
             Latitude: row.Latitude,
             Northing: row.Northing,
             Easting: row.Easting,
-            Status: row.Status,
         });
 
         associatedAtco.busstops.push(newBusStop);
