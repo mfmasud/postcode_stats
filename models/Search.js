@@ -38,8 +38,12 @@ const searchSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Crime",
-        }
+        },
     ],
+    linkedATCO: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Atco",
+    },
 });
 
 // query bus stops - selected bus stops matching a query e.g. within radius of lat and long.
