@@ -1,11 +1,10 @@
 const axios = require("axios");
 const JSDOM = require("jsdom").JSDOM;
+const mongoose = require("mongoose");
 
 const Atco = require("../models/Atco");
 
 async function getScotlandLocations() {
-    // should only be run once, to add scottish regions and alternative names for the locations.
-
     const url = "https://en.wikipedia.org/wiki/Local_government_in_Scotland";
     const response = await axios.get(url);
     const dom = new JSDOM(response.data);
@@ -22,41 +21,82 @@ async function getScotlandLocations() {
         if (text === "Orkney") {
             const altname = "Orkney Islands";
             const altAtco = await Atco.findOne({ location: altname });
-            await altAtco.other_names.insert(text);
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    { $addToSet: { other_names: { $each: [text, "Orkney"] } } }
+                );
+            }
             text = altname;
         } else if (text === "Shetland") {
             const altname = "Shetland Islands";
             const altAtco = await Atco.findOne({ location: altname });
-            await altAtco.other_names.insert(text);
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: { $each: [text, "Shetland"] },
+                        },
+                    }
+                );
+            }
             text = altname;
         } else if (text === "Na h-Eileanan Siar") {
             const altname = "Western Isles";
             const altAtco = await Atco.findOne({ location: altname });
-            await altAtco.other_names.insert(text); // add the alternative name to the "other_names" array.
-            await altAtco.other_names.insert("Western Islands");
-            await altAtco.other_names.insert("Outer Hebrides");
-            await altAtco.other_names.insert("Outer Hebrides");
-            await altAtco.other_names.insert("Comhairle nan Eilean Siar"); // more can be added later or as part of another function which finds and adds alt names.
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: {
+                                $each: [
+                                    text,
+                                    "Western Islands",
+                                    "Outer Hebrides",
+                                    "Comhairle nan Eilean Siar",
+                                ],
+                            },
+                        },
+                    }
+                );
+            }
             text = altname;
         } else if (text === "Argyll and Bute") {
             const altname = "Argyll & Bute";
             const altAtco = await Atco.findOne({ location: altname });
-            await altAtco.other_names.insert(text);
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: { $each: [text, "Argyll and Bute"] },
+                        },
+                    }
+                );
+            }
             text = altname;
         } else if (text === "Dumfries and Galloway") {
             const altname = "Dumfries & Galloway";
             const altAtco = await Atco.findOne({ location: altname });
-            await altAtco.other_names.insert(text);
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: {
+                                $each: [text, "Dumfries and Galloway"],
+                            },
+                        },
+                    }
+                );
+            }
             text = altname;
         }
 
         names.push(text);
     }
-
-    //console.log(names);
-    // Inverclyde to Shetland - all 32
-    // Orkney and Shetland needs to have "Islands" for the list.
-    // In the ATCO list, "Western Islands" refers to Na h-Eileanan Siar
 
     return names;
 }
