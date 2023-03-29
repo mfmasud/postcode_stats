@@ -15,3 +15,21 @@ try {
 } catch (error) {
     console.error(error);
 }
+
+/*
+try {
+    getWalesLocations().then( (locations) => {
+        console.log(locations)
+    });
+} catch (error) {
+    console.error(error);
+}
+
+try {
+    getNILocations().then( (locations) => {
+        console.log(locations)
+    });
+} catch (error) {
+    console.error(error);
+}
+*/

@@ -1,23 +1,28 @@
 const mongoose = require("mongoose");
 
 const atcoSchema = new mongoose.Schema({
-  code: {
-    type: String,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  region: {
-    type: String,
-    required: true,
-  },
-  busstops: [
-    {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "BusStop",
+    code: {
+        type: String,
+        required: true,
     },
+    location: {
+        type: String,
+        required: true,
+    },
+    region: {
+        type: String,
+        required: true,
+    },
+    busstops: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "BusStop",
+        },
+    ],
+    other_names: [
+        {
+            type: String,
+        },
     ],
 });
 
