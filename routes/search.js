@@ -23,7 +23,7 @@ const {
 
 router.post("/", auth, bodyParser(), searchArea); // search for details of a lat and long area
 router.get("/:postcode", auth, searchPostcode); // searches by lat and long internally
-router.get("/random", auth, searchRandom);
+router.get("/random", auth, searchRandom); // admins only - for testing
 
 async function searchArea(cnx) {
     // allows anyone to search via a lat and long in the body of the request
@@ -67,6 +67,11 @@ async function searchPostcode(cnx) {
     if (!postcode) {
         cnx.status = 400;
         cnx.body = "Please provide a postcode.";
+        return;
+    } else if (postcode === "random") {
+        // temporary workaround
+        // in the future, postcode should be from the body instead of a path param
+        await searchRandom(cnx);
         return;
     }
 
@@ -113,8 +118,8 @@ async function searchPostcode(cnx) {
 
             const SearchModel = await Search.findOne({
                 latitude: dbPostcode.latitude,
-            });
-            const body = await SearchModel.populate("Postcode");
+            }).populate(["Postcode", "queryBusStops"]);
+            const body = SearchModel;
             cnx.status = 200;
             cnx.body = body;
         } else {
@@ -127,8 +132,8 @@ async function searchPostcode(cnx) {
     }
 }
 
-async function searchRandom() {
+async function searchRandom(cnx) {
     //admins only
-    return;
+    cnx.status = 404;
 }
 module.exports = router;

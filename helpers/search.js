@@ -3,6 +3,7 @@ const BusStop = require("../models/BusStop");
 const Nptg = require("../models/Nptg");
 const Atco = require("../models/Atco");
 
+const {queryAtco} = require("../helpers/AtcoCodes");
 const { getCrimeData } = require("../helpers/crime"); // can be switched to a model later
 
 const axios = require("axios");
@@ -12,24 +13,19 @@ async function getRelatedStops(SearchModel, radius = 1000) {
     // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
     const { longitude, latitude, Northing, Easting } = SearchModel;
 
-    /*
-    console.log(longitude, postcode.longitude);
-    console.log(latitude, postcode.latitude);
-    console.log(Easting, postcode.eastings);
-    console.log(Northing, postcode.northings);
-    */
-
     console.log(
         "Going to find related stuff here by looking up postcode details / region name etc"
     );
     
-    const linkedAtco = await SearchModel.populate("linkedATCO");
-    console.log(linkedAtco.code.busstops); // fill this up via a new query
+    let linkedAtco = await SearchModel.populate("linkedATCO");
+    linkedAtco = linkedAtco.linkedATCO;
 
     // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
+    // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
+    // just returning first 5 for now...
+    SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5);
+    await SearchModel.save();
 
-    // updates related search object with matching lat/long Easting/Northing.
-    // Need to find the right ATCO for the given search. LinkATCO function?
 }
 
 async function getRelatedCrimes(SearchModel) {
@@ -48,7 +44,6 @@ async function getRelatedListings(SearchModel) {
 async function linkAtco(SearchModel) {
     // links Search model to correct ATCO from available information.
     // Should be run when search is created / postcode is updated.
-    // Tricky as there are no standard ways to do this? NptgLocalityCode?
     // Does not return anything
 
     const linkedAtco = await searchAtco(SearchModel.Postcode);
@@ -90,6 +85,7 @@ async function searchAtco(PostcodeModel) {
     if (searchAtco) {
         // match found
         console.log("Matching ATCO:", searchAtco.code);
+        await queryAtco(searchAtco.code);
         return searchAtco;
     } else {
         console.log("Matching ATCO not found");
