@@ -2,7 +2,11 @@ From the HTML on the page https://beta-naptan.dft.gov.uk/download/la
 Shows Local Authority names and respective Atco Area codes.
 
 ATCO code can be used for data here: https://naptan.api.dft.gov.uk/swagger/index.html
-Then data can be edited / formatted to get lat long and other information, which can be used by the API. Significant server side processing and data
+Then data can be edited / formatted to get lat long and other information, which can be used by the API.
+
+Significant server side processing and data manipulation required to conform the region/location names.
+
+The first number in the code represents the country e.g. Scotland = 6
 
 Region: East Of England - Subdivision: Luton
 Region: North West - Subdivision: Greater Manchester (place name: Oldham [OL9 9AP])

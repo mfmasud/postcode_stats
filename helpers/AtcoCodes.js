@@ -11,79 +11,78 @@ const JSDOM = require("jsdom").JSDOM;
 const csvtojson = require("csvtojson");
 
 const Atco = require("../models/Atco");
-const BusStop = require("../models/BusStop")
-
+const BusStop = require("../models/BusStop");
 
 async function getAtcoCodes() {
-  const url = "https://beta-naptan.dft.gov.uk/download/la";
-  const response = await axios.get(url);
-  const dom = new JSDOM(response.data);
+    const url = "https://beta-naptan.dft.gov.uk/download/la";
+    const response = await axios.get(url);
+    const dom = new JSDOM(response.data);
 
-  const options = dom.window.document.querySelectorAll(
-    "#localAuthorityName option"
-  );
+    const options = dom.window.document.querySelectorAll(
+        "#localAuthorityName option"
+    );
 
-  const codes = [];
+    const codes = [];
 
-  options.forEach((option) => {
-    const text = option.textContent.trim();
-    codes.push(text);
-  });
+    options.forEach((option) => {
+        const text = option.textContent.trim();
+        codes.push(text);
+    });
 
-  codes.shift();
+    codes.shift();
 
-  return codes;
+    return codes;
 }
 
 // process atco codes as atco:{location, region}
 async function processAtco(data) {
-  // example string: Aberdeenshire / Scotland (630)
-  // result: {630: {location: Aberdeenshire, region: Scotland}}
+    // example string: Aberdeenshire / Scotland (630)
+    // result: {630: {location: Aberdeenshire, region: Scotland}}
 
-  const location = data.split(" / ")[0];
-  const region = data.split(" / ")[1].split(" (")[0];
-  const atco = data.split(" / ")[1].split(" (")[1].split(")")[0];
+    const location = data.split(" / ")[0];
+    const region = data.split(" / ")[1].split(" (")[0];
+    const atco = data.split(" / ")[1].split(" (")[1].split(")")[0];
 
-  const processedData = {};
-  processedData[atco] = { location, region };
-  //console.log(atco, processedData[atco]);
+    const processedData = {};
+    processedData[atco] = { location, region };
+    //console.log(atco, processedData[atco]);
 
-  const existingAtco = await Atco.findOne({code: atco}); // can filter for e.g. busstops.length === 0 to check for empty codes
-  if (existingAtco) {
-    //console.log(`ATCO ${atco} already exists in db`);
-    return; // skip creating another Atco for no reason.
-  }
+    const existingAtco = await Atco.findOne({ code: atco }); // can filter for e.g. busstops.length === 0 to check for empty codes
+    if (existingAtco) {
+        //console.log(`ATCO ${atco} already exists in db`);
+        return; // skip creating another Atco for no reason.
+    }
 
-  const newAtco = await Atco.create({
-    code: atco,
-    region: region,
-    location: location,
-    busstops: []
-  });
+    const newAtco = await Atco.create({
+        code: atco,
+        region: region,
+        location: location,
+        busstops: [],
+    });
+
+    //console.log(`ATCO ${newAtco.code} created in database`);
 }
 
 async function regionCheck(regionName) {
-  // switches region names from ATCO to the ones from those used by Naptan.
+    // switches region names from ATCO to the ones from those used by Naptan.
 }
 
 async function saveAtcoList() {
-  // run on db initialisation to get a list of searchable ATCOs.
-  const codeList = await getAtcoCodes();
-  for (code of codeList) {
-    await processAtco(code);
-  }
+    // run on db initialisation to get a list of searchable ATCOs.
+    const codeList = await getAtcoCodes();
+    for (code of codeList) {
+        await processAtco(code);
+    }
 }
 
 async function regionSearch(location) {
-  // Function which tries to match locations/regions to the ones in the ATCO list.
-  // This is troublesome, as region names are not standard - England is split up:
-  // "Aberdeen" -> "639: {location: Aberdeen, region: Scotland" -> 639
-
-  // For now, only exact searches will match: -> "Luton" -> "Luton / South East (029)"
-  // to add to the complexity, Luton's region is returned as "East of England" by the postcodes API.
-  // And using OS Names API, the "REGION" is "Eastern".
-  // so I need to turn "Eastern" or "East of England" into "South East" somehow ...
-
+    // Function which tries to match locations/regions to the ones in the ATCO list.
+    // This is troublesome, as region names are not standard - England is split up:
+    // "Aberdeen" -> "639: {location: Aberdeen, region: Scotland" -> 639
+    // For now, only exact searches will match: -> "Luton" -> "Luton / South East (029)"
+    // to add to the complexity, Luton's region is returned as "East of England" by the postcodes API.
+    // And using OS Names API, the "REGION" is "Eastern".
+    // so I need to turn "Eastern" or "East of England" into "South East" somehow ...
 }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
@@ -91,118 +90,118 @@ async function regionSearch(location) {
 // 420 is Warwickshire / West Midlands.
 
 async function queryAtco(format = "csv", code) {
-  // backend function to query the API for bus stops
-  // basic validation - not meant to be complete
-  format = format.toString();
-  code = code.toString();
+    // backend function to query the API for bus stops
+    // basic validation - not meant to be complete
+    format = format.toString();
+    code = code.toString();
 
-  const api = "https://naptan.api.dft.gov.uk/v1/access-nodes";
-  const query = `dataFormat=${format}&atcoAreaCodes=${code}`;
-  // Note: If no codes are specified, the download size will be 100Mb - The whole dataset.
+    const api = "https://naptan.api.dft.gov.uk/v1/access-nodes";
+    const query = `dataFormat=${format}&atcoAreaCodes=${code}`;
+    // Note: If no codes are specified, the download size will be 100Mb - The whole dataset.
 
-  try {
-    const response = await axios.get(`${api}?${query}`);
-    // response is raw csv data, not an object should be cached and parsed into json
+    try {
+        const response = await axios.get(`${api}?${query}`);
+        // response is raw csv data, not an object should be cached and parsed into json
 
-    if (format === "csv") {
-      
-      const AtcoExists = await Atco.findOne({code: code});
-      if (AtcoExists.busstops.length > 1) {
-        console.log(`ATCO ${code} BusStops found, not processing any further.`);
-        return;
-      } else {
-        console.log("processing ATCO code:", code)
-        await processCSV(code, response.data);
-        console.log("finished processing ATCO:", code)
-        return;
-      }
-      
-    } else {
-      console.log("Invalid format");
-      return;
+        if (format === "csv") {
+            const AtcoExists = await Atco.findOne({ code: code });
+            if (AtcoExists.busstops.length > 1) {
+                console.log(
+                    `ATCO ${code} BusStops found, not processing any further.`
+                );
+                return;
+            } else {
+                console.log("processing ATCO code:", code);
+                await processCSV(code, response.data);
+                console.log("finished processing ATCO:", code);
+                return;
+            }
+        } else {
+            console.log("Invalid format");
+            return;
+        }
+    } catch (error) {
+        console.error(error);
     }
-  } catch (error) {
-    console.error(error);
-  }
 }
 
 async function processCSV(code, rawdata) {
-  const associatedAtco = await Atco.findOne({code: code});
+    const associatedAtco = await Atco.findOne({ code: code });
 
-  // parse csv using csvtojson
-  const data = await csvtojson().fromString(rawdata);
-  //console.log(data);
-  // data is an array of objects e.g. dictionary of column:value pairs
+    // parse csv using csvtojson
+    const data = await csvtojson().fromString(rawdata);
+    //console.log(data);
+    // data is an array of objects e.g. dictionary of column:value pairs
 
-  // filter out bus stops
-  const busstops = data.filter((row) => row.StopType === "BCT");
+    // filter out bus stops
+    const busstops = data.filter((row) => row.StopType === "BCT");
 
-  // filter out bus stops that are not active
-  const active = busstops.filter((row) => row.Status === "active");
+    // filter out bus stops that are not active
+    const active = busstops.filter((row) => row.Status === "active");
 
-  // filter through columns - can remove NaptanCode later if it remains unused.
-  const columns = [
-    "ATCOCode",
-    "NaptanCode",
-    "NptgLocalityCode",
-    "CommonName",
-    "Street",
-    "LocalityName",
-    "ParentLocalityName",
-    "Longitude",
-    "Latitude",
-    "Status",
-  ];
+    // filter through columns - can remove NaptanCode later if it remains unused.
+    const columns = [
+        "ATCOCode",
+        "NaptanCode",
+        "NptgLocalityCode",
+        "CommonName",
+        "Street",
+        "LocalityName",
+        "ParentLocalityName",
+        "Longitude",
+        "Latitude",
+        "Status",
+    ];
 
-  const filtered = active.map((row) => {
-    // for each row in the active busstops array
-    const filteredRow = {}; // create empty object to store new filtered records in
-    columns.forEach((column) => {
-      // for each column in columns
-      filteredRow[column] = row[column]; // add column:value pair to filteredRow
-    });
-    return filteredRow; // add back to filtered array
-  });
-
-  // first 4 records as test
-  //console.log(filtered.slice(0, 4));
-  //console.log(filtered);
-
-  // store each result in BusStop collection
-  for (const row of filtered) {
-    //console.log(row);
-    const newBusStop = new BusStop({
-      ATCO_long: row.ATCOCode,
-      ATCO_short: code,
-      NaptanCode: row.NaptanCode,
-      NptgLocalityCode: row.NptgLocalityCode,
-      CommonName: row.CommonName,
-      Street: row.Street,
-      LocalityName: row.LocalityName,
-      ParentLocalityName: row.ParentLocalityName,
-      Longitude: row.Longitude,
-      Latitude: row.Latitude,
-      Northing: row.Northing,
-      Easting: row.Easting,
-      Status: row.Status,
+    const filtered = active.map((row) => {
+        // for each row in the active busstops array
+        const filteredRow = {}; // create empty object to store new filtered records in
+        columns.forEach((column) => {
+            // for each column in columns
+            filteredRow[column] = row[column]; // add column:value pair to filteredRow
+        });
+        return filteredRow; // add back to filtered array
     });
 
-    associatedAtco.busstops.push(newBusStop);
-    
-    try {
-      await newBusStop.save();
-      await associatedAtco.save();
-      //console.log(`Saved ATCO code ${newBusStop.ATCO_long} to BusStop collection`);
-      //console.log(`debug: ${associatedAtco.busstops.length}`)
-    } catch (error) {
-      console.error(error);
+    // first 4 records as test
+    //console.log(filtered.slice(0, 4));
+    //console.log(filtered);
+
+    // store each result in BusStop collection
+    for (const row of filtered) {
+        //console.log(row);
+        const newBusStop = new BusStop({
+            ATCO_long: row.ATCOCode,
+            ATCO_short: code,
+            NaptanCode: row.NaptanCode,
+            NptgLocalityCode: row.NptgLocalityCode,
+            CommonName: row.CommonName,
+            Street: row.Street,
+            LocalityName: row.LocalityName,
+            ParentLocalityName: row.ParentLocalityName,
+            Longitude: row.Longitude,
+            Latitude: row.Latitude,
+            Northing: row.Northing,
+            Easting: row.Easting,
+            Status: row.Status,
+        });
+
+        associatedAtco.busstops.push(newBusStop);
+
+        try {
+            await newBusStop.save();
+            await associatedAtco.save();
+            //console.log(`Saved ATCO code ${newBusStop.ATCO_long} to BusStop collection`);
+            //console.log(`debug: ${associatedAtco.busstops.length}`)
+        } catch (error) {
+            console.error(error);
+        }
     }
-  };
 }
 
 module.exports = {
-  getAtcoCodes,
-  queryAtco,
-  processAtco,
-  saveAtcoList,
+    getAtcoCodes,
+    queryAtco,
+    processAtco,
+    saveAtcoList,
 };
