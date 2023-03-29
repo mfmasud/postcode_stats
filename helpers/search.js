@@ -1,6 +1,7 @@
 const Search = require("../models/Search");
 const BusStop = require("../models/BusStop");
 const Nptg = require("../models/Nptg");
+const Atco = require("../models/Atco");
 
 const { getCrimeData } = require("../helpers/crime"); // can be switched to a model later
 
@@ -21,6 +22,9 @@ async function getRelatedStops(SearchModel, radius = 1000) {
     console.log(
         "Going to find related stuff here by looking up postcode details / region name etc"
     );
+    
+    const linkedAtco = await SearchModel.populate("linkedATCO");
+    console.log(linkedAtco.code.busstops); // fill this up via a new query
 
     // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
 
@@ -31,10 +35,13 @@ async function getRelatedStops(SearchModel, radius = 1000) {
 async function getRelatedCrimes(SearchModel) {
     const { latitude, longitude } = SearchModel;
     await getCrimeData(latitude, longitude);
+    SearchModel.queryCrimes = [] // first 5 related crimes
     return;
 }
 
 async function getRelatedListings(SearchModel) {
+    const { latitude, longitude } = SearchModel;
+    //await getPropertyData(latitude, longitude);
     return;
 }
 
@@ -42,16 +49,53 @@ async function linkAtco(SearchModel) {
     // links Search model to correct ATCO from available information.
     // Should be run when search is created / postcode is updated.
     // Tricky as there are no standard ways to do this? NptgLocalityCode?
+    // Does not return anything
 
-    await searchAtco(SearchModel.Postcode);
+    const linkedAtco = await searchAtco(SearchModel.Postcode);
+    if (!linkedAtco){
+        return;
+    }
+
+    SearchModel.linkedATCO = linkedAtco;
+    await SearchModel.save();
+
 }
 
 async function searchAtco(PostcodeModel) {
-    /*
-    order to search for ATCOs: (in postcode object of searchmodel)
-    admin_county
-    admin_district
-    */
+
+    const { admin_county, admin_district, country } = PostcodeModel;
+    //console.log(admin_county, admin_district, country);
+
+    if (!admin_county) {
+        console.log("No admin county");
+
+        if (!admin_district) {
+            // no admin district
+            console.log("No admin district");
+        } else {
+            // admin district exists
+            var searchAtco = await Atco.findOne({ location: admin_district});
+            if (!searchAtco) {
+                searchAtco = await Atco.findOne({other_names: admin_district});
+            }
+        }
+    } else {
+        // admin county exists
+        var searchAtco = await Atco.findOne({ location: admin_county});
+        if (!searchAtco) {
+            searchAtco = await Atco.findOne({other_names: admin_county});
+        }
+    }
+
+    if (searchAtco) {
+        // match found
+        console.log("Matching ATCO:", searchAtco.code);
+        return searchAtco;
+    } else {
+        console.log("Matching ATCO not found");
+        return;
+    }
+
 }
 
 async function getNptgData() {
