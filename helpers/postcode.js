@@ -6,6 +6,17 @@ async function getRandomPostcode() {
         const response = await axios.get(
             "https://api.postcodes.io/random/postcodes"
         );
+
+        // EXTREMELY unlikely but added nonetheless.
+        const postcodeExists = await Postcode.findOne({
+            postcode: response.data.result.postcode,
+        });
+    
+        if (postcodeExists) {
+            console.log("Postcode already exists in db: " + response.data.result.postcode);
+            return postcodeExists;
+        }
+
         await processPostcode(response.data.result);
         return response.data.result;
     } catch (error) {

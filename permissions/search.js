@@ -1,12 +1,13 @@
 const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
 
 function defineAbilitiesFor(user) {
+  // can use Search Model in the future.
   //console.log(`current user: ${user.username}\nrole: ${user.role.name}`)
 
   const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
 
   // non authenticated users
-  can("read", "Search")
+  can("read", "Search");
 
   // authenticated users
   // standard users
@@ -22,7 +23,8 @@ function defineAbilitiesFor(user) {
   // admin users
   if (user.role.name === "admin") {
     //console.log('admin user role')
-    
+
+    can("read", "RandomSearch");
   }
 
   return build();
