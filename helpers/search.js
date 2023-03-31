@@ -24,7 +24,7 @@ async function getRelatedStops(SearchModel, radius = 1000) {
     // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
     // just returning first 5 for now...
 
-    if (linkedAtco.busstops.length){
+    if (linkedAtco){
         SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5);
     }
     
