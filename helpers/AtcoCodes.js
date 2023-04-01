@@ -130,7 +130,8 @@ async function processCSV(code, rawdata) {
     // can also filter to city level at this stage, by finding the right column. "430" has 15,000 values to process ...
     // BNG can be converted to lat long if needed to simplify calculations.
 
-    // store each result in BusStop collection
+    // store each result into the BusStop collection and associate it with the ATCO
+    const newBusStops = [];
     const ids = [];
     for (const row of busstops) {
         //console.log(row);
@@ -150,22 +151,21 @@ async function processCSV(code, rawdata) {
             Northing: row.Northing,
             Easting: row.Easting,
         });
+
         ids.push(newBusStop._id);
+        newBusStops.push(newBusStop);
+    }
+
+    if (newBusStops.length > 0) {
+        await BusStop.insertMany(newBusStops);
 
         try {
-            await newBusStop.save();
-            //console.log(`Saved ATCO code ${newBusStop.ATCO_long} to BusStop collection`);
+            associatedAtco.busstops = ids;
+            associatedAtco.AllProcessed = true;
+            await associatedAtco.save();
         } catch (error) {
             console.error(error);
         }
-    }
-
-    try {
-        associatedAtco.busstops = ids;
-        associatedAtco.AllProcessed = true;
-        await associatedAtco.save();
-    } catch (error) {
-        console.error(error);
     }
 }
 

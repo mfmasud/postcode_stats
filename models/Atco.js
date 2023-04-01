@@ -20,7 +20,7 @@ const atcoSchema = new mongoose.Schema({
         },
     ],
     AllProcessed: {
-        type: bool,
+        type: Boolean,
         required: true,
     },
     other_names: [

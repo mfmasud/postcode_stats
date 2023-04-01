@@ -13,16 +13,13 @@ async function getRelatedStops(SearchModel, radius = 1000) {
     // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
     const { longitude, latitude, Northing, Easting } = SearchModel;
 
-    console.log(
-        "Going to find related stuff here by looking up postcode details / region name etc"
-    );
-    
     let linkedAtco = await SearchModel.populate("linkedATCO");
     linkedAtco = linkedAtco.linkedATCO;
 
     // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
     // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
     // just returning first 5 for now...
+    // Need to convert BNG to lat/long for empty values or search using BNG instead.
 
     if (linkedAtco){
         SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5);
