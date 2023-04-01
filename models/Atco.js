@@ -19,6 +19,10 @@ const atcoSchema = new mongoose.Schema({
             ref: "BusStop",
         },
     ],
+    AllProcessed: {
+        type: bool,
+        required: true,
+    },
     other_names: [
         {
             type: String,

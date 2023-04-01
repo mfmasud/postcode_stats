@@ -66,6 +66,7 @@ async function processAtco(data) {
         region: region,
         location: location,
         busstops: [],
+        AllProcessed: false,
     });
 
     //console.log(`ATCO ${newAtco.code} created in database`);
@@ -92,9 +93,9 @@ async function queryAtco(code) {
 
         if (format === "csv") {
             const AtcoExists = await Atco.findOne({ code: code });
-            if (AtcoExists.busstops.length > 1) {
+            if (AtcoExists.AllProcessed) {
                 console.log(
-                    `ATCO ${code} BusStops found, not processing any further.`
+                    `All ATCO ${code} BusStops found, not processing any further.`
                 );
                 return;
             } else {
@@ -113,8 +114,11 @@ async function queryAtco(code) {
 }
 
 async function processCSV(code, rawdata) {
-    // this can take a while, should be run on startup of the server so users use cached mongodb models instead
+    // this can take a while, should be run on startup of the server so users use processed mongodb models instead of processing them when a request is made
     const associatedAtco = await Atco.findOne({ code: code });
+    if (!associatedAtco) {
+        console.log("Stopping processing of bus stops. Either code is invalid or ATCO list has not been loaded.")
+    }
 
     // parse csv using csvtojson
     const data = await csvtojson().fromString(rawdata);
@@ -124,35 +128,14 @@ async function processCSV(code, rawdata) {
     // filter out data to just bus stops
     const busstops = data.filter((row) => row.StopType === "BCT" && row.Status === "active" && row.Northing && row.Easting);
     // can also filter to city level at this stage, by finding the right column. "430" has 15,000 values to process ...
-
     // BNG can be converted to lat long if needed to simplify calculations.
 
-    // filter through columns - can remove NaptanCode later if it remains unused.
-    const columns = [
-        "ATCOCode",
-        "CommonName",
-        "Street",
-        "Longitude",
-        "Latitude",
-        "Northing",
-        "Easting",
-    ];
-
-    const filtered = busstops.map((row) => {
-        // for each row in the filtered busstops array
-        const filteredRow = {}; // create empty object to store new filtered records in
-        columns.forEach((column) => {
-            // for each column in columns
-            filteredRow[column] = row[column]; // add column:value pair to filteredRow
-        });
-        return filteredRow; // add back to filtered array
-    });
-
     // store each result in BusStop collection
-    for (const row of filtered) {
+    const ids = [];
+    for (const row of busstops) {
         //console.log(row);
 
-        const existingBusStop = await BusStop.findOne({ATCO_long: row.ATCOCode});
+        const existingBusStop = await BusStop.findOne({ATCO_long: row.ATCOCode}).lean();
         if (existingBusStop) {
             continue;
         }
@@ -167,19 +150,25 @@ async function processCSV(code, rawdata) {
             Northing: row.Northing,
             Easting: row.Easting,
         });
-
-        associatedAtco.busstops.push(newBusStop);
+        ids.push(newBusStop._id);
 
         try {
             await newBusStop.save();
-            await associatedAtco.save();
             //console.log(`Saved ATCO code ${newBusStop.ATCO_long} to BusStop collection`);
-            //console.log(`debug: ${associatedAtco.busstops.length}`)
         } catch (error) {
             console.error(error);
         }
     }
+
+    try {
+        associatedAtco.busstops = ids;
+        associatedAtco.AllProcessed = true;
+        await associatedAtco.save();
+    } catch (error) {
+        console.error(error);
+    }
 }
+
 
 module.exports = {
     getAtcoCodes,

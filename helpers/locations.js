@@ -110,6 +110,7 @@ async function getEnglandLocations() {
     const UA_data = new JSDOM(UA_response.data);
 
     // ceremnonial counties
+    // https://raw.githubusercontent.com/ideal-postcodes/postcodes.io/master/data/counties.json
     const county_url =
         "https://en.wikipedia.org/wiki/Ceremonial_counties_of_England";
     const county_response = await axios.get(county_url);
