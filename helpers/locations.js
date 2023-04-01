@@ -108,10 +108,17 @@ async function getEnglandLocations() {
     const UA_response = await axios.get(UA_url);
     const UA_data = new JSDOM(UA_response.data);
 
+    // ceremnonial counties
     const county_url =
         "https://en.wikipedia.org/wiki/Ceremonial_counties_of_England";
     const county_response = await axios.get(county_url);
     const county_data = new JSDOM(county_response.data);
+
+    // to be added to Greater London altnames
+    // Also includes City of London as a borough.
+    const london_url = "https://en.wikipedia.org/wiki/London_boroughs"
+    const london_response = await axios.get(london_url)
+    const london_data = new JSDOM(london_response.data)
 
     const english_places = [];
 

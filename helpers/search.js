@@ -62,8 +62,8 @@ async function linkAtco(SearchModel) {
 
 async function searchAtco(PostcodeModel) {
 
-    const { admin_county, admin_district, country } = PostcodeModel;
-    //console.log(admin_county, admin_district, country);
+    const { admin_county, admin_district, region } = PostcodeModel;
+    //console.log(admin_county, admin_district, region);
 
     if (!admin_county) {
         console.log("No admin county");
@@ -76,6 +76,21 @@ async function searchAtco(PostcodeModel) {
             var searchAtco = await Atco.findOne({ location: admin_district});
             if (!searchAtco) {
                 searchAtco = await Atco.findOne({other_names: admin_district});
+            }
+
+            if (region === "London") {
+                /*
+                example: Lambeth - Local Authority / London Borough
+        
+                Postcode API data:
+                Region: London
+                admin_district: Lambeth
+        
+                In the ATCO List, this is part of "Greater London".
+
+                This also includes postcodes in the City of London (e.g. E1 7DA)
+                */
+                var searchAtco = await Atco.findOne({ location: "Greater London" });
             }
         }
     } else {
