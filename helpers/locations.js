@@ -18,6 +18,7 @@ async function getScotlandLocations() {
         var text = place.textContent.trim();
 
         // add alt names to ATCO list. e.g. other_names: Na h-Eileanan Siar
+        // make this into a function? normalname - altnames
         if (text === "Orkney") {
             const altname = "Orkney Islands";
             const altAtco = await Atco.findOne({ location: altname });
@@ -129,9 +130,25 @@ async function getEnglandLocations() {
 
 async function getWalesLocations() {
     // https://en.wikipedia.org/wiki/Local_government_in_Wales#Principal_areas
+
+    const url = "https://en.wikipedia.org/wiki/Local_government_in_Wales#Principal_areas";
+    const response = await axios.get(url);
+    const dom = new JSDOM(response.data);
+
+    const tabledata = dom.window.document.querySelectorAll('table.wikitable li a');
+
+    const names = [];
+
+    for (li of tabledata) {
+        names.push(li.textContent.trim());
+    }
+
+    //console.log(names)
+    return names.slice(0, 22);
 }
 
 module.exports = {
     getScotlandLocations,
     getEnglandLocations,
+    getWalesLocations,
 };
