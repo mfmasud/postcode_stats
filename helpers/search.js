@@ -55,8 +55,20 @@ async function linkAtco(SearchModel) {
     // links Search model to correct ATCO from available information.
     // Should be run when search is created / postcode is updated.
     // Does not return anything
+    console.log("Looking to link Atco");
 
-    const linkedAtco = await searchAtco(SearchModel.Postcode);
+    var linkedAtco;
+
+    if (SearchModel.Postcode.country === "Northern Ireland") {
+        // Skip ATCO linking for northern irish postcodes e.g. BT23 6SA
+        // linkedAtco = linkOther(SearchModel.Postcode)
+        console.log("Cannot link NI Atco.");
+        return;
+    } else {
+        linkedAtco = await searchAtco(SearchModel.Postcode);
+    }
+
+    
     if (!linkedAtco){
         return;
     }
@@ -73,8 +85,12 @@ async function linkAtco(SearchModel) {
  */
 async function searchAtco(PostcodeModel) {
 
-    const { admin_county, admin_district, parliamentary_constituency, region } = PostcodeModel;
+    var { admin_county, admin_district, parliamentary_constituency, region, country } = PostcodeModel;
     //console.log(admin_county, admin_district, region);
+
+    if (country === "Scotland") {
+        region = "Scotland";
+    }
 
     const pc = parliamentary_constituency;
 
@@ -101,6 +117,7 @@ async function searchAtco(PostcodeModel) {
                 admin_district: Lambeth
         
                 In the ATCO List, this is part of "Greater London".
+                In the future, this will be considered an altname for "London", generated from getEnglandLocations
 
                 This also includes postcodes in the City of London (e.g. E1 7DA)
                 */
@@ -109,6 +126,7 @@ async function searchAtco(PostcodeModel) {
 
             if (!AtcoToLink && pc) {
                 // parlimentiary constituency, e.g. Poole (South West)
+                // Others like Bournemout East would be under Dorset (ceremonial country)
                 var AtcoToLink = await Atco.findOne({ location: pc});
                 if (!AtcoToLink) {
                     AtcoToLink = await Atco.findOne({other_names: pc});
@@ -147,6 +165,8 @@ async function getNptgData() {
 }
 
 async function processNptgCSV(rawdata) {
+    // TODO: speed this up like the code used to save bus stops / ATCOs.
+
     // check if Nptg collection is empty
     const count = await Nptg.countDocuments();
     if (count > 0) {

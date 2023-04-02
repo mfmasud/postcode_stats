@@ -87,10 +87,6 @@ async function processPostcode(postcodeObject) {
         admin_county,
     } = postcodeObject;
 
-    if (postcodeObject.country === "Scotland") {
-        region = "Scotland";
-    }
-
     const newPostcode = new Postcode({
         postcode: postcode,
         eastings: eastings,

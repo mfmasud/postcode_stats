@@ -61,7 +61,7 @@ async function searchArea(cnx) {
     }
 }
 
-async function searchPostcode(cnx) {
+async function searchPostcode(cnx, next) {
     // GET and postcode in body.
     // allows anyone to search via a postcode in the request body.
     // returns a list of property listings, transport nodes and crime data
@@ -90,6 +90,7 @@ async function searchPostcode(cnx) {
             });
 
             // check for existing search by comparing latitude
+            // TODO: move to function
             const existingSearch = await Search.findOne({
                 latitude: dbPostcode.latitude,
             });
@@ -132,7 +133,7 @@ async function searchPostcode(cnx) {
     }
 }
 
-async function searchRandom(cnx) {
+async function searchRandom(cnx, next) {
 
     let { user } = cnx.state;
     if (!user) {

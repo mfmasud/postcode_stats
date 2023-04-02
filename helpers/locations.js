@@ -109,6 +109,9 @@ async function getEnglandLocations() {
     const UA_response = await axios.get(UA_url);
     const UA_data = new JSDOM(UA_response.data);
 
+    // Example: Bournemouth, Christchurch and Poole
+    // Bournemouth and Poole are separate in the ATCO list.
+
     // ceremnonial counties
     // https://raw.githubusercontent.com/ideal-postcodes/postcodes.io/master/data/counties.json
     const county_url =
