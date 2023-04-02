@@ -144,7 +144,9 @@ async function initLocationDB() {
     // Get and process ATCO codes master list
     await saveAtcoList();
 
-    await getScotlandLocations();
+    await getScotlandLocations(); // adds alternative names to scottish location names
+    // await getEnglandLocations();
+    // await getWalesLocations();
 
     console.log("Successfully initialised Location Data");
 }

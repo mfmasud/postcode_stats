@@ -83,6 +83,14 @@ async function queryAtco(code) {
     format = "csv";
     code = code.toString();
 
+    const AtcoExists = await Atco.findOne({ code: code });
+    if (AtcoExists.AllProcessed) {
+        console.log(
+            `All ATCO ${code} BusStops found, not processing any further.`
+        );
+        return;
+    }
+
     const api = "https://naptan.api.dft.gov.uk/v1/access-nodes";
     const query = `dataFormat=${format}&atcoAreaCodes=${code}`;
     // Note: If no codes are specified, the download size will be 100Mb - The whole dataset.
@@ -92,20 +100,11 @@ async function queryAtco(code) {
         // response is raw csv data, not an object should be cached and parsed into json
 
         if (format === "csv") {
-            const AtcoExists = await Atco.findOne({ code: code });
-            if (AtcoExists.AllProcessed) {
-                console.log(
-                    `All ATCO ${code} BusStops found, not processing any further.`
-                );
-                return;
-            } else {
-                console.log("processing ATCO code:", code);
-                await processCSV(code, response.data);
-                console.log("finished processing ATCO:", code);
-                return;
-            }
+            console.log("processing ATCO code:", code);
+            await processCSV(code, response.data);
+            console.log("finished processing ATCO:", code);
         } else {
-            console.log("Invalid format");
+            console.log("Invalid data format. should be csv");
             return;
         }
     } catch (error) {

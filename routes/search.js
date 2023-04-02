@@ -117,7 +117,7 @@ async function searchPostcode(cnx) {
 
             const SearchModel = await Search.findOne({
                 latitude: dbPostcode.latitude,
-            }).populate(["Postcode", "queryBusStops"]);
+            }).populate(["Postcode", "queryBusStops", "queryCrimes"]);
             const body = SearchModel;
             cnx.status = 200;
             cnx.body = body;

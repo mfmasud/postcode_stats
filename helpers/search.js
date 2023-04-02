@@ -8,6 +8,7 @@ const { getCrimeData } = require("../helpers/crime"); // can be switched to a mo
 
 const axios = require("axios");
 const csvtojson = require("csvtojson");
+const mongoose = require("mongoose");
 
 async function getRelatedStops(SearchModel, radius = 1000) {
     // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
@@ -31,12 +32,20 @@ async function getRelatedStops(SearchModel, radius = 1000) {
 
 async function getRelatedCrimes(SearchModel) {
     const { latitude, longitude } = SearchModel;
-    await getCrimeData(latitude, longitude);
-    SearchModel.queryCrimes = [] // first 5 related crimes
+    if (latitude && longitude) {
+        await getCrimeData(latitude, longitude);
+        // SearchModel.queryCrimes = ... // first 5 related crimes
+        SearchModel.queryCrimes = [];
+    } else {
+        SearchModel.queryCrimes = [] // empty to indicate not found
+    }
+    
+    await SearchModel.save();
     return;
 }
 
 async function getRelatedListings(SearchModel) {
+    // unimplemented - Zoopla API is basically discontinued.
     const { latitude, longitude } = SearchModel;
     //await getPropertyData(latitude, longitude);
     return;
@@ -57,11 +66,19 @@ async function linkAtco(SearchModel) {
 
 }
 
+/**
+ * 
+ * @param {mongoose.Object} PostcodeModel - The Postcode model object
+ * @returns {mongoose.Object} The Atco model object to link to the Search
+ */
 async function searchAtco(PostcodeModel) {
 
-    const { admin_county, admin_district, region } = PostcodeModel;
+    const { admin_county, admin_district, parliamentary_constituency, region } = PostcodeModel;
     //console.log(admin_county, admin_district, region);
 
+    const pc = parliamentary_constituency;
+
+    // starting to look ugly - maybe use functions or switch/case
     if (!admin_county) {
         console.log("No admin county");
 
@@ -70,9 +87,9 @@ async function searchAtco(PostcodeModel) {
             console.log("No admin district");
         } else {
             // admin district exists
-            var searchAtco = await Atco.findOne({ location: admin_district});
-            if (!searchAtco) {
-                searchAtco = await Atco.findOne({other_names: admin_district});
+            var AtcoToLink = await Atco.findOne({ location: admin_district});
+            if (!AtcoToLink) {
+                AtcoToLink = await Atco.findOne({other_names: admin_district});
             }
 
             if (region === "London") {
@@ -87,22 +104,32 @@ async function searchAtco(PostcodeModel) {
 
                 This also includes postcodes in the City of London (e.g. E1 7DA)
                 */
-                var searchAtco = await Atco.findOne({ location: "Greater London" });
+                var AtcoToLink = await Atco.findOne({ location: "Greater London" });
             }
+
+            if (!AtcoToLink && pc) {
+                // parlimentiary constituency, e.g. Poole (South West)
+                var AtcoToLink = await Atco.findOne({ location: pc});
+                if (!AtcoToLink) {
+                    AtcoToLink = await Atco.findOne({other_names: pc});
+                }
+            }
+
         }
+
     } else {
         // admin county exists
-        var searchAtco = await Atco.findOne({ location: admin_county});
-        if (!searchAtco) {
-            searchAtco = await Atco.findOne({other_names: admin_county});
+        var AtcoToLink = await Atco.findOne({ location: admin_county});
+        if (!AtcoToLink) {
+            AtcoToLink = await Atco.findOne({other_names: admin_county});
         }
     }
 
-    if (searchAtco) {
+    if (AtcoToLink) {
         // match found
-        console.log("Matching ATCO:", searchAtco.code);
-        await queryAtco(searchAtco.code);
-        return searchAtco;
+        console.log("Matching ATCO:", AtcoToLink.code);
+        await queryAtco(AtcoToLink.code);
+        return AtcoToLink;
     } else {
         console.log("Matching ATCO not found");
         return;
