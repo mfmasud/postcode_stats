@@ -78,6 +78,12 @@ async function linkAtco(SearchModel) {
 
 }
 
+async function linkCrimeList(SearchModel) {
+    // links crime list to search model
+    // can be linked by latitude - assuming it is available. If not, this should have been calculated beforehand.
+    return;
+}
+
 /**
  * 
  * @param {mongoose.Object} PostcodeModel - The Postcode model object
@@ -226,5 +232,6 @@ module.exports = {
     getRelatedStops,
     getRelatedCrimes,
     linkAtco,
+    linkCrimeList,
     getNptgData,
 };

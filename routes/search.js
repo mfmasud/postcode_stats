@@ -19,6 +19,7 @@ const {
     getRelatedStops,
     getRelatedCrimes,
     linkAtco,
+    linkCrimeList,
 } = require("../helpers/search");
 
 router.post("/", auth, bodyParser(), searchArea); // POST - finds a postcode internally
@@ -107,6 +108,7 @@ async function searchPostcode(cnx, next) {
                 });
                 await newSearch.save();
                 await linkAtco(newSearch);
+                // await linkCrimeList(newSearch);
                 await getRelatedStops(newSearch); // get all bus stops for location and link to search model
                 await getRelatedCrimes(newSearch); // get all crimes for location and link to search model
             } else {

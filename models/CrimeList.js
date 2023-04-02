@@ -21,10 +21,14 @@ const crimeListSchema = new mongoose.Schema({
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Crime",
-        }
+        },
     ],
     date: {
         type: String,
+    },
+    emptydata: {
+        type: Boolean,
+        default: false,
     },
 });
 

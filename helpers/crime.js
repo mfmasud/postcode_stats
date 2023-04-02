@@ -26,6 +26,21 @@ async function processCrimeData(lat, long, rawCrimeData) {
     // model the Crime and categorise it too for paid / admins.
     // lat long to differentiate crime lists
 
+    // console.log(rawCrimeData); // can be empty
+    // below code can be edited to handle a minimum amount of crimes required e.g. 5
+    if (rawCrimeData.length === 0) {
+        CrimeList.create( {
+            crimeListID: 1,
+            latitude: lat,
+            longitude: long,
+            count: 0,
+            date: "X",
+            emptydata: true,
+        })
+        // emptydata and the X here is used to indicate that there is no data.
+        return;
+    }
+
     const newCrimeList = new CrimeList({
         crimeListID: 1,
         latitude: lat,
