@@ -13,12 +13,13 @@ const Search = require("../models/Search");
 const CrimeList = require("../models/CrimeList");
 const Crime = require("../models/Crime");
 
-const { getNptgData } = require("../helpers/search"); // nptg localities 1 time download
 const { saveAtcoList } = require("../helpers/AtcoCodes");
 
 const {
     getScotlandLocations,
     getEnglandLocations,
+    getWalesLocations,
+    getNptgData,
 } = require("../helpers/locations");
 
 const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file

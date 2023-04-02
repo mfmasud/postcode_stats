@@ -1,13 +1,10 @@
 const Search = require("../models/Search");
 const BusStop = require("../models/BusStop");
-const Nptg = require("../models/Nptg");
 const Atco = require("../models/Atco");
 
 const {queryAtco} = require("../helpers/AtcoCodes");
 const { getCrimeData } = require("../helpers/crime"); // can be switched to a model later
 
-const axios = require("axios");
-const csvtojson = require("csvtojson");
 const mongoose = require("mongoose");
 
 async function getRelatedStops(SearchModel, radius = 1000) {
@@ -161,77 +158,9 @@ async function searchAtco(PostcodeModel) {
 
 }
 
-async function getNptgData() {
-    const url = "https://naptan.api.dft.gov.uk/v1/nptg/localities";
-
-    const response = await axios.get(url);
-    const data = response.data;
-
-    await processNptgCSV(data);
-}
-
-async function processNptgCSV(rawdata) {
-    // TODO: speed this up like the code used to save bus stops / ATCOs.
-
-    // check if Nptg collection is empty
-    const count = await Nptg.countDocuments();
-    if (count > 0) {
-        console.log("Nptg data already saved.");
-        return;
-    } else {
-        console.log("Processing Nptg data...");
-    }
-
-    // adatped from AtcoCodes.processCSV()
-    const data = await csvtojson().fromString(rawdata);
-
-    // filter through columns
-    const columns = [
-        "NptgLocalityCode",
-        "LocalityName",
-        "ParentLocalityName",
-        "Northing",
-        "Easting",
-        "QualifierName",
-    ];
-
-    const filtered = data.map((row) => {
-        const filteredRow = {}; // create empty object to store new filtered records in
-        columns.forEach((column) => {
-            // for each column in columns
-            filteredRow[column] = row[column]; // add column:value pair to filteredRow
-        });
-        return filteredRow; // add back to filtered array
-    });
-
-    for (const row of filtered) {
-        //console.log(row);
-        const newNptg = new Nptg({
-            NptgLocalityCode: row.NptgLocalityCode,
-            LocalityName: row.LocalityName,
-            ParentLocalityName: row.ParentLocalityName,
-            Northing: row.Northing,
-            Easting: row.Easting,
-            QualifierName: row.QualifierName,
-        });
-
-        // console.log(newNptg);
-
-        try {
-            await newNptg.save();
-            //console.log(`Saved Nptg code ${Nptg.NptgLocalityCode} to Nptg collection`);
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
-    console.log("Nptg data saved.");
-}
-
 module.exports = {
     getRelatedStops,
     getRelatedCrimes,
     linkAtco,
     linkCrimeList,
-    getNptgData,
 };
