@@ -7,76 +7,77 @@ const CrimeList = require("../models/CrimeList");
 const Crime = require("../models/Crime");
 
 async function getCrimeData(lat, long) {
-    const url = `https://data.police.uk/api/crimes-street/all-crime?lat=${lat}&lng=${long}`;
-    const response = await axios.get(url);
+  const url = `https://data.police.uk/api/crimes-street/all-crime?lat=${lat}&lng=${long}`;
+  const response = await axios.get(url);
 
-    // returns the crimes in the most recent month
-    const existingCrimeList = await CrimeList.findOne({latitude: lat});
-    if (existingCrimeList) {
-        console.log("Existing crime list found, ID:", existingCrimeList.crimeListID)
-        return;
-    } else {
-        await processCrimeData(lat, long, response.data);
-    }
-
+  // returns the crimes in the most recent month
+  const existingCrimeList = await CrimeList.findOne({ latitude: lat });
+  if (existingCrimeList) {
+    console.log(
+      "Existing crime list found, ID:",
+      existingCrimeList.crimeListID
+    );
     return;
+  } else {
+    await processCrimeData(lat, long, response.data);
+  }
+
+  return;
 }
 
 async function processCrimeData(lat, long, rawCrimeData) {
-    // model the Crime and categorise it too for paid / admins.
-    // lat long to differentiate crime lists
+  // model the Crime and categorise it too for paid / admins.
+  // lat long to differentiate crime lists
 
-    // console.log(rawCrimeData); // can be empty
-    // below code can be edited to handle a minimum amount of crimes required e.g. 5
-    if (rawCrimeData.length === 0) {
-        CrimeList.create( {
-            crimeListID: 1,
-            latitude: lat,
-            longitude: long,
-            count: 0,
-            date: "X",
-            emptydata: true,
-        })
-        // emptydata and the X here is used to indicate that there is no data.
-        return;
+  // console.log(rawCrimeData); // can be empty
+  // below code can be edited to handle a minimum amount of crimes required e.g. 5
+  if (rawCrimeData.length === 0) {
+    CrimeList.create({
+      crimeListID: 1,
+      latitude: lat,
+      longitude: long,
+      count: 0,
+      date: "X",
+      emptydata: true,
+    });
+    // emptydata and the X here is used to indicate that there is no data.
+    return;
+  }
+
+  const newCrimeList = new CrimeList({
+    crimeListID: 1,
+    latitude: lat,
+    longitude: long,
+    count: rawCrimeData.length,
+    date: rawCrimeData[0].month,
+  });
+
+  for (const data of rawCrimeData) {
+    const existingCrime = await Crime.findOne({ crimeID: data.id });
+    if (existingCrime) {
+      continue;
     }
 
-    const newCrimeList = new CrimeList({
-        crimeListID: 1,
-        latitude: lat,
-        longitude: long,
-        count: rawCrimeData.length,
-        date: rawCrimeData[0].month,
+    //console.log(data);
+    const newCrime = await Crime.create({
+      crimeID: data.id,
+      latitude: data.location.latitude,
+      longitude: data.location.longitude,
+      crime_category: data.category,
+      crime_date: data.month,
     });
 
-    for (const data of rawCrimeData) {
-
-        const existingCrime = await Crime.findOne({crimeID: data.id});
-        if (existingCrime) {
-            continue;
-        }
-
-        //console.log(data);
-        const newCrime = await Crime.create({
-            crimeID: data.id,
-            latitude: data.location.latitude,
-            longitude: data.location.longitude,
-            crime_category: data.category,
-            crime_date: data.month,
-        });
-
-        if (data.outcome_status) {
-            newCrime.outcome_category = data.outcome_status.category;
-            newCrime.outcome_date = data.outcome_status.month;
-        }
-
-        newCrimeList.crimes.push(newCrime);
+    if (data.outcome_status) {
+      newCrime.outcome_category = data.outcome_status.category;
+      newCrime.outcome_date = data.outcome_status.month;
     }
 
-    await newCrimeList.save();
+    newCrimeList.crimes.push(newCrime);
+  }
 
+  await newCrimeList.save();
 }
 
 module.exports = {
-    getCrimeData,
+  getCrimeData,
 };

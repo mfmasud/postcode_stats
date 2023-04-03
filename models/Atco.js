@@ -1,33 +1,33 @@
 const mongoose = require("mongoose");
 
 const atcoSchema = new mongoose.Schema({
-    code: {
-        type: String,
-        required: true,
+  code: {
+    type: String,
+    required: true,
+  },
+  location: {
+    type: String,
+    required: true,
+  },
+  region: {
+    type: String,
+    required: true,
+  },
+  busstops: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "BusStop",
     },
-    location: {
-        type: String,
-        required: true,
+  ],
+  AllProcessed: {
+    type: Boolean,
+    required: true,
+  },
+  other_names: [
+    {
+      type: String,
     },
-    region: {
-        type: String,
-        required: true,
-    },
-    busstops: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: "BusStop",
-        },
-    ],
-    AllProcessed: {
-        type: Boolean,
-        required: true,
-    },
-    other_names: [
-        {
-            type: String,
-        },
-    ],
+  ],
 });
 
 module.exports = mongoose.model("Atco", atcoSchema);

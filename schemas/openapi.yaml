@@ -31,31 +31,31 @@ paths:
         - Users
       description: Get user by id.
       responses:
-        '200':
+        "200":
           description: View user details.
-        '401':
+        "401":
           description: Non-admin users can only view their own record.
-        '404':
+        "404":
           description: User was not found in the DB.
     put:
       tags:
         - Users
       description: Update user by ID.
       responses:
-        '200':
+        "200":
           description: Update confirmation and link to record.
-        '404':
+        "404":
           description: User was not found in the DB.
     delete:
       tags:
         - Users
       description: Delete user by ID.
       responses:
-        '200':
+        "200":
           description: User deletion confirmation.
-        '401':
+        "401":
           description: Only admin users can delete user accounts.
-        '404':
+        "404":
           description: User was not found in the DB.
   /users:
     description: Register new users and view all users
@@ -64,17 +64,16 @@ paths:
         - Users
       description: Create a new user.
       responses:
-        '201':
+        "201":
           description: User created.
-        '400':
+        "400":
           description: User creation failed.
     get:
       tags:
         - Users
       description: View all users
       responses:
-        '200':
+        "200":
           description: View details for all users
-        '401':
+        "401":
           description: Only admin users can view details for all users
-

@@ -1,27 +1,27 @@
 require("dotenv").config();
 
 const {
-    getScotlandLocations,
-    getEnglandLocations,
-    getWalesLocations,
+  getScotlandLocations,
+  getEnglandLocations,
+  getWalesLocations,
 } = require("../helpers/locations");
 
 const { connectDB } = require("../helpers/database");
 
 (async () => {
-    try {
-        await connectDB();
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    await connectDB();
+  } catch (error) {
+    console.log(error);
+  }
 })();
 
 try {
-    getScotlandLocations().then((locations) => {
-        console.log(locations);
-    });
+  getScotlandLocations().then((locations) => {
+    console.log(locations);
+  });
 } catch (error) {
-    console.error(error);
+  console.error(error);
 }
 
 /*
@@ -35,11 +35,11 @@ try {
 */
 
 try {
-    getWalesLocations().then( (locations) => {
-        console.log(locations)
-    });
+  getWalesLocations().then((locations) => {
+    console.log(locations);
+  });
 } catch (error) {
-    console.error(error);
+  console.error(error);
 }
 
 /*

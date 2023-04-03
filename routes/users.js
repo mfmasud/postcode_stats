@@ -30,7 +30,7 @@ async function getAllUsers(cnx, next) {
     cnx.body = { message: "You are not logged in." };
     return;
   }
-  
+
   //console.log("User: " + cnx.state.user);
   const ability = createAbilityFor(cnx.state.user);
   const permission = ability.can("read", "AllUsers");
