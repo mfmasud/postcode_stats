@@ -1,5 +1,16 @@
 const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
 
+/**
+ * Defines a user's permissions/abilities for the /users route. Also incorporates the readAll permission for admins.
+ * 
+ * @function defineAbilitiesFor
+ * 
+ * @param {Mongoose.Model} user - The mongoose User model to check permissions against.
+ * @param {Mongoose.Model} [UserModel] - Another (optional) User model to check permissions against.
+ * 
+ * @returns A CASL ability object defining the user's permissions for the /users route.
+ * 
+ */
 function defineAbilitiesFor(user) {
   //console.log(`current user: ${user.username}\nrole: ${user.role.name}`)
 

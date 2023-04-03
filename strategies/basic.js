@@ -5,11 +5,15 @@ const User = require("../models/User");
 
 /**
  * Verifies passwords using bcrypt.
+ * 
  * @async
  * @function verifyPassword
+ * 
  * @param {Object} userobj - The User object with user information populated.
  * @param {string} password - The password to compare against.
+ * 
  * @returns {boolean} A boolean value indicating whether or not the password matches.
+ * 
  */
 async function verifyPassword(userobj, password) {
   //console.log("verifyPassword called");
@@ -25,12 +29,16 @@ async function verifyPassword(userobj, password) {
 
 /**
  * Authenticates a user via from given username and password.
+ * 
  * @async
  * @function checkUserAndPass
+ * 
  * @param {string} username - The username to authenticate.
  * @param {string} password - The password to authenticate.
  * @param {Function} done - A callback function that is called with either an error or the authenticated user.
+ * 
  * @returns {Promise<void>} A Promise that resolves after calling the done() middleware, returning the corresponding User object if successful.
+ * 
  */
 const checkUserAndPass = async (username, password, done) => {
   console.log("Authenticating user \"" + username + "\"");

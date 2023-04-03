@@ -20,12 +20,16 @@ let port = process.env.PORT;
 
 /**
  * Initializes the databases and starts the Koa server.
+ * 
  * @async
  * @function startServer
+ * 
  * @param {Object} app - The Koa application object.
  * @param {Number} port - The port to listen on for incoming requests.
+ * 
  * @returns {Promise} A Promise that resolves when the server is started/listening.
  * @throws {Error} Throws an error if the server fails to start.
+ * 
  */
 async function startServer(app, port) {
     try {
