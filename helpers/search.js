@@ -17,7 +17,7 @@ async function getRelatedStops(SearchModel, radius = 1000) {
     // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
     // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
     // just returning first 5 for now...
-    // Need to convert BNG to lat/long for empty values or search using BNG instead.
+    // Need to convert BNG to lat/long for empty values or search using BNG instead. See https://github.com/chrisveness/geodesy/blob/master/osgridref.js to convert
 
     if (linkedAtco){
         SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5);

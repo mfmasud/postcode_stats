@@ -127,7 +127,7 @@ async function processCSV(code, rawdata) {
     // filter out data to just bus stops
     const busstops = data.filter((row) => row.StopType === "BCT" && row.Status === "active" && row.Northing && row.Easting);
     // can also filter to city level at this stage, by finding the right column. "430" has 15,000 values to process ...
-    // BNG can be converted to lat long if needed to simplify calculations.
+    // BNG can be converted to lat long if needed to simplify calculations. See https://github.com/chrisveness/geodesy/blob/master/osgridref.js
 
     // store each result into the BusStop collection and associate it with the ATCO
     const newBusStops = [];
