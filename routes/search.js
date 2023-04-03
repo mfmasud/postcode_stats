@@ -59,17 +59,26 @@ async function searchArea(cnx, next) {
         console.error(error);
         cnx.status = 400;
         cnx.body = "Please provide valid latitude and longitude values.";
-        next();
+        return;
     }
     
-    console.log(lat, latFloat);
-    console.log(long, longFloat);
-    console.log(validateLatLong(latFloat, longFloat));
+    const locationObj = { latitude: latFloat, longitude: longFloat };
+    //console.log(locationObj);
+    //console.log(validateLatLong(locationObj));
 
     // Validate the lat/long values
-    if (!validateLatLong(latFloat, longFloat)) {
+    if (!validateLatLong(locationObj)) {
+
+        const errorMessages = ['Please provide valid latitude and longitude values:'];
+        for (const error of validateLatLong.errors) {
+            // dataPath below could change in the future
+            errorMessages.push(`Value for ${error.dataPath.slice(1)} ${error.message}`); // "value for x should be <=y"
+        }
+
+        console.error("Lat/Long validation error:", validateLatLong.errors);
         cnx.status = 400;
-        cnx.body = validateLatLong.errors;
+        cnx.body = errorMessages.join('\n');
+        return;
     }
 
     let { user } = cnx.state;
@@ -82,7 +91,7 @@ async function searchArea(cnx, next) {
         // reverse lookup lat long to postcode to generate data for postcode field
         // await FindPostcode with lat long
         // await getPostcode with postcode
-
+        cnx.status = 200;
         cnx.body = `lat: ${lat} long: ${long}`;
     } else {
         cnx.status = 403;
