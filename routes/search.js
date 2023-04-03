@@ -19,7 +19,7 @@ const validateLatLong = ajv.compile(latlongSchema);
 const createAbilityFor = require("../permissions/search");
 
 // helpers
-const { getPostcode, getRandomPostcode, validatePostcode } = require("../helpers/postcode");
+const {findPostcodeFromWGS84, getPostcode, getRandomPostcode, validatePostcode } = require("../helpers/postcode");
 const {
     getRelatedStops,
     getRelatedCrimes,
@@ -88,11 +88,16 @@ async function searchArea(cnx, next) {
     const ability = createAbilityFor(user);
 
     if (ability.can("read", "Search")) {
-        // reverse lookup lat long to postcode to generate data for postcode field
-        // await FindPostcode with lat long
-        // await getPostcode with postcode
-        cnx.status = 200;
-        cnx.body = `lat: ${lat} long: ${long}`;
+        // lookup lat long to postcode to generate data for postcode field, then search via postcode
+
+        const findPostcode = await findPostcodeFromWGS84(locationObj);
+        if (!findPostcode) {
+            cnx.status = 200;
+            cnx.body = "No postcode found for provided coordinates."
+        } else {
+            cnx.request.body.postcode = findPostcode;
+            await searchPostcode(cnx, next)
+        }
     } else {
         cnx.status = 403;
         cnx.body = "You are not authorised to view this resource";
@@ -127,10 +132,10 @@ async function searchPostcode(cnx, next) {
                 postcode: processedPostcode.postcode,
             });
 
-            // check for existing search by comparing latitude
+            // check for existing search by comparing northing
             // TODO: move to function
             const existingSearch = await Search.findOne({
-                latitude: dbPostcode.latitude,
+                Northing: dbPostcode.northings,
             });
             if (!existingSearch) {
                 console.log("Saving new Search");
@@ -165,10 +170,12 @@ async function searchPostcode(cnx, next) {
             // invalid postcode
             cnx.status = 400;
             cnx.body = "Please provide a valid postcode.";
+            return;
         }
     } else {
         cnx.status = 403;
         cnx.body = "You are not authorised to view this resource";
+        next();
     }
 }
 

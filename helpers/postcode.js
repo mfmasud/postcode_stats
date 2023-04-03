@@ -1,6 +1,45 @@
 const axios = require("axios");
 const Postcode = require("../models/Postcode");
 
+/**
+ * Represents a pair of latitude and longitude floats (WGS84)
+ * @typedef {Object} LocationPair
+ * @property {number} latitude - The latitude of the location.
+ * @property {number} longitude - The longitude of the location.
+ */
+
+/**
+ * Finds a postcode given a pair of latitude and longitude values.
+ * 
+ * @async
+ * @function findPostcodeFromWGS84
+ * 
+ * @param {LocationPair} location - A pair of lat/long values to find a postcode for.
+ * 
+ * @returns {(String|undefined)} A UK postcode or undefined if one has not been found.
+ * 
+ */
+async function findPostcodeFromWGS84(location) {
+    const postcodeapi = "https://api.postcodes.io/postcodes"; // using bulk search as it works better for some reason, also more extensible
+    const req = {"geolocations" : [{
+        "longitude": location.longitude,
+        "latitude": location.latitude,
+        "radius": 1000,
+        "limit": 1}]
+      }
+    const response = await axios.post(postcodeapi, req)
+    const result = response.data.result[0];
+    //console.log(result);
+    if (!result.result) {
+        console.log("No postcodes found, returning nothing")
+        return;
+    }
+    const queryResult = result.result[0];
+    //console.log(queryResult); // postcodes.io postcode object
+    return queryResult.postcode;
+
+}
+
 async function getRandomPostcode() {
     try {
         const response = await axios.get(
@@ -111,6 +150,7 @@ async function processPostcode(postcodeObject) {
 }
 
 module.exports = {
+    findPostcodeFromWGS84,
     getRandomPostcode,
     getPostcode,
     validatePostcode,
