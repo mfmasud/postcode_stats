@@ -1,0 +1,5 @@
+https://wikinearby.toolforge.org/?lang=en&q=51.463696,+-0.11489
+
+This website provides a service which finds nearby places given a pair of latitude and longitude co-ordinates.
+
+This could be used in this API as part of a search - adding a new field "queryNearbyPlaces" to the Search model.
