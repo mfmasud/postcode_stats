@@ -2,7 +2,7 @@ const Search = require("../models/Search");
 const BusStop = require("../models/BusStop");
 const Atco = require("../models/Atco");
 
-const {queryAtco} = require("../helpers/AtcoCodes");
+const { queryAtco } = require("../helpers/AtcoCodes");
 const { getCrimeData } = require("../helpers/crime"); // can be switched to a model later
 
 const mongoose = require("mongoose");

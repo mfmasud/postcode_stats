@@ -1,0 +1,9 @@
+# packages
+node_modules
+
+# docs
+docs/
+
+# any html/css files
+*.html
+*.css
