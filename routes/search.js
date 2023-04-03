@@ -2,13 +2,18 @@ const Router = require("koa-router");
 const bodyParser = require("koa-bodyparser");
 const auth = require("../controllers/auth");
 const router = Router({ prefix: "/api/v1/search" });
-const mongoose = require("mongoose");
 
-// models
+const mongoose = require("mongoose");
+const Ajv = require("ajv");
+const ajv = new Ajv();
+
+// models and json schemas
 const User = require("../models/User");
 const Role = require("../models/Role");
 const Postcode = require("../models/Postcode");
 const Search = require("../models/Search");
+const latlongSchema = require('../schemas/latlong.json');
+const validateLatLong = ajv.compile(latlongSchema);
 
 // permissions
 const createAbilityFor = require("../permissions/search");
@@ -22,26 +27,49 @@ const {
     linkCrimeList,
 } = require("../helpers/search");
 
+// routes
 router.post("/", auth, bodyParser(), searchArea); // POST - finds a postcode internally
 router.get("/", auth, bodyParser(), searchPostcode); // GET - verifies and searches using postcode from the request body
 router.get("/random", auth, searchRandom); // admins only - for testing
 
-async function searchArea(cnx) {
+// functions to handle the routes
+async function searchArea(cnx, next) {
     // POST and latitude/longitude in query params
     // allows anyone to search via a lat and long in the body of the request
     // returns a list of property listings, transport nodes and crime.
 
-    // no validation on the lat and long for now
     const { latitude, longitude } = cnx.query;
 
     const lat = latitude;
     const long = longitude;
+    
     console.log(`lat: ${lat} long: ${long}`);
 
+    // Check for empty values
     if (!lat || !long) {
         cnx.status = 400;
         cnx.body = "Please provide latitude and longitude values.";
         return;
+    }
+    
+    try {
+        var latFloat = parseFloat(lat);
+        var longFloat = parseFloat(long);
+    } catch (error) {
+        console.error(error);
+        cnx.status = 400;
+        cnx.body = "Please provide valid latitude and longitude values.";
+        next();
+    }
+    
+    console.log(lat, latFloat);
+    console.log(long, longFloat);
+    console.log(validateLatLong(latFloat, longFloat));
+
+    // Validate the lat/long values
+    if (!validateLatLong(latFloat, longFloat)) {
+        cnx.status = 400;
+        cnx.body = validateLatLong.errors;
     }
 
     let { user } = cnx.state;
