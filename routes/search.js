@@ -4,6 +4,7 @@ const auth = require("../controllers/auth");
 const router = Router({ prefix: "/api/v1/search" });
 
 const mongoose = require("mongoose");
+const logger = require("../utils/logger");
 const Ajv = require("ajv");
 const ajv = new Ajv();
 
@@ -48,7 +49,7 @@ async function searchArea(cnx, next) {
   const lat = latitude;
   const long = longitude;
 
-  console.log(`lat: ${lat} long: ${long}`);
+  logger.info(`lat: ${lat} long: ${long}`);
 
   // Check for empty values
   if (!lat || !long) {

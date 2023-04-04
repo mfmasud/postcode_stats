@@ -6,6 +6,8 @@ related note:
 docs/notes/atco_codes.txt
 */
 
+const logger = require("../utils/logger");
+
 const axios = require("axios");
 const JSDOM = require("jsdom").JSDOM;
 const csvtojson = require("csvtojson");
@@ -57,7 +59,7 @@ async function processAtco(data) {
 
   const existingAtco = await Atco.findOne({ code: atco }); // can filter for e.g. busstops.length === 0 to check for empty codes
   if (existingAtco) {
-    //console.log(`ATCO ${atco} already exists in db`);
+    //logger.info(`ATCO ${atco} already exists in db`);
     return; // skip creating another Atco for no reason.
   }
 
@@ -69,7 +71,7 @@ async function processAtco(data) {
     AllProcessed: false,
   });
 
-  //console.log(`ATCO ${newAtco.code} created in database`);
+  //logger.info(`ATCO ${newAtco.code} created in database`);
 }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
@@ -85,7 +87,7 @@ async function queryAtco(code) {
 
   const AtcoExists = await Atco.findOne({ code: code });
   if (AtcoExists.AllProcessed) {
-    console.log(`All ATCO ${code} BusStops found, not processing any further.`);
+    logger.info(`All ATCO ${code} BusStops found, not processing any further.`);
     return;
   }
 

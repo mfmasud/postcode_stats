@@ -2,6 +2,7 @@ const Router = require("koa-router");
 
 const bodyParser = require("koa-bodyparser");
 
+const logger = require("../utils/logger");
 const auth = require("../controllers/auth");
 
 const router = Router({ prefix: "/api/v1/users" });
@@ -236,7 +237,7 @@ async function updateUserById(cnx, next) {
       await updateUser.save();
 
       cnx.status = 200;
-      console.log(`[200] User with ID ${id} updated successfully`);
+      logger.info(`[200] User with ID ${id} updated successfully`);
       changes = ""; // would show the fields that have changes in them
       cnx.body = {
         message: `Edited fields for user with ID: ${id}`,
@@ -283,7 +284,7 @@ async function deleteUserById(cnx, next) {
     try {
       await User.deleteOne({ id: id });
       cnx.status = 200;
-      console.log(`[200] User with ID ${id} deleted successfully`);
+      logger.info(`[200] User with ID ${id} deleted successfully`);
 
       cnx.body = {
         message: "User deleted.",

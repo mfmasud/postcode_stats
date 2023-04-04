@@ -1,5 +1,7 @@
 const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
 
+const logger = require("../utils/logger");
+
 /**
  * Defines the user's permissions for the /postcodes route.
  *
@@ -11,7 +13,7 @@ const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
  * @returns A CASL ability object defining the user's permissions for the /postcodes route.
  */
 function defineAbilitiesFor(user) {
-  //console.log(`current user: ${user.username}\nrole: ${user.role.name}`)
+  //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
   const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
 

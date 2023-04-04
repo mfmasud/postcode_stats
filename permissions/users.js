@@ -1,5 +1,7 @@
 const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
 
+const logger = require("../utils/logger");
+
 /**
  * Defines a user's permissions/abilities for the /users route. Also incorporates the readAll permission for admins.
  *
@@ -12,7 +14,7 @@ const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
  *
  */
 function defineAbilitiesFor(user) {
-  //console.log(`current user: ${user.username}\nrole: ${user.role.name}`)
+  //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
   const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
 

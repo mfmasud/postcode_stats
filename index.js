@@ -5,6 +5,7 @@ const Koa = require("koa");
 const app = new Koa();
 
 const database = require("./helpers/database");
+const logger = require("./utils/logger")
 
 const special = require("./routes/special");
 const postcodes = require("./routes/postcodes");
@@ -41,10 +42,10 @@ async function startServer(app, port) {
 
     // start koa server
     app.listen(port, () => {
-      console.log("Server running on port", port);
+      logger.info(`Server running on port ${port}`);
     });
   } catch (error) {
-    console.error(`Error starting server:\n${error.message}`);
+    logger.error(`Error starting server:\n${error.message}`);
   }
 }
 (async () => {

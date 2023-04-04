@@ -1,5 +1,7 @@
 const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
 
+const logger = require("../utils/logger");
+
 /**
  * Defines the user's permissions for the /search route.
  *
@@ -22,7 +24,7 @@ const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
  */
 function defineAbilitiesFor(user) {
   // can use Search Model in the future.
-  //console.log(`current user: ${user.username}\nrole: ${user.role.name}`)
+  //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
   const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
 

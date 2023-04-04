@@ -1,6 +1,8 @@
 const Nptg = require("../models/Nptg");
 const Atco = require("../models/Atco");
 
+const logger = require("../utils/logger");
+
 const axios = require("axios");
 const JSDOM = require("jsdom").JSDOM;
 const mongoose = require("mongoose");
@@ -215,7 +217,7 @@ async function processNptgCSV(rawdata) {
 
     try {
       await newNptg.save();
-      //console.log(`Saved Nptg code ${Nptg.NptgLocalityCode} to Nptg collection`);
+      //logger.info(`Saved Nptg code ${Nptg.NptgLocalityCode} to Nptg collection`);
     } catch (error) {
       console.error(error);
     }

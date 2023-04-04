@@ -1,4 +1,7 @@
 const axios = require("axios");
+
+const logger = require("../utils/logger");
+
 const Postcode = require("../models/Postcode");
 
 /**
@@ -98,7 +101,7 @@ async function validatePostcode(postcodeString) {
       /validate`
     );
 
-    console.log(`${postcodeString} is valid: ${response.data.result}`);
+    logger.info(`${postcodeString} is valid: ${response.data.result}`);
 
     if (response.data.result === true) {
       return true;
