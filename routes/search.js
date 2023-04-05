@@ -49,7 +49,7 @@ async function searchArea(cnx, next) {
   const lat = latitude;
   const long = longitude;
 
-  logger.info(`lat: ${lat} long: ${long}`);
+  logger.info(`searching for lat: ${lat} long: ${long}`);
 
   // Check for empty values
   if (!lat || !long) {
