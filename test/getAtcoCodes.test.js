@@ -19,7 +19,7 @@ var expect = chai.expect;
 var assert = chai.assert;
 
 
-describe('AtcoCodes helper file', function () {
+describe('helpers/AtcoCodes.js', function () {
   describe('getAtcoCodes()', function () {
 
     let codes;
