@@ -22,10 +22,10 @@ var assert = chai.assert;
 describe('AtcoCodes helper file', function () {
   describe('getAtcoCodes()', function () {
 
+    let codes;
     before(async function () {
       // runs once before the first test in this block
-      const codes = await getAtcoCodes();
-      return codes;
+      codes = await getAtcoCodes();
     });
 
     it('Should be an array', function () {
