@@ -27,7 +27,10 @@ const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it
 
 /**
  * Connect to the mongodb server. The connection string is stored in the MONGO_URI parameter.
- * @param {Boolean} [output=false] - Control whether or not to output a message indicating a successful connection.
+ * @param {boolean} [output=false] - Control whether or not to output a message indicating a successful connection.
+ * 
+ * @async
+ * @function connectDB
  * 
  * @see disconnectDB
  * 
@@ -53,7 +56,7 @@ async function connectDB(output = false) {
  * @async
  * @function disconnectDB
  * 
- * @param {Boolean} [output=false] - Control whether or not to output a message to the console stating that the database has been disconnected from.
+ * @param {boolean} [output=false] - Control whether or not to output a message to the console stating that the database has been disconnected from.
  * 
  * @see connectDB
  * 
@@ -144,9 +147,9 @@ async function initUserDB() {
 }
 
 /**
- * Resets cached location data. Deletes the Postcode, Search, Crime and CrimeList collections.
+ * Resets cached location data. Deletes the `Postcode`, `Search`, `Crime` and `CrimeList` collections.
  * Must be used carefully, as re-downloading data will take a long time.
- * As to not force a re-download, this function does not delete the Atco, BusStop and Nptg collections.
+ * As to not force a re-download, this function does not delete the `Atco`, `BusStop` and `Nptg` collections.
  * 
  * @async
  * @function resetDataDB
@@ -174,7 +177,7 @@ async function resetDataDB() {
 }
 
 /**
- * Initialises the location database collections. Adds the Nptg data if not cached already. Assigns ATCOs and related names.
+ * Initialises the location database collections. Adds the `Nptg` data if not cached already. Assigns `Atco` codes for Scoltand,England and Wales and related names for Scotland.
  * 
  * @async
  * @function initLocationDB
@@ -185,6 +188,7 @@ async function resetDataDB() {
 async function initLocationDB() {
   // 1 time download of NPTG locality database ~ 5mb csv. Is cached.
   // Takes approximately 10 minutes (*on Codio) to save everything so this should be run on setup only.
+  // Needs to be optimised like the Atco saving code, using insertmany/bulkwrite.
   await getNptgData();
 
   // Get and process ATCO codes master list

@@ -8,6 +8,18 @@ const JSDOM = require("jsdom").JSDOM;
 const mongoose = require("mongoose");
 const csvtojson = require("csvtojson");
 
+/**
+ * Processes the names for the 32 local goverments of Scotland in order to match the names from the government Atco list. 
+ *  
+ * @async
+ * @function getScotlandLocations
+ * 
+ * @returns {string[]} A list of strings used by the wikipedia page.
+ * 
+ * @see getEnglandLocations
+ * @see getWalesLocations
+ * 
+ */
 async function getScotlandLocations() {
   const url = "https://en.wikipedia.org/wiki/Local_government_in_Scotland";
   const response = await axios.get(url);
@@ -106,6 +118,19 @@ async function getScotlandLocations() {
   return names;
 }
 
+/**
+ * Processes online sources to assign alt names to English Atco locations.
+ * e.g. the region "London" > City of London and London Boroughs as alt names
+ * 
+ * @async
+ * @function getEnglandLocations
+ * 
+ * @returns {string[]} A list of English locations matching the ones in the government Atco list.
+ * 
+ * @see getScotlandLocations
+ * @see getWalesLocations
+ * 
+ */
 async function getEnglandLocations() {
   // unitary authorities
   const UA_url =
@@ -114,7 +139,7 @@ async function getEnglandLocations() {
   const UA_data = new JSDOM(UA_response.data);
 
   // Example: Bournemouth, Christchurch and Poole
-  // Bournemouth and Poole are separate in the ATCO list.
+  // Bournemouth and Poole are separate in the ATCO list, so not foolproof yet.
 
   // ceremnonial counties
   // https://raw.githubusercontent.com/ideal-postcodes/postcodes.io/master/data/counties.json
@@ -136,6 +161,18 @@ async function getEnglandLocations() {
   return english_places;
 }
 
+/**
+ * Processes the wikipedia page on Welsh local governments to assign alt names to Wales Atco locations.
+ * 
+ * @async
+ * @function getWalesLocations
+ * 
+ * @returns {string[]} A list of Welsh locations from Wikipedia, matching the ones in the government supplied local authority Atco list.
+ * 
+ * @see getScotlandLocations
+ * @see getEnglandLocations
+ * 
+ */
 async function getWalesLocations() {
   // https://en.wikipedia.org/wiki/Local_government_in_Wales#Principal_areas
 
@@ -158,6 +195,15 @@ async function getWalesLocations() {
   return names.slice(0, 22);
 }
 
+/**
+ * Downloads and processes the National Public Transport Gazetteer (NPTG) dataset from Naptan.
+ * 
+ * @async
+ * @function getNptgData
+ * 
+ * @see processNptgCSV
+ * 
+ */
 async function getNptgData() {
   // Nptg could potentially be used as a fallback for finding location names
   const url = "https://naptan.api.dft.gov.uk/v1/nptg/localities";
@@ -168,6 +214,18 @@ async function getNptgData() {
   await processNptgCSV(data);
 }
 
+/**
+ * Procceses the NPTG API csv data. Checks for an existing cache to ensure data is not needlessly re-downloaded.
+ * 
+ * @async
+ * @function processNptgCSV
+ * 
+ * @param {Object} rawdata - The raw CSV data returned from getNptgData. 
+ * @returns 
+ * 
+ * @see getNptgData
+ * 
+ */
 async function processNptgCSV(rawdata) {
   // TODO: speed this up like the code used to save bus stops / ATCOs.
 
