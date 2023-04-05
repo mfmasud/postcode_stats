@@ -25,7 +25,13 @@ const {
 
 const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file
 
-// Connect MongoDB database
+/**
+ * Connect to the mongodb server. The connection string is stored in the MONGO_URI parameter.
+ * @param {Boolean} [output=false] - Control whether or not to output a message indicating a successful connection.
+ * 
+ * @see disconnectDB
+ * 
+ */
 async function connectDB(output = false) {
   try {
     await mongoose.connect(MONGO_URI, {
@@ -41,7 +47,17 @@ async function connectDB(output = false) {
   }
 }
 
-// Disconnect MongoDB database
+/**
+ * Disconnects from the mongodb database
+ * 
+ * @async
+ * @function disconnectDB
+ * 
+ * @param {Boolean} [output=false] - Control whether or not to output a message to the console stating that the database has been disconnected from.
+ * 
+ * @see connectDB
+ * 
+ */
 async function disconnectDB(output = false) {
   try {
     await mongoose.connection.close();
@@ -54,7 +70,16 @@ async function disconnectDB(output = false) {
   }
 }
 
-// Initialise + reset dummy user db
+/**
+ * Initialises and resets the dummy Users and Roles collections. Requires an active mongodb connection. 
+ * Adds 3 users, corresponding to the standard, paid and admin access levels.
+ * 
+ * @async
+ * @function initUserDB
+ * 
+ * @see connectDB
+ * 
+ */
 async function initUserDB() {
   logger.info("Resetting User data...");
 
@@ -98,7 +123,7 @@ async function initUserDB() {
       password: "password",
       passwordSalt: "salt",
       email: "PaidUser1@test.com",
-      role: UserRole,
+      role: PaidUser,
     });
 
     const admin = await User.create({
@@ -118,7 +143,17 @@ async function initUserDB() {
   }
 }
 
-// Reset location data cache
+/**
+ * Resets cached location data. Deletes the Postcode, Search, Crime and CrimeList collections.
+ * Must be used carefully, as re-downloading data will take a long time.
+ * As to not force a re-download, this function does not delete the Atco, BusStop and Nptg collections.
+ * 
+ * @async
+ * @function resetDataDB
+ * 
+ * @see initLocationDB
+ * 
+ */
 async function resetDataDB() {
   logger.info("Resetting location data...");
 
@@ -138,6 +173,15 @@ async function resetDataDB() {
   }
 }
 
+/**
+ * Initialises the location database collections. Adds the Nptg data if not cached already. Assigns ATCOs and related names.
+ * 
+ * @async
+ * @function initLocationDB
+ * 
+ * @see resetDataDB
+ * 
+ */
 async function initLocationDB() {
   // 1 time download of NPTG locality database ~ 5mb csv. Is cached.
   // Takes approximately 10 minutes (*on Codio) to save everything so this should be run on setup only.
