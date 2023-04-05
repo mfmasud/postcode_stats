@@ -84,7 +84,7 @@ async function searchArea(cnx, next) {
       ); // "value for x should be <=y"
     }
 
-    logger.error(`Lat/Long validation error: ${validateLatLong.errors}`);
+    logger.error(`Lat/Long validation error: ${JSON.stringify(validateLatLong.errors[0])}`);
     cnx.status = 400;
     cnx.body = errorMessages.join("\n");
     return;
