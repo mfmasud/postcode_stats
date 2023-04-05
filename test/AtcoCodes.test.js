@@ -19,23 +19,30 @@ var expect = chai.expect;
 var assert = chai.assert;
 
 
-describe('getAtcoCodes Function', function () {
-  describe('getAtcoCodes()', async function () {
-    // call function
-    const codes = await getAtcoCodes();
+describe('AtcoCodes helper file', function () {
+  describe('getAtcoCodes()', function () {
 
-    it('Should be an array', async function (codes) {
+    before(async function () {
+      // runs once before the first test in this block
+      const codes = await getAtcoCodes();
+      return codes;
+    });
+
+    it('Should be an array', function () {
       // check if it is an array
+      expect(codes).to.be.an('array');
     });
 
     // make sure array returns some values
-    it('Should not be empty', async function (codes) {
+    it('Should not be empty', function () {
       // check if it is not empty
+      expect(codes).to.not.be.empty;
     });
 
     // codes can change if the website is updated
-    it('Should have 147 codes', async function (codes) {
+    it('Should have 147 codes', function () {
       // check if the array length is equal to 147
+      expect(codes).to.have.lengthOf(147);
     });
 
   });

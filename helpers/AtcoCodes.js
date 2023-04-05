@@ -15,6 +15,14 @@ const csvtojson = require("csvtojson");
 const Atco = require("../models/Atco");
 const BusStop = require("../models/BusStop");
 
+/**
+ * Processes the list of ATCO codes for local authorities.
+ * 
+ * @async
+ * @function getAtcoCodes
+ * 
+ * @returns {Array} An array of codes
+ */
 async function getAtcoCodes() {
   const url = "https://beta-naptan.dft.gov.uk/download/la";
   const response = await axios.get(url);
@@ -32,6 +40,8 @@ async function getAtcoCodes() {
   });
 
   codes.shift();
+
+  //logger.info(codes);
 
   return codes;
 }
