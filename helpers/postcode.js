@@ -36,13 +36,13 @@ async function findPostcodeFromWGS84(location) {
   };
   const response = await axios.post(postcodeapi, req);
   const result = response.data.result[0];
-  //console.log(result);
+  //logger.info(result);
   if (!result.result) {
-    console.log("No postcodes found, returning nothing");
+    logger.info("No postcodes found, returning nothing");
     return;
   }
   const queryResult = result.result[0];
-  //console.log(queryResult); // postcodes.io postcode object
+  //logger.info(queryResult); // postcodes.io postcode object
   return queryResult.postcode;
 }
 
@@ -58,8 +58,8 @@ async function getRandomPostcode() {
     });
 
     if (postcodeExists) {
-      console.log(
-        "Postcode already exists in db: " + response.data.result.postcode
+      logger.info(
+        `Postcode already exists in db: ${response.data.result.postcode}`
       );
       return postcodeExists;
     }
@@ -67,7 +67,7 @@ async function getRandomPostcode() {
     await processPostcode(response.data.result);
     return response.data.result;
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 }
 
@@ -78,7 +78,7 @@ async function getPostcode(validPostcodeString) {
   });
 
   if (postcodeExists) {
-    console.log("Postcode already exists in db: " + validPostcodeString);
+    logger.info(`Postcode already exists in db: ${validPostcodeString}`);
     return postcodeExists;
   }
 
@@ -89,7 +89,7 @@ async function getPostcode(validPostcodeString) {
     await processPostcode(response.data.result);
     return response.data.result;
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 }
 
@@ -109,12 +109,12 @@ async function validatePostcode(postcodeString) {
       return false;
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 }
 
 async function processPostcode(postcodeObject) {
-  console.log("Processing:", postcodeObject.postcode);
+  logger.info(`Processing: ${postcodeObject.postcode}`);
 
   // fields to save: postcode, eastings, northings, country, longitude, latitude, region (can be null)
   // parliamentary_constituency, admin_district, admin_ward, parish, admin_county (can be null too)
@@ -151,9 +151,9 @@ async function processPostcode(postcodeObject) {
 
   try {
     await newPostcode.save();
-    console.log("Successfully saved postcode: " + postcodeObject.postcode);
+    logger.info(`Successfully saved postcode: ${postcodeObject.postcode}`);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 }
 

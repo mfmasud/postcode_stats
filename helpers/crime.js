@@ -1,6 +1,7 @@
 // https://data.police.uk/docs/method/crime-street/ - Uk crime data by street
 // can search by lat and long and relate it to a search object.
 
+const logger = require("../utils/logger");
 const axios = require("axios");
 
 const CrimeList = require("../models/CrimeList");
@@ -13,9 +14,8 @@ async function getCrimeData(lat, long) {
   // returns the crimes in the most recent month
   const existingCrimeList = await CrimeList.findOne({ latitude: lat });
   if (existingCrimeList) {
-    console.log(
-      "Existing crime list found, ID:",
-      existingCrimeList.crimeListID
+    logger.info(
+      `Existing crime list found, ID: ${existingCrimeList.crimeListID}`
     );
     return;
   } else {
@@ -29,7 +29,7 @@ async function processCrimeData(lat, long, rawCrimeData) {
   // model the Crime and categorise it too for paid / admins.
   // lat long to differentiate crime lists
 
-  // console.log(rawCrimeData); // can be empty
+  // logger.info(rawCrimeData); // can be empty
   // below code can be edited to handle a minimum amount of crimes required e.g. 5
   if (rawCrimeData.length === 0) {
     CrimeList.create({
@@ -58,7 +58,7 @@ async function processCrimeData(lat, long, rawCrimeData) {
       continue;
     }
 
-    //console.log(data);
+    //logger.info(data);
     const newCrime = await Crime.create({
       crimeID: data.id,
       latitude: data.location.latitude,

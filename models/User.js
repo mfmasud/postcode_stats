@@ -1,4 +1,7 @@
 const mongoose = require("mongoose");
+
+const logger = require("../utils/logger");
+
 const bcrypt = require("bcrypt"); // https://www.npmjs.com/package/bcrypt
 const saltRounds = 10;
 
@@ -54,7 +57,7 @@ userSchema.pre("save", async function save(next) {
       this.passwordSalt = salt;
       this.password = await bcrypt.hash(this.password, salt);
 
-      console.log(
+      logger.info(
         `password modified/created for user: ${this.username}\nhashed password: ${this.password}`
       );
 
@@ -66,7 +69,7 @@ userSchema.pre("save", async function save(next) {
 });
 
 userSchema.statics.findByUsername = async function findByUsername(username) {
-  //console.log('findByUsername called');
+  //logger.info('findByUsername called');
   const user = await this.findOne({ username: username }).populate("role");
   return user;
 };

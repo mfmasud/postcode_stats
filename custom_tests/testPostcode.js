@@ -1,5 +1,8 @@
 const postcode = require("../helpers/postcode");
 const database = require("../helpers/database");
+
+const logger = require("../utils/logger");
+
 database.connectDB();
 
 // promises at the top level:
@@ -8,8 +11,8 @@ database.connectDB();
 
 try {
   postcode.getRandomPostcode().then((randomPostcode) => {
-    console.log(randomPostcode);
+    logger.info(randomPostcode);
   });
 } catch (error) {
-  console.error(error);
+  logger.error(error);
 }

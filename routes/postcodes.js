@@ -3,11 +3,14 @@ const bodyParser = require("koa-bodyparser");
 const auth = require("../controllers/auth");
 const router = Router({ prefix: "/api/v1/postcodes" });
 
+const logger = require("../utils/logger");
+
 const User = require("../models/User");
 const Role = require("../models/Role");
 const Postcode = require("../models/Postcode");
 
 const mongoose = require("mongoose");
+
 const createAbilityFor = require("../permissions/postcodes");
 
 const {
@@ -24,7 +27,7 @@ async function getAllPostcodes(cnx) {
   const { user } = cnx.state;
   if (!cnx.state.user) {
     cnx.status = 401;
-    console.error("[401] User needs to log in.");
+    logger.error("[401] User needs to log in.");
     cnx.body = { message: "You are not logged in." };
     return;
   }
@@ -43,7 +46,7 @@ async function getRandomPostcodeRoute(cnx) {
   const { user } = cnx.state;
   if (!cnx.state.user) {
     cnx.status = 401;
-    console.error("[401] User needs to log in.");
+    logger.error("[401] User needs to log in.");
     cnx.body = { message: "You are not logged in." };
     return;
   }
@@ -52,7 +55,7 @@ async function getRandomPostcodeRoute(cnx) {
   if (ability.can("read", "Postcode")) {
     const randompostcode = await getRandomPostcode();
     cnx.status = 200;
-    console.log("returned postcode", randompostcode.postcode);
+    logger.info(`returned postcode ${randompostcode.postcode}`);
     cnx.body = randompostcode;
   } else {
     cnx.status = 403;
@@ -81,7 +84,7 @@ async function getPostcodeRoute(cnx) {
     if (validPostcode) {
       const body = await getPostcode(postcode);
       cnx.status = 200;
-      console.log("returned postcode", body.postcode);
+      logger.info(`returned postcode ${body.postcode}`);
       cnx.body = body;
     } else {
       cnx.status = 400;

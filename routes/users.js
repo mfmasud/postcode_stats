@@ -1,10 +1,9 @@
 const Router = require("koa-router");
-
 const bodyParser = require("koa-bodyparser");
 
 const logger = require("../utils/logger");
-const auth = require("../controllers/auth");
 
+const auth = require("../controllers/auth");
 const router = Router({ prefix: "/api/v1/users" });
 
 const User = require("../models/User");
@@ -23,19 +22,19 @@ router.put("/:id([0-9]{1,})", auth, bodyParser(), updateUserById); // authentica
 router.del("/:id([0-9]{1,})", auth, deleteUserById); // admins can delete any standard user, standard users can delete their own account.
 
 async function getAllUsers(cnx, next) {
-  console.log("getAllUsers() called");
+  logger.info("getAllUsers() called");
 
   if (!cnx.state.user) {
     cnx.status = 401;
-    console.error("[401] User needs to log in.");
+    logger.error("[401] User needs to log in.");
     cnx.body = { message: "You are not logged in." };
     return;
   }
 
-  //console.log("User: " + cnx.state.user);
+  //logger.info(`User: ${cnx.state.user}`);
   const ability = createAbilityFor(cnx.state.user);
   const permission = ability.can("read", "AllUsers");
-  //console.log("Permission: " + permission);
+  //logger.info(`Permission: ${permission}`);
 
   if (!permission) {
     cnx.throw(403, "You are not allowed to perform this action");
@@ -45,12 +44,12 @@ async function getAllUsers(cnx, next) {
     if (!users) {
       // technically this should never happen as we are literally signing in with a user
       cnx.status = 404;
-      console.error("[404] No users found in database.");
+      logger.error("[404] No users found in database.");
       cnx.body = { message: "No users found." };
     } else {
       cnx.body = users;
       cnx.status = 200;
-      console.log("[200] All users from database returned.");
+      logger.info("[200] All users from database returned.");
     }
   }
 }
@@ -59,14 +58,14 @@ async function createUser(cnx, next) {
   // users register with a username, password and email
   // they are assigned the role of "user" by default
 
-  console.log("createUser() called");
+  logger.info("createUser() called");
 
   const { username, password, email } = cnx.request.body;
 
   // check if email, password, or username are empty
   if (!username || !password || !email) {
     cnx.status = 400;
-    console.error("[400] Username, password or email field is empty.");
+    logger.error("[400] Username, password or email field is empty.");
     cnx.body = { message: "Username, password or email field is empty." };
     return;
   }
@@ -77,12 +76,12 @@ async function createUser(cnx, next) {
 
   if (usernameCheck) {
     cnx.status = 400;
-    console.error("[400] Username already exists.");
+    logger.error("[400] Username already exists.");
     cnx.body = { message: "Username already exists." };
     return;
   } else if (emailCheck) {
     cnx.status = 400;
-    console.error("[400] Email already exists.");
+    logger.error("[400] Email already exists.");
     cnx.body = { message: "Email already exists." };
     return;
   }
@@ -99,36 +98,36 @@ async function createUser(cnx, next) {
     // return the username, email and role of the new user from the database
     const savedUser = user;
     cnx.status = 201;
-    console.log("[201] User created: " + savedUser.username);
+    logger.info(`[201] User created: ${savedUser.username}`);
     cnx.body = {
       username: savedUser.username,
       email: savedUser.email,
       role: savedUser.role.name,
     };
-  } catch (err) {
+  } catch (error) {
     cnx.status = 400;
-    console.error("[400] Error: User creation failed:\n" + err);
+    logger.error(`[400] Error: User creation failed:\n${error}`);
     cnx.body = { message: "User creation failed." };
   }
 }
 
 async function getUserById(cnx, next) {
-  console.log("getUserById() called");
+  logger.info("getUserById() called");
   const id = cnx.params.id;
 
   if (!cnx.state.user) {
     cnx.status = 401;
-    console.error("[401] User needs to log in.");
+    logger.error("[401] User needs to log in.");
     cnx.body = { message: "You are not logged in." };
     return;
   }
   const user = cnx.state.user;
 
-  console.log("Looking for User with ID: " + id);
+  logger.info(`Looking for User with ID: ${id}`);
 
   if (!(await isValidUserID(id))) {
     cnx.status = 400;
-    console.error("[400] Invalid user ID: " + id);
+    logger.error("[400] Invalid user ID: " + id);
     cnx.body = { message: "Invalid user ID." };
     return;
   }
@@ -136,7 +135,7 @@ async function getUserById(cnx, next) {
 
   if (!findUser) {
     cnx.status = 404;
-    console.error("[404] User not found, ID: " + id);
+    logger.error(`[404] User not found, ID: ${id}`);
     cnx.body = { message: "User not found." };
     return;
   }
@@ -145,12 +144,12 @@ async function getUserById(cnx, next) {
 
   if (!ability.can("read", findUser)) {
     cnx.status = 403;
-    console.error("[403] User is not allowed to perform this action.");
+    logger.error("[403] User is not allowed to perform this action.");
     cnx.body = { message: "You are not allowed to perform this action." };
     return;
   } else {
     cnx.status = 200;
-    console.log("[200] User found.");
+    logger.info("[200] User found.");
     cnx.body = {
       id: findUser.id,
       firstName: findUser.firstName,
@@ -171,7 +170,7 @@ async function getUserById(cnx, next) {
 }
 
 async function updateUserById(cnx, next) {
-  console.log("updateUserByID() called");
+  logger.info("updateUserByID() called");
 
   let id = cnx.params.id;
   let { firstName, lastName, about, password, email, avatarURL } =
@@ -181,7 +180,7 @@ async function updateUserById(cnx, next) {
 
   if (!cnx.state.user) {
     cnx.status = 401;
-    console.error("[401] User needs to log in.");
+    logger.error("[401] User needs to log in.");
     cnx.body = { message: "You are not logged in." };
   }
   const user = cnx.state.user;
@@ -189,7 +188,7 @@ async function updateUserById(cnx, next) {
   const ValidUserID = await isValidUserID(id);
   if (!ValidUserID) {
     cnx.status = 400;
-    console.error("[400] Invalid User ID:", id);
+    logger.error(`[400] Invalid User ID: ${id}`);
     cnx.body = { message: "Invalid user ID." };
     return;
   }
@@ -200,7 +199,7 @@ async function updateUserById(cnx, next) {
 
   if (!ability.can("update", updateUser)) {
     cnx.status = 403;
-    console.error(
+    logger.error(
       `[403] User ${user.username} is not allowed to update user with ID: ${id}`
     );
     cnx.body = { message: "You are not allowed to update this user." };
@@ -242,31 +241,31 @@ async function updateUserById(cnx, next) {
       cnx.body = {
         message: `Edited fields for user with ID: ${id}`,
       }; // fields would be replaced with the changes string
-    } catch (err) {
+    } catch (error) {
       cnx.status = 400;
-      console.error("[400] Error: User update failed with error:\n" + err);
+      logger.error(`[400] Error: User update failed with error:\n${error}`);
       cnx.body = { message: "User update failed." };
     }
   }
 }
 
 async function deleteUserById(cnx, next) {
-  console.log("deleteUserById() called");
+  logger.info("deleteUserById() called");
   const id = cnx.params.id;
 
   if (!cnx.state.user) {
     cnx.status = 401;
-    console.error("[401] User needs to log in.");
+    logger.error("[401] User needs to log in.");
     cnx.body = { message: "You are not logged in." };
     return;
   }
   const user = cnx.state.user;
 
-  console.log("Looking for User with ID: " + id);
+  logger.info(`Looking for User with ID: ${id}`);
 
   if (!(await isValidUserID(id))) {
     cnx.status = 400;
-    console.error("[400] Invalid user ID: " + id);
+    logger.error(`[400] Invalid user ID: ${id}`);
     cnx.body = { message: "Invalid user ID." };
     return;
   }
@@ -277,7 +276,7 @@ async function deleteUserById(cnx, next) {
 
   if (!ability.can("delete", deleteUser)) {
     cnx.status = 403;
-    console.error("[403] User is not allowed to delete this user.");
+    logger.error("[403] User is not allowed to delete this user.");
     cnx.body = { message: "You are not allowed to delete this user." };
     return;
   } else {
@@ -289,9 +288,9 @@ async function deleteUserById(cnx, next) {
       cnx.body = {
         message: "User deleted.",
       };
-    } catch (err) {
+    } catch (error) {
       cnx.status = 400;
-      console.error("[400] Error: User deletion failed:\n" + err);
+      logger.error(`[400] Error: User deletion failed:\n${error}`);
       cnx.body = { message: "User deletion failed." };
     }
   }

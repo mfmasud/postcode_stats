@@ -22,21 +22,21 @@ function defineAbilitiesFor(user) {
   // authenticated users
   // standard users
   if (user.role.name === "user") {
-    //console.log('standard user role')
+    //logger.info('standard user role')
 
     can("read", "Postcode");
   }
 
   // paid users
   if (user.role.name === "user") {
-    //console.log('standard user role')
+    //logger.info('standard user role')
 
     can("read", "Postcode");
   }
 
   // admin users
   if (user.role.name === "admin") {
-    //console.log('admin user role')
+    //logger.info('admin user role')
 
     can("readAll", "Postcode");
     can("read", "Postcode");

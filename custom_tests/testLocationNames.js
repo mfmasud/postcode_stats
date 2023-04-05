@@ -1,4 +1,5 @@
 require("dotenv").config();
+const logger = require("../utils/logger");
 
 const {
   getScotlandLocations,
@@ -12,34 +13,34 @@ const { connectDB } = require("../helpers/database");
   try {
     await connectDB();
   } catch (error) {
-    console.log(error);
+    logger.error(error);
   }
 })();
 
 try {
   getScotlandLocations().then((locations) => {
-    console.log(locations);
+    logger.info(locations);
   });
 } catch (error) {
-  console.error(error);
+  logger.error(error);
 }
 
 /*
 try {
     getEnglandLocations().then((locations) => {
-        console.log(locations);
+        logger.info(locations);
     });
 } catch (error) {
-    console.error(error);
+    logger.error(error);
 }
 */
 
 try {
   getWalesLocations().then((locations) => {
-    console.log(locations);
+    logger.info(locations);
   });
 } catch (error) {
-  console.error(error);
+  logger.error(error);
 }
 
 /*
@@ -47,9 +48,9 @@ try {
 // see https://www.data.gov.uk/dataset/495c6964-e8d2-4bf1-9942-8d950b3a0ceb/translink-bus-stop-list
 try {
     getNILocations().then( (locations) => {
-        console.log(locations)
+        logger.info(locations)
     });
 } catch (error) {
-    console.error(error);
+    logger.error(error);
 }
 */

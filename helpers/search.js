@@ -2,6 +2,8 @@ const Search = require("../models/Search");
 const BusStop = require("../models/BusStop");
 const Atco = require("../models/Atco");
 
+const logger = require("../utils/logger");
+
 const { queryAtco } = require("../helpers/AtcoCodes");
 const { getCrimeData } = require("../helpers/crime"); // can be switched to a model later
 
@@ -51,14 +53,14 @@ async function linkAtco(SearchModel) {
   // links Search model to correct ATCO from available information.
   // Should be run when search is created / postcode is updated.
   // Does not return anything
-  console.log("Looking to link Atco");
+  logger.info("Looking to link Atco");
 
   var linkedAtco;
 
   if (SearchModel.Postcode.country === "Northern Ireland") {
     // Skip ATCO linking for northern irish postcodes e.g. BT23 6SA
     // linkedAtco = linkOther(SearchModel.Postcode)
-    console.log("Cannot link NI Atco.");
+    logger.info("Cannot link NI Atco.");
     return;
   } else {
     linkedAtco = await searchAtco(SearchModel.Postcode);
@@ -91,7 +93,7 @@ async function searchAtco(PostcodeModel) {
     region,
     country,
   } = PostcodeModel;
-  //console.log(admin_county, admin_district, region);
+  //logger.info(admin_county, admin_district, region);
 
   if (country === "Scotland") {
     region = "Scotland";
@@ -101,11 +103,11 @@ async function searchAtco(PostcodeModel) {
 
   // starting to look ugly - maybe use functions or switch/case
   if (!admin_county) {
-    console.log("No admin county");
+    logger.info("No admin county");
 
     if (!admin_district) {
       // no admin district
-      console.log("No admin district");
+      logger.info("No admin district");
     } else {
       // admin district exists
       var AtcoToLink = await Atco.findOne({ location: admin_district });
@@ -148,11 +150,11 @@ async function searchAtco(PostcodeModel) {
 
   if (AtcoToLink) {
     // match found
-    console.log("Matching ATCO:", AtcoToLink.code);
+    logger.info(`Matching ATCO:" ${AtcoToLink.code}`);
     await queryAtco(AtcoToLink.code);
     return AtcoToLink;
   } else {
-    console.log("Matching ATCO not found");
+    logger.info("Matching ATCO not found");
     return;
   }
 }

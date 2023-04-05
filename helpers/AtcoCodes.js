@@ -55,7 +55,7 @@ async function processAtco(data) {
 
   const processedData = {};
   processedData[atco] = { location, region };
-  //console.log(atco, processedData[atco]);
+  //logger.info(`${atco}: ${processedData[atco]}`);
 
   const existingAtco = await Atco.findOne({ code: atco }); // can filter for e.g. busstops.length === 0 to check for empty codes
   if (existingAtco) {
@@ -100,15 +100,15 @@ async function queryAtco(code) {
     // response is raw csv data, not an object should be cached and parsed into json
 
     if (format === "csv") {
-      console.log("processing ATCO code:", code);
+      logger.info(`processing ATCO code: ${code}`);
       await processCSV(code, response.data);
-      console.log("finished processing ATCO:", code);
+      logger.info(`finished processing ATCO: ${code}`);
     } else {
-      console.log("Invalid data format. should be csv");
+      logger.info("Invalid data format. should be csv");
       return;
     }
   } catch (error) {
-    console.error(error);
+    logger.error(error);
   }
 }
 
@@ -116,14 +116,14 @@ async function processCSV(code, rawdata) {
   // this can take a while, should be run on startup of the server so users use processed mongodb models instead of processing them when a request is made
   const associatedAtco = await Atco.findOne({ code: code });
   if (!associatedAtco) {
-    console.log(
+    logger.info(
       "Stopping processing of bus stops. Either code is invalid or ATCO list has not been loaded."
     );
   }
 
   // parse csv using csvtojson
   const data = await csvtojson().fromString(rawdata);
-  //console.log(data);
+  //logger.info(data);
   // data is an array of objects e.g. dictionary of column:value pairs
 
   // filter out data to just bus stops
@@ -141,7 +141,7 @@ async function processCSV(code, rawdata) {
   const newBusStops = [];
   const ids = [];
   for (const row of busstops) {
-    //console.log(row);
+    //logger.info(row);
 
     const existingBusStop = await BusStop.findOne({
       ATCO_long: row.ATCOCode,
@@ -173,7 +173,7 @@ async function processCSV(code, rawdata) {
       associatedAtco.AllProcessed = true;
       await associatedAtco.save();
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 }

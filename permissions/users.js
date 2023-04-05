@@ -24,7 +24,7 @@ function defineAbilitiesFor(user) {
   // authenticated users
   // standard users
   if (user.role.name === "user") {
-    //console.log('standard user role')
+    //logger.info('standard user role')
 
     can("read", "User", { _id: user._id }); // can read own details except for password/passwordSalt
     cannot("read", "AllUsers"); // cannot read other user's details
@@ -36,7 +36,7 @@ function defineAbilitiesFor(user) {
 
   // paid users
   if (user.role.name === "paid") {
-    //console.log('paid user role')
+    //logger.info('paid user role')
 
     can("read", "User", { _id: user._id }); // can read own details except for password/passwordSalt
     cannot("read", "AllUsers"); // cannot read other user's details
@@ -48,7 +48,7 @@ function defineAbilitiesFor(user) {
 
   // admin users
   if (user.role.name === "admin") {
-    //console.log('admin user role')
+    //logger.info('admin user role')
 
     can("read", "User");
     can("read", "UserPassword");

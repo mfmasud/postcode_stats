@@ -131,7 +131,7 @@ async function getEnglandLocations() {
 
   const english_places = [];
 
-  console.log(english_places);
+  logger.info(english_places);
 
   return english_places;
 }
@@ -154,7 +154,7 @@ async function getWalesLocations() {
     names.push(li.textContent.trim());
   }
 
-  //console.log(names)
+  //logger.info(names)
   return names.slice(0, 22);
 }
 
@@ -174,10 +174,10 @@ async function processNptgCSV(rawdata) {
   // check if Nptg collection is empty
   const count = await Nptg.countDocuments();
   if (count > 0) {
-    console.log("Nptg data already saved.");
+    logger.info("Nptg data already saved.");
     return;
   } else {
-    console.log("Processing Nptg data...");
+    logger.info("Processing Nptg data...");
   }
 
   // adatped from AtcoCodes.processCSV()
@@ -203,7 +203,7 @@ async function processNptgCSV(rawdata) {
   });
 
   for (const row of filtered) {
-    //console.log(row);
+    //logger.info(row);
     const newNptg = new Nptg({
       NptgLocalityCode: row.NptgLocalityCode,
       LocalityName: row.LocalityName,
@@ -213,17 +213,17 @@ async function processNptgCSV(rawdata) {
       QualifierName: row.QualifierName,
     });
 
-    // console.log(newNptg);
+    // logger.info(newNptg);
 
     try {
       await newNptg.save();
       //logger.info(`Saved Nptg code ${Nptg.NptgLocalityCode} to Nptg collection`);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
     }
   }
 
-  console.log("Nptg data saved.");
+  logger.info("Nptg data saved.");
 }
 
 module.exports = {

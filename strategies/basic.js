@@ -80,7 +80,7 @@ const checkUserAndPass = async (username, password, done) => {
       }
     }
   } catch (error) {
-    console.error(`Error during authentication for user ${username}`);
+    logger.error(`Error during authentication for user ${username}`);
     return done(error);
   }
   return done(null, false); // username or password were incorrect

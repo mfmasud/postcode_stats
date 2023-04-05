@@ -1,4 +1,5 @@
 require("dotenv").config();
+const logger = require("../utils/logger");
 
 const atco = require("../helpers/AtcoCodes");
 const { connectDB, resetDataDB } = require("../helpers/database");
@@ -10,7 +11,7 @@ const { connectDB, resetDataDB } = require("../helpers/database");
     await connectDB();
     //await resetDataDB();
   } catch (error) {
-    console.log(error);
+    logger.error(error);
   }
 })();
 
@@ -22,5 +23,5 @@ try {
     });
   });
 } catch (error) {
-  console.error(error);
+  logger.error(error);
 }

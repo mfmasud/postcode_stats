@@ -2,9 +2,10 @@ const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
 //mongoose.set("debug", true);
 
+const logger = require("../utils/logger");
+
 const User = require("../models/User");
 const Role = require("../models/Role");
-
 const Atco = require("../models/Atco");
 const BusStop = require("../models/BusStop");
 const Postcode = require("../models/Postcode");
@@ -33,10 +34,10 @@ async function connectDB(output = false) {
     });
 
     if (output) {
-      console.log("Connected to database!");
+      logger.info("Connected to database!");
     }
   } catch (error) {
-    console.error(`Error connecting to database:\n\n${error.message}`);
+    logger.error(`Error connecting to database:\n\n${error.message}`);
   }
 }
 
@@ -46,16 +47,16 @@ async function disconnectDB(output = false) {
     await mongoose.connection.close();
 
     if (output) {
-      console.log("Disconnected from database!");
+      logger.info("Disconnected from database!");
     }
   } catch (error) {
-    console.error(`Error disconnecting from database:\n\n${error.message}`);
+    logger.error(`Error disconnecting from database:\n\n${error.message}`);
   }
 }
 
 // Initialise + reset dummy user db
 async function initUserDB() {
-  console.log("Resetting User data...");
+  logger.info("Resetting User data...");
 
   try {
     // Delete all documents in each collection
@@ -111,15 +112,15 @@ async function initUserDB() {
       role: AdminRole,
     });
 
-    console.log("Reset user data successfully!");
+    logger.info("Reset user data successfully!");
   } catch (error) {
-    console.error(`Error resetting user data:\n\n${error.message}`);
+    logger.error(`Error resetting user data:\n\n${error.message}`);
   }
 }
 
 // Reset location data cache
 async function resetDataDB() {
-  console.log("Resetting location data...");
+  logger.info("Resetting location data...");
 
   try {
     // Delete all documents in each collection
@@ -131,9 +132,9 @@ async function resetDataDB() {
     await Crime.deleteMany();
     await CrimeList.deleteMany();
 
-    console.log("Reset location data successfully!");
+    logger.info("Reset location data successfully!");
   } catch (error) {
-    console.error(`Error resetting location data:\n\n${error.message}`);
+    logger.error(`Error resetting location data:\n\n${error.message}`);
   }
 }
 
@@ -149,7 +150,7 @@ async function initLocationDB() {
   // await getEnglandLocations();
   // await getWalesLocations();
 
-  console.log("Successfully initialised Location Data");
+  logger.info("Successfully initialised Location Data");
 }
 
 module.exports = {

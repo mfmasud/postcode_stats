@@ -62,15 +62,15 @@ async function searchArea(cnx, next) {
     var latFloat = parseFloat(lat);
     var longFloat = parseFloat(long);
   } catch (error) {
-    console.error(error);
+    logger.error(error);
     cnx.status = 400;
     cnx.body = "Please provide valid latitude and longitude values.";
     return;
   }
 
   const locationObj = { latitude: latFloat, longitude: longFloat };
-  //console.log(locationObj);
-  //console.log(validateLatLong(locationObj));
+  //logger.info(locationObj);
+  //logger.info(validateLatLong(locationObj));
 
   // Validate the lat/long values
   if (!validateLatLong(locationObj)) {
@@ -84,7 +84,7 @@ async function searchArea(cnx, next) {
       ); // "value for x should be <=y"
     }
 
-    console.error("Lat/Long validation error:", validateLatLong.errors);
+    logger.error(`Lat/Long validation error: ${validateLatLong.errors}`);
     cnx.status = 400;
     cnx.body = errorMessages.join("\n");
     return;
@@ -147,7 +147,7 @@ async function searchPostcode(cnx, next) {
         Northing: dbPostcode.northings,
       });
       if (!existingSearch) {
-        console.log("Saving new Search");
+        logger.info("Saving new Search");
         // save the search to the database
         const newSearch = new Search({
           Postcode: dbPostcode,
@@ -163,7 +163,7 @@ async function searchPostcode(cnx, next) {
         await getRelatedStops(newSearch); // get all bus stops for location and link to search model
         await getRelatedCrimes(newSearch); // get all crimes for location and link to search model
       } else {
-        console.log("Existing search found, ID:", existingSearch.searchID);
+        logger.info(`Existing search found, ID: ${existingSearch.searchID}`);
       }
 
       const SearchModel = await Search.findOne({
@@ -204,7 +204,7 @@ async function searchRandom(cnx, next) {
     });
 
     if (!existingSearch) {
-      console.log("Saving new Random Search");
+      logger.info("Saving new Random Search");
       // save the search to the database
       const newSearch = new Search({
         Postcode: dbPostcode,
@@ -220,7 +220,7 @@ async function searchRandom(cnx, next) {
       await getRelatedStops(newSearch); // get all bus stops for location and link to search model
       await getRelatedCrimes(newSearch); // get all crimes for location and link to search model
     } else {
-      console.log("Existing search found, ID:", existingSearch.searchID);
+      logger.info(`Existing search found, ID: ${existingSearch.searchID}`);
     }
 
     const SearchModel = await Search.findOne({

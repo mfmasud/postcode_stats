@@ -17,9 +17,9 @@ const logger = require("../utils/logger");
  * const defineAbilitiesFor = require('./permissions/search')
  * const ability = defineAbilitiesFor(user, SearchModel)
  * if (ability.can('update', 'Search')) {
- *  console.log("user can update this Search."")
+ *  logger.info("user is allowed to update this Search.")
  * } else {
- *  console.log('user cannot update this Search.')
+ *  logger.info("user is not allowed update this Search.")
  * }
  */
 function defineAbilitiesFor(user) {
@@ -34,17 +34,17 @@ function defineAbilitiesFor(user) {
   // authenticated users
   // standard users
   if (user.role.name === "user") {
-    //console.log('standard user role')
+    //logger.info('standard user role')
   }
 
   // paid users
   if (user.role.name === "paiduser") {
-    //console.log('paid user role')
+    //logger.info('paid user role')
   }
 
   // admin users
   if (user.role.name === "admin") {
-    //console.log('admin user role')
+    //logger.info('admin user role')
 
     can("read", "RandomSearch");
   }
