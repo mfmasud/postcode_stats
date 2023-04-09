@@ -6,8 +6,9 @@ const { initUserDB, connectDB, disconnectDB } = require("../helpers/database");
 const User = require("../models/User");
 const Role = require("../models/Role");
 
-// Note: sinon could potentially be used to stub the logger commands/prints
-// Or the logger can detect if a test is being run and save to a different place or something
+// stub logger commands using sinon
+var logger = require("../utils/logger");
+var sinon = require('sinon');
 
 var chai = require("chai");
 var expect = chai.expect;
@@ -15,17 +16,30 @@ var expect = chai.expect;
 describe("helpers/database.js", function () {
     describe("initUserDB()", function () {
 
+        let infoLogStub;
+
         before(async function (){
-            await connectDB();
+          infoLogStub = sinon.stub(logger, "info"); // hide winston info logs
+          await connectDB();
         });
 
         beforeEach(async function () {
           await initUserDB();
         });
+
+        afterEach(async function () {
+          // empty for now
+        });
       
         after(async function () {
           await disconnectDB();
+          logger.info.restore();
         });
+
+        it("should create exactly 3 roles in the Role collection", async () => {
+          const roles = await Role.find();
+          expect(roles.length).to.equal(3);
+        })
       
         it("should create 3 roles (standard/paid/admin) in the Role collection", async () => {
           const roles = await Role.find();
@@ -40,7 +54,7 @@ describe("helpers/database.js", function () {
           expect(user.role.name).to.equal("user");
         });
       
-        it("should create a PaidUser with the role name 'paiduser'", async () => {
+        it("should create a Paid User with the role name 'paiduser'", async () => {
           const paidUser = await User.findOne({ username: "PaidUser1" }).populate(
             "role"
           );

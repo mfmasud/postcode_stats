@@ -1,6 +1,3 @@
-// This is the Role model (lol) schema
-// might make independent models for each role in the future
-
 const mongoose = require("mongoose");
 
 const RoleSchema = new mongoose.Schema({
