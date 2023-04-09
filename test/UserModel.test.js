@@ -153,11 +153,16 @@ describe("models/User.js", () => {
     });
 
     it("should throw an error if role is not one of the 4 roles in the Role collection", async () => {
+      // Roles have been assigned directly in the above tests, but the application actually fetches for it first
+      // This forces the mongoose "enum" validation to check for the roles.
+
+      const invalidRole = Role.findOne({name: "invalid role"});
+
       const invalidUser = new User({
         username: "example3",
         email: "example@example.com",
         password: "password",
-        role: Role({name: "abcdefgh"})
+        role: invalidRole,
       });
       return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
     });

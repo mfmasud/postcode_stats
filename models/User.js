@@ -1,5 +1,13 @@
 const mongoose = require("mongoose");
 
+/* validation: 
+https://mongoosejs.com/docs/validation.html
+https://pinoria.com/how-to-validate-email-syntax-with-mongoose/
+https://stackoverflow.com/a/28396238
+https://github.com/validatorjs/validator.js
+*/
+const {isEmail} = require("validator");
+
 const logger = require("../utils/logger");
 
 const bcrypt = require("bcrypt"); // https://www.npmjs.com/package/bcrypt
@@ -33,6 +41,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
+    validate: [ isEmail, 'invalid email']
   },
   role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
 });
