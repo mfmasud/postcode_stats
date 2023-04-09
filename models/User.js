@@ -40,6 +40,9 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", async function save(next) {
   if (this.isNew) {
     // if this is a new user then set the id to the next available id, or 1 if there are no users
+    // bug: deleting the most recent user then creating another will assign the same ID
+    // potential solution: link to a sequence/counter model and use that instead
+    // https://stackoverflow.com/a/30164636
     const maxId = await this.constructor.find().sort("-id").limit(1);
     this.id = maxId.length ? maxId[0].id + 1 : 1; //javascript ternary operator - condition ? if : else
   }
