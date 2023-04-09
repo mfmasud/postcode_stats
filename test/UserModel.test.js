@@ -19,19 +19,36 @@ describe("models/User.js", () => {
   let infoLogStub, errorLogStub;
 
   before(async () => {
-    infoLogStub = sinon.stub(logger, "info");
-    errorLogStub = sinon.stub(logger, "error"); // For duplicate key errors
     await connectDB();
   });
 
   beforeEach(async () => {
+    infoLogStub = sinon.stub(logger, "info");
+    errorLogStub = sinon.stub(logger, "error"); // For duplicate key errors
     await initUserDB();
   });
 
+  afterEach(async () => {
+    sinon.restore();
+  })
+
   after(async () => {
     await disconnectDB();
-    logger.info.restore();
-    logger.error.restore();
+    sinon.restore();
+  });
+
+  describe("Auto Increment id", () => {
+    // Always takes 80ms+ - needs to be optimised
+    it("should auto-increment the ID field when creating a user", async () => {
+      await User.create({
+        username: "mocha",
+        email: "mocha@coffee.co.uk",
+        password: "chai",
+        role: Role({ name: "none" }),
+      });
+      const newUser = await User.findOne({ username: "mocha" });
+      return expect(newUser.id).to.equal(4);
+    });
   });
 
   describe("Required fields", () => {
@@ -41,7 +58,7 @@ describe("models/User.js", () => {
         password: "password",
         role: Role({ name: "user" }),
       });
-      await expect(user.save()).to.be.rejectedWith(
+      return expect(user.save()).to.eventually.be.rejectedWith(
         "User validation failed: username: Path `username` is required."
       );
     });
@@ -52,7 +69,7 @@ describe("models/User.js", () => {
         password: "password",
         role: Role({ name: "user" }),
       });
-      await expect(user.save()).to.be.rejectedWith(
+      return expect(user.save()).to.eventually.be.rejectedWith(
         "User validation failed: email: Path `email` is required."
       );
     });
@@ -63,7 +80,7 @@ describe("models/User.js", () => {
         email: "test@test.com",
         role: Role({ name: "user" }),
       });
-      await expect(user.save()).to.be.rejectedWith(
+      return expect(user.save()).to.eventually.be.rejectedWith(
         "User validation failed: password: Path `password` is required."
       );
     });
@@ -74,7 +91,7 @@ describe("models/User.js", () => {
         email: "test@test.com",
         password: "password",
       });
-      await expect(user.save()).to.be.rejectedWith(
+      return expect(user.save()).to.eventually.be.rejectedWith(
         "User validation failed: role: Path `role` is required."
       );
     });
@@ -88,7 +105,7 @@ describe("models/User.js", () => {
         password: "password",
         role: Role({ name: "user" }),
       });
-      expect(user.save()).to.eventually.be.rejectedWith("E11000 duplicate key error collection: test.users index: username_1 dup key: { username: \"TestUser1\" }");
+      return expect(user.save()).to.eventually.be.rejectedWith("E11000 duplicate key error collection: test.users index: username_1 dup key: { username: \"TestUser1\" }");
     });
 
     it("should throw an error if the email already exists", async () => {
@@ -98,27 +115,52 @@ describe("models/User.js", () => {
         password: "password",
         role: Role({ name: "user" }),
       });
-      expect(user.save()).to.eventually.be.rejectedWith("E11000 duplicate key error collection: test.users index: email_1 dup key: { email: \"TestUser1@test.com\" }");
+      return expect(user.save()).to.eventually.be.rejectedWith("E11000 duplicate key error collection: test.users index: email_1 dup key: { email: \"TestUser1@test.com\" }");
     });
   });
 
   describe("Invalid data", () => {
-    it("should ...", async () => {
-      // do something
-    });
-  });
-
-  describe("Auto Increment id", () => {
-    // Always takes 80ms+ - needs to be optimised
-    it("should auto-increment the ID field when creating a user", async () => {
-      await User.create({
-        username: "mocha",
-        email: "mocha@coffee.co.uk",
-        password: "chai",
-        role: Role({ name: "none" }),
+    // work in progress
+    it("should throw an error if the username is empty", async () => {
+      const invalidUser = new User({
+        username: "",
+        email: "example@example.com",
+        password: "password",
+        role: Role({name: "user"})
       });
-      const newUser = await User.findOne({ username: "mocha" });
-      expect(newUser.id).to.equal(4);
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
     });
+
+    it("should throw an error if the email is invalid (or empty)", async () => {
+      // includes testing if the email is empty - empty is also invalid
+      const invalidUser = new User({
+        username: "example1",
+        email: "example.com",
+        password: "password",
+        role: Role({name: "user"})
+      });
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
+    });
+
+    it("should throw an error if password is empty", async () => {
+      const invalidUser = new User({
+        username: "example2",
+        email: "example@example.com",
+        password: "",
+        role: Role({name: "user"})
+      });
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
+    });
+
+    it("should throw an error if role is not one of the 4 roles in the Role collection", async () => {
+      const invalidUser = new User({
+        username: "example3",
+        email: "example@example.com",
+        password: "password",
+        role: Role({name: "abcdefgh"})
+      });
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
+    });
+
   });
 });

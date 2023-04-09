@@ -33,58 +33,58 @@ describe("helpers/database.js", function () {
   describe("Check Role collection", function () {
     it("should create exactly 3 roles in the Role collection", async () => {
       const roles = await Role.find();
-      expect(roles.length).to.equal(3);
+      return expect(roles.length).to.equal(3);
     });
 
     it("should create 3 roles (standard/paid/admin) in the Role collection", async () => {
       const roles = await Role.find();
-      expect(roles.length).to.equal(3);
-      expect(roles[0].name).to.equal("admin");
-      expect(roles[1].name).to.equal("paiduser");
-      expect(roles[2].name).to.equal("user");
+      return expect(roles.length).to.equal(3);
+      return expect(roles[0].name).to.equal("admin");
+      return expect(roles[1].name).to.equal("paiduser");
+      return expect(roles[2].name).to.equal("user");
     });
 
     it("should create a User with the role name set to 'user'", async () => {
       const user = await User.findOne({ username: "TestUser1" }).populate(
         "role"
       );
-      expect(user.role.name).to.equal("user");
+      return expect(user.role.name).to.equal("user");
     });
 
     it("should create a Paid User with the role name 'paiduser'", async () => {
       const paidUser = await User.findOne({ username: "PaidUser1" }).populate(
         "role"
       );
-      expect(paidUser.role.name).to.equal("paiduser");
+      return expect(paidUser.role.name).to.equal("paiduser");
     });
 
     it("should create an Admin with the role name 'admin'", async () => {
       const admin = await User.findOne({ username: "TestAdmin1" }).populate(
         "role"
       );
-      expect(admin.role.name).to.equal("admin");
+      return expect(admin.role.name).to.equal("admin");
     });
   });
 
   describe("Check User collection", () => {
     it("should not have TestUser2", async () => {
       const user = await User.findOne({ username: "TestUser2" });
-      expect(user).to.not.exist;
+      return expect(user).to.not.exist;
     });
 
     it("should create 'TestUser1'", async () => {
       const user = await User.findOne({ username: "TestUser1" });
-      expect(user.username).to.equal("TestUser1");
+      return expect(user.username).to.equal("TestUser1");
     });
 
     it("should create 'PaidUser1'", async () => {
       const paidUser = await User.findOne({ username: "PaidUser1" });
-      expect(paidUser.username).to.equal("PaidUser1");
+      return expect(paidUser.username).to.equal("PaidUser1");
     });
 
     it("should create 'TestAdmin1'", async () => {
       const admin = await User.findOne({ username: "TestAdmin1" });
-      expect(admin.username).to.equal("TestAdmin1");
+      return expect(admin.username).to.equal("TestAdmin1");
     });
   });
 });
