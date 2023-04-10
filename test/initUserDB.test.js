@@ -38,10 +38,10 @@ describe("helpers/database.js", function () {
 
     it("should create 3 roles (standard/paid/admin) in the Role collection", async () => {
       const roles = await Role.find();
-      return expect(roles.length).to.equal(3);
-      return expect(roles[0].name).to.equal("admin");
-      return expect(roles[1].name).to.equal("paiduser");
-      return expect(roles[2].name).to.equal("user");
+      expect(roles.length).to.equal(3);
+      expect(roles[0].name).to.equal("admin");
+      expect(roles[1].name).to.equal("paiduser");
+      expect(roles[2].name).to.equal("user");
     });
 
     it("should create a User with the role name set to 'user'", async () => {
