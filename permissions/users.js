@@ -14,7 +14,14 @@ const logger = require("../utils/logger");
  *
  */
 function defineAbilitiesFor(user) {
-  //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
+  /*
+  if (user.username && user.role.name) {
+    logger.info(`current user: ${user.username}`);
+    logger.info(`current role: ${user.role.name}`);
+  } else {
+    logger.info(`current user: none`)
+  }
+  */
 
   const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
 

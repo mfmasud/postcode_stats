@@ -182,6 +182,7 @@ async function updateUserById(cnx, next) {
     cnx.status = 401;
     logger.error("[401] User needs to log in.");
     cnx.body = { message: "You are not logged in." };
+    return;
   }
   const user = cnx.state.user;
 

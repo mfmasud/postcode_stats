@@ -68,6 +68,7 @@ const checkUserAndPass = async (username, password, done) => {
     if (!user) {
       // no user found in database
       logger.info(`No user found with username ${username}`);
+      return( done(null, false))
     } else {
       // user found in database
       logger.info(`Found user ${username}`);

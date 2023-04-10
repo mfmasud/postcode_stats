@@ -69,9 +69,8 @@ userSchema.pre("save", async function save(next) {
       this.passwordSalt = salt;
       this.password = await bcrypt.hash(this.password, salt);
 
-      logger.info(
-        `password modified/created for user: ${this.username}\nhashed password: ${this.password}`
-      );
+      logger.info(`password modified/created for user: ${this.username}`);
+      logger.info(`hashed password: ${this.password}`);
 
       return next();
     } catch (err) {
@@ -82,8 +81,12 @@ userSchema.pre("save", async function save(next) {
 
 userSchema.statics.findByUsername = async function findByUsername(username) {
   //logger.info('findByUsername called');
-  const user = await this.findOne({ username: username }).populate("role");
-  return user;
+  let user = await this.findOne({ username: username });
+  if (user) {
+    user = await user.populate("role");
+    return user;
+  }
+  
 };
 
 module.exports = mongoose.model("User", userSchema);
