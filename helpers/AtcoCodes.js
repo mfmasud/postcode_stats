@@ -110,9 +110,9 @@ async function queryAtco(code) {
     // response is raw csv data, not an object should be cached and parsed into json
 
     if (format === "csv") {
-      logger.info(`processing ATCO code: ${code}`);
+      logger.info(`Processing ATCO code: ${code}`);
       await processCSV(code, response.data);
-      logger.info(`finished processing ATCO: ${code}`);
+      logger.info(`Finished processing ATCO: ${code}`);
     } else {
       logger.info("Invalid data format. should be csv");
       return;

@@ -70,7 +70,7 @@ userSchema.pre("save", async function save(next) {
       this.password = await bcrypt.hash(this.password, salt);
 
       logger.info(`password modified/created for user: ${this.username}`);
-      logger.info(`hashed password: ${this.password}`);
+      //logger.info(`hashed password: ${this.password}`);
 
       return next();
     } catch (err) {

@@ -1,28 +1,26 @@
 const Search = require("../models/Search");
 const BusStop = require("../models/BusStop");
 const Atco = require("../models/Atco");
+const CrimeList = require("../models/CrimeList");
 
 const logger = require("../utils/logger");
 
 const { queryAtco } = require("../helpers/AtcoCodes");
-const { getCrimeData } = require("../helpers/crime"); // can be switched to a model later
+const { getCrimeData } = require("../helpers/crime");
 
 const mongoose = require("mongoose");
 
-async function getRelatedStops(SearchModel, radius = 1000) {
-  // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
-  const { longitude, latitude, Northing, Easting } = SearchModel;
+async function linkCrimeList(SearchModel) {
+  // links crime list to search model
+  // can be linked by latitude - assuming it is available. If not, this should have been calculated beforehand.
 
-  let linkedAtco = await SearchModel.populate("linkedATCO");
-  linkedAtco = linkedAtco.linkedATCO;
-
-  // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
-  // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
-  // just returning first 5 for now...
-  // Need to convert BNG to lat/long for empty values or search using BNG instead. See https://github.com/chrisveness/geodesy/blob/master/osgridref.js to convert
-
-  if (linkedAtco) {
-    SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5);
+  const linkedCrimes = await CrimeList.findOne({latitude: SearchModel.latitude});
+  if (linkedCrimes) {
+    SearchModel.linkedCrimeList = linkedCrimes;
+    logger.info("Successfully linked crime list to search");
+  } else {
+    logger.error("Could not link crime list to search.");
+    return;
   }
 
   await SearchModel.save();
@@ -30,15 +28,24 @@ async function getRelatedStops(SearchModel, radius = 1000) {
 
 async function getRelatedCrimes(SearchModel) {
   const { latitude, longitude } = SearchModel;
+
+  if (SearchModel.Postcode.country === "Northern Ireland") {
+    // NI not handled by policing API.
+    logger.info("Cannot link NI CrimeList.");
+    return;
+  }
+
   if (latitude && longitude) {
-    await getCrimeData(latitude, longitude); // edit to return crime list _id after processing code.
-    // SearchModel.queryCrimes = ... // first 5 related crimes
-    // need to link search model to linkedCrimeList to crimeList
+    await getCrimeData(latitude, longitude); // fetches the police data API
+    await linkCrimeList(SearchModel); // Links the CrimeList data to the Search model
     if (SearchModel.linkedCrimeList){
-      SearchModel.queryCrimes = SearchModel.linkedCrimeList.crimes.slice(0, 5);
+      logger.info("Added crimes to search");
+      SearchModel.queryCrimes = SearchModel.linkedCrimeList.crimes;
+    } else {
+      SearchModel.queryCrimes = []; // empty to indicate not found
     }
-    
   } else {
+    logger.error("Need LAT/LONG Coordinates to use the police data API.")
     SearchModel.queryCrimes = []; // empty to indicate not found
   }
 
@@ -48,6 +55,7 @@ async function getRelatedCrimes(SearchModel) {
 
 async function getRelatedListings(SearchModel) {
   // unimplemented - Zoopla API is basically discontinued.
+  // Have to use Urban Big Data Centre zoopla data instead.
   const { latitude, longitude } = SearchModel;
   //await getPropertyData(latitude, longitude);
   return;
@@ -78,14 +86,13 @@ async function linkAtco(SearchModel) {
   await SearchModel.save();
 }
 
-async function linkCrimeList(SearchModel) {
-  // links crime list to search model
-  // can be linked by latitude - assuming it is available. If not, this should have been calculated beforehand.
-  return;
-}
 
 /**
- *
+ * Finds the related Atco model to link to a search
+ * 
+ * @async
+ * @function searchAtco
+ * 
  * @param {mongoose.Object} PostcodeModel - The Postcode model object
  * @returns {mongoose.Object} The Atco model object to link to the Search
  */
@@ -163,9 +170,27 @@ async function searchAtco(PostcodeModel) {
   }
 }
 
+async function getRelatedStops(SearchModel, radius = 1000) {
+  // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
+  const { longitude, latitude, Northing, Easting } = SearchModel;
+
+  let linkedAtco = await SearchModel.populate("linkedATCO");
+  linkedAtco = linkedAtco.linkedATCO;
+
+  // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
+  // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
+  // just returning first 5 for now...
+  // Need to convert BNG to lat/long for empty values or search using BNG instead. See https://github.com/chrisveness/geodesy/blob/master/osgridref.js to convert
+
+  if (linkedAtco) {
+    SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5);
+  }
+
+  await SearchModel.save();
+}
+
 module.exports = {
   getRelatedStops,
   getRelatedCrimes,
   linkAtco,
-  linkCrimeList,
 };

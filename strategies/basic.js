@@ -71,7 +71,7 @@ const checkUserAndPass = async (username, password, done) => {
       return( done(null, false))
     } else {
       // user found in database
-      logger.info(`Found user ${username}`);
+      //logger.info(`Found user ${username}`);
       if (await verifyPassword(user, password)) {
         // password correct
         logger.info(`Successfully authenticated user ${username}`);

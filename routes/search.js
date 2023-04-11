@@ -30,7 +30,6 @@ const {
   getRelatedStops,
   getRelatedCrimes,
   linkAtco,
-  linkCrimeList,
 } = require("../helpers/search");
 
 // routes
@@ -159,7 +158,6 @@ async function searchPostcode(cnx, next) {
         });
         await newSearch.save();
         await linkAtco(newSearch);
-        // await linkCrimeList(newSearch);
         await getRelatedStops(newSearch); // get all bus stops for location and link to search model
         await getRelatedCrimes(newSearch); // get all crimes for location and link to search model
       } else {
@@ -225,7 +223,7 @@ async function searchRandom(cnx, next) {
 
     const SearchModel = await Search.findOne({
       latitude: dbPostcode.latitude,
-    }).populate(["Postcode", "queryBusStops"]);
+    }).populate(["Postcode", "queryBusStops", "queryCrimes"]);
 
     const body = SearchModel;
     cnx.status = 200;

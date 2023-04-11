@@ -28,13 +28,14 @@ async function getCrimeData(lat, long) {
 }
 
 async function processCrimeData(lat, long, rawCrimeData) {
-  logger.info("processing new crime list");
+  logger.info("Processing new crime list");
   // model the Crime and categorise it too for paid / admins.
   // lat long to differentiate crime lists
 
   // logger.info(rawCrimeData); // can be empty
   // below code can be edited to handle a minimum amount of crimes required e.g. 5
   if (rawCrimeData.length === 0) {
+    logger.info("No crime data.");
     CrimeList.create({
       crimeListID: 1,
       latitude: lat,
@@ -55,9 +56,9 @@ async function processCrimeData(lat, long, rawCrimeData) {
     date: rawCrimeData[0].month,
   });
 
-  // Only store 10 (or less) crimes to speed up operations.
+  // Only store 5 (or less) crimes to speed up operations. 5 is used by the search model.
   // City Of London for example has 2309 crimes in the area.
-  rawCrimeData = rawCrimeData.slice(0, 10);
+  rawCrimeData = rawCrimeData.slice(0, 5);
 
   const newCrimes = [];
   const ids = [];
@@ -67,13 +68,13 @@ async function processCrimeData(lat, long, rawCrimeData) {
       continue;
     }
 
-    const newCrime = {
+    const newCrime = Crime({
       crimeID: data.id,
       latitude: data.location.latitude,
       longitude: data.location.longitude,
       crime_category: data.category,
       crime_date: data.month,
-    };
+    });
 
     if (data.outcome_status) {
       newCrime.outcome_category = data.outcome_status.category;
@@ -82,7 +83,12 @@ async function processCrimeData(lat, long, rawCrimeData) {
 
     ids.push(newCrime._id);
     newCrimes.push(newCrime);
+
+    //logger.info(newCrime);
+
   }
+
+  //logger.info(newCrimes);
 
   if (newCrimes.length > 0) {
     await Crime.insertMany(newCrimes);
@@ -90,12 +96,15 @@ async function processCrimeData(lat, long, rawCrimeData) {
     try {
       newCrimeList.crimes = ids;
       await newCrimeList.save();
+
+      //logger.info(newCrimeList);
+
     } catch (error) {
       logger.error(error);
     }
   }
 
-  logger.info("finished processing new crime list");
+  logger.info("Finished processing new crime list");
 
 }
 
