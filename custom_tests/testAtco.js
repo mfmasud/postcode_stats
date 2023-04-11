@@ -18,7 +18,7 @@ const { connectDB, resetDataDB } = require("../helpers/database");
 try {
   atco.saveAtcoList().then(() => {
     // code 430 is for West Midlands:
-    atco.queryAtco(430).then(() => {
+    atco.queryAtcoAPI(430).then(() => {
       // console will show logs.
     });
   });

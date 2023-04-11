@@ -17,11 +17,14 @@ const BusStop = require("../models/BusStop");
 
 /**
  * Processes the list of ATCO codes for local authorities.
+ * Separated from saveAtcoList to allow for testing without saving codes to the database.
  * 
  * @async
  * @function getAtcoCodes
  * 
- * @returns {Array} An array of codes
+ * @returns {String[]} An array of ATCO codes
+ * 
+ * @see saveAtcoList
  */
 async function getAtcoCodes() {
   const url = "https://beta-naptan.dft.gov.uk/download/la";
@@ -46,19 +49,41 @@ async function getAtcoCodes() {
   return codes;
 }
 
+/**
+ * Saves the processed ATCO codes to the Atco collection.
+ * 
+ * @async 
+ * @function saveAtcoList
+ * 
+ * @see getAtcoCodes
+ * @see processAtcoString
+ * 
+ */
 async function saveAtcoList() {
   // run on db initialisation to get a list of searchable ATCOs.
+  // Can integrate the functions in helpers/locations to add the alternative location names.
   const codeList = await getAtcoCodes();
   for (code of codeList) {
-    await processAtco(code);
+    await processAtcoString(code);
   }
 }
 
-// process atco codes as atco:{location, region}
-async function processAtco(data) {
-  // example string: Aberdeenshire / Scotland (630)
-  // result: {630: {location: Aberdeenshire, region: Scotland}}
-
+/**
+ * Processes the ATCO codes into the format code:{location, region}. Run by saveAtcoList.
+ * 
+ * @async
+ * @function processAtcoString
+ * 
+ * @param {String} data - The ATCO code to process
+ * @returns nothing, saves the processed data to the Atco collection.
+ * 
+ * @see saveAtcoList
+ * 
+ * @example
+ * const data = "Aberdeenshire / Scotland (630)"
+ * // returns {630: {location: Aberdeenshire, region: Scotland}}
+ */
+async function processAtcoString(data) {
   const location = data.split(" / ")[0];
   const region = data.split(" / ")[1].split(" (")[0];
   const atco = data.split(" / ")[1].split(" (")[1].split(")")[0];
@@ -73,7 +98,7 @@ async function processAtco(data) {
     return; // skip creating another Atco for no reason.
   }
 
-  const newAtco = await Atco.create({
+   await Atco.create({
     code: atco,
     region: region,
     location: location,
@@ -81,14 +106,25 @@ async function processAtco(data) {
     AllProcessed: false,
   });
 
-  //logger.info(`ATCO ${newAtco.code} created in database`);
 }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
 // example api call: https://naptan.api.dft.gov.uk/v1/access-nodes?dataFormat=csv&atcoAreaCodes=420
 // 420 is Warwickshire / West Midlands.
 
-async function queryAtco(code) {
+/**
+ * Sends a request to the NAPTAN API to get the bus stops for a given ATCO code.
+ * The API returns CSV data which is then processed by processCSV.
+ * 
+ * @async
+ * @function queryAtcoAPI
+ * 
+ * @param {String} code - The ATCO code to query the NAPTAN API
+ * @returns {undefined}
+ * 
+ * @see processCSV
+ */
+async function queryAtcoAPI(code) {
   // backend function to query the API for bus stops
   // run when linking ATCOs to searches (to find bus stops).
   // basic validation - not meant to be complete
@@ -122,6 +158,19 @@ async function queryAtco(code) {
   }
 }
 
+/**
+ * Processes the CSV data from the NAPTAN API into the BusStop collection and saves it to the relevant Atco collection.
+ * 
+ * @async
+ * @function processCSV
+ * 
+ * @param {String} code - The ATCO code to process the CSV data for
+ * @param {*} rawdata - The raw CSV data to process, retrieved from queryAtcoAPI
+ * @returns {undefined} Nothing, saves the processed data to the BusStop collection and updates the relevant Atco collection.
+ * 
+ * @see queryAtcoAPI
+ * 
+ */
 async function processCSV(code, rawdata) {
   // this can take a while, should be run on startup of the server so users use processed mongodb models instead of processing them when a request is made
   const associatedAtco = await Atco.findOne({ code: code });
@@ -190,7 +239,7 @@ async function processCSV(code, rawdata) {
 
 module.exports = {
   getAtcoCodes,
-  queryAtco,
-  processAtco,
+  queryAtcoAPI,
+  processAtcoString,
   saveAtcoList,
 };

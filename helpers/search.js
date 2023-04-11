@@ -162,7 +162,7 @@ async function searchAtco(PostcodeModel) {
   if (AtcoToLink) {
     // match found
     logger.info(`Matching ATCO:" ${AtcoToLink.code}`);
-    await queryAtco(AtcoToLink.code);
+    await queryAtcoAPI(AtcoToLink.code);
     return AtcoToLink;
   } else {
     logger.info("Matching ATCO not found");
