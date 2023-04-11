@@ -67,7 +67,7 @@ async function processAtco(data) {
   processedData[atco] = { location, region };
   //logger.info(`${atco}: ${processedData[atco]}`);
 
-  const existingAtco = await Atco.findOne({ code: atco }); // can filter for e.g. busstops.length === 0 to check for empty codes
+  const existingAtco = await Atco.exists({ code: atco }); // can filter for e.g. busstops.length === 0 to check for empty codes
   if (existingAtco) {
     //logger.info(`ATCO ${atco} already exists in db`);
     return; // skip creating another Atco for no reason.
@@ -153,9 +153,9 @@ async function processCSV(code, rawdata) {
   for (const row of busstops) {
     //logger.info(row);
 
-    const existingBusStop = await BusStop.findOne({
+    const existingBusStop = await BusStop.exists({
       ATCO_long: row.ATCOCode,
-    }).lean();
+    })
     if (existingBusStop) {
       continue;
     }

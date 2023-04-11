@@ -31,9 +31,13 @@ async function getRelatedStops(SearchModel, radius = 1000) {
 async function getRelatedCrimes(SearchModel) {
   const { latitude, longitude } = SearchModel;
   if (latitude && longitude) {
-    await getCrimeData(latitude, longitude);
+    await getCrimeData(latitude, longitude); // edit to return crime list _id after processing code.
     // SearchModel.queryCrimes = ... // first 5 related crimes
-    SearchModel.queryCrimes = [];
+    // need to link search model to linkedCrimeList to crimeList
+    if (SearchModel.linkedCrimeList){
+      SearchModel.queryCrimes = SearchModel.linkedCrimeList.crimes.slice(0, 5);
+    }
+    
   } else {
     SearchModel.queryCrimes = []; // empty to indicate not found
   }
