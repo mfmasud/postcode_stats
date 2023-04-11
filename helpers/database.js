@@ -177,7 +177,8 @@ async function resetDataDB() {
 }
 
 /**
- * Initialises the location database collections. Adds the `Nptg` data if not cached already. Assigns `Atco` codes for Scoltand,England and Wales and related names for Scotland.
+ * Initialises the location database collections. Adds the `Nptg` data if not cached already.
+ * Assigns `Atco` codes for Scoltand,England and Wales and related names for Scotland.
  * 
  * @async
  * @function initLocationDB

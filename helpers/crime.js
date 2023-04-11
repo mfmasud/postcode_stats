@@ -7,7 +7,22 @@ const axios = require("axios");
 const CrimeList = require("../models/CrimeList");
 const Crime = require("../models/Crime");
 
+/**
+ * Queries the Police Data API for crime data using a pair of latitude and longitude values.
+ * The data is then processed into a CrimeList using processCrimeData.
+ * 
+ * @async
+ * @function getCrimeData
+ * 
+ * @param {Number} lat - The latitude to pass to the Police Data API
+ * @param {Number} long - The longitude to pass to the Police Data API
+ * @returns {*} - Returns nothing
+ * 
+ * @see processCrimeData
+ * 
+ */
 async function getCrimeData(lat, long) {
+
   const url = `https://data.police.uk/api/crimes-street/all-crime?lat=${lat}&lng=${long}`;
   const response = await axios.get(url);
 
@@ -27,6 +42,22 @@ async function getCrimeData(lat, long) {
   return;
 }
 
+
+/**
+ * Processes the crime data retrieved from the Police Data API into a CrimeList and Crime models.
+ * This is currently capped at just the first 5 crimes per location to speed up the code.
+ * 
+ * @async
+ * @function processCrimeData
+ * 
+ * @param {Number} lat - The latitude to pass to the Police Data API
+ * @param {Number} long - The longitude to pass to the Police Data API
+ * @param {*} rawCrimeData - The raw crime data to be processed, retrieved from getCrimeData
+ * @returns {*} - Returns nothing
+ * 
+ * @see getCrimeData
+ * 
+ */
 async function processCrimeData(lat, long, rawCrimeData) {
   logger.info("Processing new crime list");
   // model the Crime and categorise it too for paid / admins.
