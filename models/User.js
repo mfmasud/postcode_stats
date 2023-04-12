@@ -1,3 +1,22 @@
+/**
+ * @file Contains the User model schema and exported model used to authenticate users. Originally based off of 6003CEM lab work.
+ * @module models/User
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires mongoose
+ * @requires validator
+ * @requires utils/logger
+ * @requires bcrypt
+ * 
+ * @exports User
+ * 
+ * @see {@link module:routes/users} for the routes which perform CRUD operations on this model.
+ * @see {@link module:models/Role} for the Role model used in this schema.
+ * @see {@link module:controllers/auth} for the authentication middleware used in the routes.
+ * @See {@link https://stackoverflow.com/a/28396238} for more on the approach used to validate email addresses.
+ * 
+ */
+
 const mongoose = require("mongoose");
 
 /* validation: 

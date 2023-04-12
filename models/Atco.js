@@ -1,3 +1,18 @@
+/**
+ * @file Contains the Atco model schema.
+ * @module models/Atco
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires mongoose
+ * 
+ * @exports Atco
+ * 
+ * @see {@link module:models/BusStop} for the BusStop model which is used by this model schema.
+ * @see {@link module:models/Search} for the `Search` model which links this model.
+ * @see {@link processCSV} for the function which processes data for this model.
+ * 
+ */
+
 const mongoose = require("mongoose");
 
 const atcoSchema = new mongoose.Schema({

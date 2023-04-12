@@ -1,3 +1,16 @@
+/**
+ * @file Contains the mongoose Crime model schema.
+ * @module models/Crime
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires mongoose
+ * 
+ * @exports Crime
+ * 
+ * @see {@link module:models/CrimeList} for the `CrimeList` model which uses these `Crime` models.
+ * 
+ */
+
 const mongoose = require("mongoose");
 
 const crimeSchema = new mongoose.Schema({
