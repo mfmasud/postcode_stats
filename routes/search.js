@@ -91,7 +91,7 @@ async function searchArea(cnx, next) {
 
   let { user } = cnx.state;
   if (!user) {
-    user = User({ role: Role({ name: "none" }) });
+    user = User({ role: await Role.findOne({ name: "none" }) });
   }
   const ability = createAbilityFor(user);
 
@@ -127,7 +127,7 @@ async function searchPostcode(cnx, next) {
 
   let { user } = cnx.state;
   if (!user) {
-    user = User({ role: Role({ name: "none" }) });
+    user = User({ role: await Role.findOne({ name: "none" }) });
   }
   const ability = createAbilityFor(user);
 
@@ -186,7 +186,7 @@ async function searchPostcode(cnx, next) {
 async function searchRandom(cnx, next) {
   let { user } = cnx.state;
   if (!user) {
-    user = User({ role: Role({ name: "none" }) });
+    user = User({ role: await Role.findOne({ name: "none" }) });
   }
   const ability = createAbilityFor(user);
 

@@ -76,7 +76,7 @@ async function disconnectDB(output = false) {
 
 /**
  * Initialises and resets the dummy Users and Roles collections. Requires an active mongodb connection.  
- * Adds 3 users, corresponding to the standard, paid and admin access levels.
+ * Adds 4 users, corresponding to the anonymous, standard, paid and admin access levels.
  * 
  * @async
  * @function initUserDB
@@ -103,6 +103,10 @@ async function initUserDB() {
 
     const UserRole = await Role.create({
       name: "user",
+    });
+
+    const noUser = await Role.create({
+      name: "none",
     });
 
     // Create sample documents for each collection

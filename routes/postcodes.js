@@ -111,7 +111,7 @@ async function getPostcodeRoute(cnx) {
 
   let { user } = cnx.state;
   if (!user) {
-    user = User({ role: Role({ name: "none" }) });
+    user = User({ role: await Role.findOne({ name: "none" }) });
   }
   const ability = createAbilityFor(user);
 
