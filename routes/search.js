@@ -1,9 +1,30 @@
+/**
+ * @file Contains the main search routes for the API, allowing users to search for a postcode/lat-long pair and get related stops and crimes.
+ * @module routes/search
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires koa-router
+ * @requires koa-bodyparser
+ * @requires controllers/auth
+ * @requires utils/logger
+ * @requires ajv
+ * @requires models/User
+ * @requires models/Role
+ * @requires models/Postcode
+ * @requires models/Search
+ * @requires schemas/latlong
+ * @requires permissions/search
+ * @requires helpers/postcode
+ * @requires helpers/search
+ * 
+ * @exports router
+ */
+
 const Router = require("koa-router");
 const bodyParser = require("koa-bodyparser");
 const auth = require("../controllers/auth");
 const router = Router({ prefix: "/api/v1/search" });
 
-const mongoose = require("mongoose");
 const logger = require("../utils/logger");
 const Ajv = require("ajv");
 const ajv = new Ajv();

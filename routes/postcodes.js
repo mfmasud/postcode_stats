@@ -1,5 +1,21 @@
+/**
+ * @file Defines the route functions for the /postcodes route.
+ * @module routes/postcodes
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires koa-router
+ * @requires controllers/auth
+ * @requires utils/logger
+ * @requires models/User
+ * @requires models/Role
+ * @requires models/Postcode
+ * @requires permissions/postcodes
+ * @requires helpers/postcode
+ * 
+ * @exports router
+ */
+
 const Router = require("koa-router");
-const bodyParser = require("koa-bodyparser");
 const auth = require("../controllers/auth");
 const router = Router({ prefix: "/api/v1/postcodes" });
 
@@ -8,8 +24,6 @@ const logger = require("../utils/logger");
 const User = require("../models/User");
 const Role = require("../models/Role");
 const Postcode = require("../models/Postcode");
-
-const mongoose = require("mongoose");
 
 const createAbilityFor = require("../permissions/postcodes");
 

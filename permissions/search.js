@@ -1,3 +1,14 @@
+/**
+ * @file Responsible for defining the abilities users have on the /search route.
+ * @module permissions/search
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires @casl/ability
+ * @requires utils/logger
+ * 
+ * @exports defineAbilitiesFor
+ */
+
 const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
 
 const logger = require("../utils/logger");
@@ -7,13 +18,15 @@ const logger = require("../utils/logger");
  *
  * @function defineAbilitiesFor
  *
- * @param {mongoose.Object} user - The mongoose User model to check permissions against.
+ * @param {mongoose.Object} user - The mongoose User model to check permissions for.
  * @param {mongoose.Object} [SearchModel] - Optional mongoose Search model to check permissions against to potentially exclude fields in the future.
  *
  * @returns A CASL ability object defining the user's permissions for the /search route.
  *
+ * @see {@link module:routes/search} for the route which uses this function.
+ * 
  * @example
- * // Example usage with a mongoose Search model (not yet implemented in the route - should be doable by admins)
+ * // Example usage with a mongoose Search model (updating is not yet implemented in the routes - should be doable by admins)
  * const defineAbilitiesFor = require('./permissions/search')
  * const ability = defineAbilitiesFor(user, SearchModel)
  * if (ability.can('update', 'Search')) {

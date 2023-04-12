@@ -1,3 +1,20 @@
+/**
+ * @file This file contains the routes for the users API.
+ * @module routes/users
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires koa-router
+ * @requires koa-bodyparser
+ * @requires utils/logger
+ * @requires controllers/auth
+ * @requires models/User
+ * @requires models/Role
+ * @requires mongoose
+ * @requires permissions/users
+ * 
+ * @exports router
+ */
+
 const Router = require("koa-router");
 const bodyParser = require("koa-bodyparser");
 
