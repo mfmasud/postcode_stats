@@ -27,10 +27,11 @@ const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it
 
 /**
  * Connect to the mongodb server. The connection string is stored in the MONGO_URI parameter.
- * @param {boolean} [output=false] - Control whether or not to output a message indicating a successful connection.
  * 
  * @async
  * @function connectDB
+ * 
+ * @param {boolean} [output=false] - Control whether or not to output a message indicating a successful connection.
  * 
  * @see disconnectDB
  * 
@@ -74,7 +75,7 @@ async function disconnectDB(output = false) {
 }
 
 /**
- * Initialises and resets the dummy Users and Roles collections. Requires an active mongodb connection. 
+ * Initialises and resets the dummy Users and Roles collections. Requires an active mongodb connection.  
  * Adds 3 users, corresponding to the standard, paid and admin access levels.
  * 
  * @async
@@ -147,8 +148,8 @@ async function initUserDB() {
 }
 
 /**
- * Resets cached location data. Deletes the `Postcode`, `Search`, `Crime` and `CrimeList` collections.
- * Must be used carefully, as re-downloading data will take a long time.
+ * Resets cached location data. Deletes the `Postcode`, `Search`, `Crime` and `CrimeList` collections.  
+ * Must be used carefully, as re-downloading data will take a long time.  
  * As to not force a re-download, this function does not delete the `Atco`, `BusStop` and `Nptg` collections.
  * 
  * @async
@@ -177,7 +178,7 @@ async function resetDataDB() {
 }
 
 /**
- * Initialises the location database collections. Adds the `Nptg` data if not cached already.
+ * Initialises the location database collections. Adds the `Nptg` data if not cached already.  
  * Assigns `Atco` codes for Scoltand,England and Wales and related names for Scotland.
  * 
  * @async

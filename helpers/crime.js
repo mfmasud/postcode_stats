@@ -8,7 +8,7 @@ const CrimeList = require("../models/CrimeList");
 const Crime = require("../models/Crime");
 
 /**
- * Queries the Police Data API for crime data using a pair of latitude and longitude values.
+ * Queries the Police Data API for crime data using a pair of latitude and longitude values.  
  * The data is then processed into a CrimeList using processCrimeData.
  * 
  * @async
@@ -44,7 +44,7 @@ async function getCrimeData(lat, long) {
 
 
 /**
- * Processes the crime data retrieved from the Police Data API into a CrimeList and Crime models.
+ * Processes the crime data retrieved from the Police Data API into a CrimeList and Crime models.  
  * This is currently capped at just the first 5 crimes per location to speed up the code.
  * 
  * @async

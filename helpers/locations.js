@@ -119,7 +119,7 @@ async function getScotlandLocations() {
 }
 
 /**
- * Processes online sources to assign alt names to English Atco locations.
+ * Processes online sources to assign alt names to English Atco locations.  
  * e.g. the region "London" > City of London and London Boroughs as alt names
  * 
  * @async

@@ -16,7 +16,7 @@ const Atco = require("../models/Atco");
 const BusStop = require("../models/BusStop");
 
 /**
- * Processes the list of ATCO codes for local authorities.
+ * Processes the list of ATCO codes for local authorities.  
  * Separated from saveAtcoList to allow for testing without saving codes to the database.
  * 
  * @async
@@ -113,7 +113,7 @@ async function processAtcoString(data) {
 // 420 is Warwickshire / West Midlands.
 
 /**
- * Sends a request to the NAPTAN API to get the bus stops for a given ATCO code.
+ * Sends a request to the NAPTAN API to get the bus stops for a given ATCO code.  
  * The API returns CSV data which is then processed by processCSV.
  * 
  * @async

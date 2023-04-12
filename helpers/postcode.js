@@ -47,7 +47,7 @@ async function findPostcodeFromWGS84(location) {
 }
 
 /**
- * Gets a random UK postcode from the postcodes.io API.
+ * Gets a random UK postcode from the postcodes.io API.  
  * Postcodes are guaranteed to be valid as they are retreived from the API directly.
  * 
  * @async
@@ -84,7 +84,7 @@ async function getRandomPostcode() {
 }
 
 /**
- * Gets a UK postcode from the postcodes.io API.
+ * Gets a UK postcode from the postcodes.io API.  
  * If the postcode is already in the database, it will return the existing Postcode document instead.
  * 
  * @async
