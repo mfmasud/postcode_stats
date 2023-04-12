@@ -23,8 +23,8 @@ const mongoose = require("mongoose");
 *
 * @throws {Error} If no matching `CrimeList` is returned from the database.
 *
-* @see linkAtco - links associated busstops to the `Search` model
-* @see getRelatedCrimes - Adds the `Crime`s to the `Search` model.
+* @see {@link linkAtco} - links associated busstops to the `Search` model
+* @see {@link getRelatedCrimes} - Adds the `Crime`s to the `Search` model.
 */
 async function linkCrimeList(SearchModel) {
   // links crime list to search model
@@ -52,8 +52,8 @@ async function linkCrimeList(SearchModel) {
  * @param {mongoose.Object} SearchModel - The `Search` model to add the `CrimeList` details to.
  * @returns nothing, adds the `CrimeList` to the `Search` model.
  * 
- * @see getCrimeData - fetches the crime data from the Police Data API, stores it as a `CrimeList` model.
- * @see linkCrimeList - links the `CrimeList` to the `Search` model for use in this function.
+ * @see {@link getCrimeData} - fetches the crime data from the Police Data API, stores it as a `CrimeList` model.
+ * @see {@link linkCrimeList} - links the `CrimeList` to the `Search` model for use in this function.
  */
 async function getRelatedCrimes(SearchModel) {
   const { latitude, longitude } = SearchModel;
@@ -115,10 +115,10 @@ async function getRelatedListings(SearchModel) {
  * 
  * @todo Refactor this function to be more readable - A switch/case combined with a function to search for the Atco model would be better.
  * 
- * @see linkAtco - links associated busstops to the `Search` model
- * @see getEnglandLocations - Generates the `Atco` model's `other_names` field for England.
- * @see getScotlandLocations - Generates the `Atco` model's `other_names` field for Scotland.
- * @see getWalesLocations - Generates the `Atco` model's `other_names` field for Wales.
+ * @see {@link linkAtco} - links associated busstops to the `Search` model
+ * @see {@link getEnglandLocations} - Generates the `Atco` model's `other_names` field for England.
+ * @see {@link getScotlandLocations} - Generates the `Atco` model's `other_names` field for Scotland.
+ * @see {@link getWalesLocations} - Generates the `Atco` model's `other_names` field for Wales.
  */
 async function searchAtco(PostcodeModel) {
   var {
@@ -204,8 +204,8 @@ async function searchAtco(PostcodeModel) {
  * @param {mongoose.Object} SearchModel - The `Search` model to link the `Atco` model to.
  * @returns nothing, adds the `Atco` model to the `Search` model's `linkedATCO` field.
  * 
- * @see linkCrimeList - links associated crimes to the `Search` model using the `CrimeList` model.
- * @see searchAtco - Finds the correct `Atco` model to be linked.
+ * @see {@link linkCrimeList} - links associated crimes to the `Search` model using the `CrimeList` model.
+ * @see {@link searchAtco} - Finds the correct `Atco` model to be linked.
  * 
  */
 async function linkAtco(SearchModel) {
@@ -247,7 +247,7 @@ async function linkAtco(SearchModel) {
  * @param {number} radius - The radius in metres to search for bus stops in. Defaults to 1000m.
  * @returns nothing, adds the `BusStop` models to the `Search` model's `relatedStops` field.
  * 
- * @see linkAtco - Links the `Atco` model to the `Search` model.
+ * @see {@link linkAtco} - Links the `Atco` model to the `Search` model.
  */
 async function getRelatedStops(SearchModel, radius = 1000) {
   // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)

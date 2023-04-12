@@ -46,7 +46,7 @@ router.get("/:postcode", auth, getPostcodeRoute); // Search for specific valid p
  * @param {Object} cnx - Koa context object
  * @returns {undefined} Nothing, updates the context object with the postcodes from the database.
  * 
- * @see getAllPostcodes - fetches all the postcodes from the database.
+ * @see {@link getAllPostcodes} - fetches all the postcodes from the database.
  * 
  */
 async function getAllPostcodes(cnx) {
@@ -77,7 +77,7 @@ async function getAllPostcodes(cnx) {
  * @param {Object} cnx - Koa context object
  * @returns {undefined} Nothing, updates the context's response body with the random postcode returned from getRandomPostcode.
  * 
- * @see getRandomPostcode - fetches a random postcode using the postcode.io API.
+ * @see {@link getRandomPostcode} - fetches a random postcode using the postcode.io API.
  * 
  */
 async function getRandomPostcodeRoute(cnx) {
@@ -110,8 +110,8 @@ async function getRandomPostcodeRoute(cnx) {
  * @param {Object} cnx - Koa context object
  * @returns {undefined} Nothing, updates the response body with the postcode returned from getPostcode.
  * 
- * @see getPostcode - fetches a postcode using the postcode.io API, or a cached version from the database.
- * @see validatePostcode - validates the postcode using the postcode.io API.
+ * @see {@link getPostcode} - fetches a postcode using the postcode.io API, or a cached version from the database.
+ * @see {@link validatePostcode} - validates the postcode using the postcode.io API.
  * 
  */
 async function getPostcodeRoute(cnx) {
