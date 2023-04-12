@@ -1,3 +1,21 @@
+/**
+ * @file This file contains the functions for getting location data from online sources and saving NPTG data.
+ * @module helpers/locations
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires models/Nptg
+ * @requires models/Atco
+ * @requires utils/logger
+ * @requires axios
+ * @requires jsdom
+ * @requires csvtojson
+ * 
+ * @exports getEnglandLocations
+ * @exports getWalesLocations
+ * @exports getScotlandLocations
+ * @exports getNptgData
+ */
+
 const Nptg = require("../models/Nptg");
 const Atco = require("../models/Atco");
 
@@ -5,7 +23,6 @@ const logger = require("../utils/logger");
 
 const axios = require("axios");
 const JSDOM = require("jsdom").JSDOM;
-const mongoose = require("mongoose");
 const csvtojson = require("csvtojson");
 
 /**
@@ -215,15 +232,18 @@ async function getNptgData() {
 }
 
 /**
- * Procceses the NPTG API csv data. Checks for an existing cache to ensure data is not needlessly re-downloaded.
+ * Procceses the NPTG API csv data.  
+ * Checks for an existing cache to ensure data is not needlessly re-downloaded.
  * 
  * @async
  * @function processNptgCSV
  * 
  * @param {Object} rawdata - The raw CSV data returned from getNptgData. 
- * @returns 
+ * @returns Nothing, processed the data in the CSV and stores it in the Nptg collection.
  * 
  * @see getNptgData
+ * 
+ * @todo Speed this up like the code used to save BusStops and Crimes.
  * 
  */
 async function processNptgCSV(rawdata) {
