@@ -1,3 +1,19 @@
+/**
+ * @file Defines the basic authentication strategy for Koa/Passport. Uses bcrypt to verify passwords and returns a User object if successful.
+ * @module strategies/basic
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires passport-http
+ * @requires bcrypt
+ * @requires module:utils/logger
+ * @requires module:models/User
+ * 
+ * @exports BasicStrategy
+ * 
+ * @see {@link module:controllers/auth} for the authentication middleware which implements this strategy.
+ * 
+ */
+
 const BasicStrategy = require("passport-http").BasicStrategy;
 const bcrypt = require("bcrypt");
 

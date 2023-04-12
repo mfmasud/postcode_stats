@@ -7,7 +7,7 @@
  * 
  * @exports Postcode
  * 
- * @see {@link module:models/Search} which uses this `Postcode` model.
+ * @see {@link module:models/Search} which uses this Postcode model.
  * @see {@link module:routes/postcodes} for the route which uses this model.
  * @See {@link module:helpers/postcodes} for the helper files which uses these models.
  */

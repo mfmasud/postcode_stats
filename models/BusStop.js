@@ -1,5 +1,5 @@
 /**
- * @file Contains the BusStop model schema.
+ * @file Contains the BusStop model schema. This stores a condensed version of the ATCO data retrieved from the NAPTAN (National Public Transport Access Nodes) API.
  * @module models/BusStop
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  * 
@@ -8,7 +8,7 @@
  * @exports BusStop
  * 
  * @see {@link module:models/Atco} for the Atco model which uses this model.
- * @see {@link processCSV} for the function which processes data for this model.
+ * @see {@link module:helpers/AtcoCodes} which has helper functions storing condensed versions of the ATCO data using this model.
  * 
  */
 

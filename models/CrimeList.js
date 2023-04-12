@@ -1,5 +1,5 @@
 /**
- * @file Contains the mongoose CrimeList model schema.
+ * @file Contains the mongoose CrimeList model schema. Sums up the results of a query made to the Police API so that it can be used by and linked to the Search model.
  * @module models/CrimeList
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  * 
@@ -7,8 +7,9 @@
  * 
  * @exports CrimeList
  * 
- * @see {@link module:models/Crime} for the `Crime` model which is used in this model's `crimes` field.
- * @see {@link module:models/Search} for the `Search` model which links this model.
+ * @see {@link module:models/Crime} for the Crime model which is used in this model's crimes field.
+ * @see {@link module:models/Search} for the Search model which links this model.
+ * @see {@link module:helpers/crime} for the helper functions used to retrieve data for this model.
  * 
  */
 

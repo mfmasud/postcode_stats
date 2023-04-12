@@ -7,7 +7,7 @@
  * 
  * @exports Role
  * 
- * @see {@link module:models/User} for the User model which has a `role` field which uses this model.
+ * @see {@link module:models/User} for the User model which has a role field which uses this model.
  * 
  */
 
