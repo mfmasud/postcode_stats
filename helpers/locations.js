@@ -1,5 +1,5 @@
 /**
- * @file This file contains the functions for getting location data from online sources and saving NPTG data.
+ * @file This file contains the functions for getting location data from online sources and saving NPTG API data.
  * @module helpers/locations
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  * 
@@ -10,10 +10,11 @@
  * @requires jsdom
  * @requires csvtojson
  * 
+ * @exports getScotlandLocations
  * @exports getEnglandLocations
  * @exports getWalesLocations
- * @exports getScotlandLocations
  * @exports getNptgData
+ * 
  */
 
 const Nptg = require("../models/Nptg");

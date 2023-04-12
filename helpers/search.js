@@ -1,5 +1,22 @@
-const Search = require("../models/Search");
-const BusStop = require("../models/BusStop");
+/**
+ * @file Contains the functions to link data related to a search to the Search model.
+ * @module helpers/search
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires models/Atco
+ * @requires models/CrimeList
+ * @requires utils/logger
+ * @requires helpers/AtcoCodes
+ * @requires helpers/crime
+ * 
+ * @exports getRelatedStops
+ * @exports getRelatedCrimes
+ * @exports linkAtco
+ * 
+ * @see {@link module:routes/search} for the route which uses these functions.
+ * 
+ */
+
 const Atco = require("../models/Atco");
 const CrimeList = require("../models/CrimeList");
 
@@ -7,8 +24,6 @@ const logger = require("../utils/logger");
 
 const { queryAtcoAPI } = require("../helpers/AtcoCodes");
 const { getCrimeData } = require("../helpers/crime");
-
-const mongoose = require("mongoose");
 
 
 /**
@@ -52,7 +67,7 @@ async function linkCrimeList(SearchModel) {
  * @param {mongoose.Object} SearchModel - The `Search` model to add the `CrimeList` details to.
  * @returns nothing, adds the `CrimeList` to the `Search` model.
  * 
- * @see {@link getCrimeData} - fetches the crime data from the Police Data API, stores it as a `CrimeList` model.
+ * @see {@link getCrimeData} - fetches the crime data from the Police API, stores it as a `CrimeList` model.
  * @see {@link linkCrimeList} - links the `CrimeList` to the `Search` model for use in this function.
  */
 async function getRelatedCrimes(SearchModel) {
@@ -65,7 +80,7 @@ async function getRelatedCrimes(SearchModel) {
   }
 
   if (latitude && longitude) {
-    await getCrimeData(latitude, longitude); // fetches the police data API
+    await getCrimeData(latitude, longitude); // fetches the Police API
     await linkCrimeList(SearchModel); // Links the CrimeList data to the Search model
     if (SearchModel.linkedCrimeList){
       logger.info("Added crimes to search");
@@ -74,7 +89,7 @@ async function getRelatedCrimes(SearchModel) {
       SearchModel.queryCrimes = []; // empty to indicate not found
     }
   } else {
-    logger.error("Need LAT/LONG Coordinates to use the police data API.")
+    logger.error("Need LAT/LONG Coordinates to use the Police API.")
     SearchModel.queryCrimes = []; // empty to indicate not found
   }
 

@@ -1,3 +1,23 @@
+/**
+ * @file Contains functions for interacting with the postcodes.io API and processing and saving the data returned.
+ * @module helpers/postcode
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires axios
+ * @requires utils/logger
+ * @requires models/Postcode
+ * 
+ * @exports findPostcodeFromWGS84
+ * @exports getRandomPostcode
+ * @exports getPostcode
+ * @exports validatePostcode
+ * @exports processPostcode
+ * 
+ * @see https://postcodes.io/docs
+ * @see {@link module:routes/postcodes} for the route which uses this module.
+ * 
+ */
+
 const axios = require("axios");
 
 const logger = require("../utils/logger");

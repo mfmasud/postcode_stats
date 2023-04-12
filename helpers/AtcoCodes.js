@@ -1,7 +1,25 @@
-/*
-web scraping and parsing HTML in javascript:
-https://www.twilio.com/blog/web-scraping-and-parsing-html-in-node-js-with-jsdom
+/**
+ * @file Contains functions to process ATCO codes and query the NAPTAN API for bus stops.
+ * @module helpers/AtcoCodes
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires utils/logger
+ * @requires axios
+ * @requires jsdom
+ * @requires csvtojson
+ * @requires models/Atco
+ * @requires models/BusStop
+ * 
+ * @exports getAtcoCodes
+ * @exports queryAtcoAPI
+ * @exports processAtcoString
+ * @exports saveAtcoList
+ * 
+ * @see {@link https://www.twilio.com/blog/web-scraping-and-parsing-html-in-node-js-with-jsdom|web scraping and parsing HTML in javascript} for information on how to scrape HTML data.
+ * 
+ */
 
+/*
 related note:
 docs/notes/atco_codes.txt
 */

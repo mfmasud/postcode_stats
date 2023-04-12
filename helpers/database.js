@@ -1,3 +1,32 @@
+/** 
+ * @file Contains functions for connecting to and initialising database collections.
+ * @module helpers/database
+ * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * 
+ * @requires dotenv
+ * @requires mongoose
+ * @requires utils/logger
+ * @requires models/User
+ * @requires models/Role
+ * @requires models/Atco
+ * @requires models/BusStop
+ * @requires models/Postcode
+ * @requires models/Nptg
+ * @requires models/Search
+ * @requires models/CrimeList
+ * @requires models/Crime
+ * @requires helpers/AtcoCodes
+ * @requires helpers/locations
+ * 
+ * @exports connectDB
+ * @exports disconnectDB
+ * @exports initUserDB
+ * @exports initAtcoDB
+ * @exports initPostcodeDB
+ * 
+ */
+
+require("dotenv").config();
 const mongoose = require("mongoose");
 mongoose.set("strictQuery", true);
 //mongoose.set("debug", true);
