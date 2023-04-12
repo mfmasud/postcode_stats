@@ -105,13 +105,13 @@ async function initUserDB() {
       name: "user",
     });
 
-    const noUser = await Role.create({
+    await Role.create({
       name: "none",
     });
 
     // Create sample documents for each collection
 
-    const user = await User.create({
+    await User.create({
       firstName: "Test",
       lastName: "User",
       username: "TestUser1",
@@ -123,7 +123,7 @@ async function initUserDB() {
       id: 1,
     });
 
-    const paiduser = await User.create({
+    await User.create({
       firstName: "Paid",
       lastName: "User",
       username: "PaidUser1",
@@ -134,7 +134,7 @@ async function initUserDB() {
       role: PaidUser,
     });
 
-    const admin = await User.create({
+    await User.create({
       firstName: "Test",
       lastName: "Admin",
       username: "TestAdmin1",
