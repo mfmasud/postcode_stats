@@ -7,8 +7,8 @@ const logger = require("../utils/logger");
  *
  * @function defineAbilitiesFor
  *
- * @param {Mongoose.Model} user - The mongoose User model to check permissions against.
- * @param {Mongoose.Model} [PostcodeModel] - Optional mongoose Postcode model to check permissions against with can/cannot.
+ * @param {mongoose.Object} user - The mongoose User model to check permissions against.
+ * @param {mongoose.Object} [PostcodeModel] - Optional mongoose Postcode model to check permissions against with can/cannot.
  *
  * @returns A CASL ability object defining the user's permissions for the /postcodes route.
  */

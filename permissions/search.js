@@ -7,8 +7,8 @@ const logger = require("../utils/logger");
  *
  * @function defineAbilitiesFor
  *
- * @param {Mongoose.Model} user - The mongoose User model to check permissions against.
- * @param {Mongoose.Model} [SearchModel] - Optional mongoose Search model to check permissions against to potentially exclude fields in the future.
+ * @param {mongoose.Object} user - The mongoose User model to check permissions against.
+ * @param {mongoose.Object} [SearchModel] - Optional mongoose Search model to check permissions against to potentially exclude fields in the future.
  *
  * @returns A CASL ability object defining the user's permissions for the /search route.
  *

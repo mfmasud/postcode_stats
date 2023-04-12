@@ -46,6 +46,18 @@ async function findPostcodeFromWGS84(location) {
   return queryResult.postcode;
 }
 
+/**
+ * Gets a random UK postcode from the postcodes.io API.
+ * Postcodes are guaranteed to be valid as they are retreived from the API directly.
+ * 
+ * @async
+ * @function getRandomPostcode
+ * 
+ * @returns {*} An object containing the details of the postcode.
+ * 
+ * @see https://postcodes.io/docs for documentation of the returned object.
+ * @see getPostcode
+ */
 async function getRandomPostcode() {
   try {
     const response = await axios.get(
@@ -53,7 +65,7 @@ async function getRandomPostcode() {
     );
 
     // EXTREMELY unlikely but added nonetheless.
-    const postcodeExists = await Postcode.findOne({
+    const postcodeExists = await Postcode.exists({
       postcode: response.data.result.postcode,
     });
 
@@ -71,9 +83,23 @@ async function getRandomPostcode() {
   }
 }
 
+/**
+ * Gets a UK postcode from the postcodes.io API.
+ * If the postcode is already in the database, it will return the existing Postcode document instead.
+ * 
+ * @async
+ * @function getPostcode
+ * 
+ * @param {String} validPostcodeString - A valid UK postcode.
+ * @returns {*} An object containing the details of the postcode.
+ * 
+ * @see https://postcodes.io/docs for documentation of the returned object.
+ * @see getRandomPostcode
+ * @see validatePostcode
+ */ 
 async function getPostcode(validPostcodeString) {
   // check if postcode exists in db
-  const postcodeExists = await Postcode.findOne({
+  const postcodeExists = await Postcode.exists({
     postcode: validPostcodeString,
   });
 
@@ -93,6 +119,17 @@ async function getPostcode(validPostcodeString) {
   }
 }
 
+/**
+ * Validates a UK postcode using the postcodes.io validation API.
+ * 
+ * @async
+ * @function validatePostcode
+ * 
+ * @param {String} postcodeString 
+ * @returns A boolean value indicating whether the postcode is valid or not.
+ * 
+ * @see getPostcode
+ */
 async function validatePostcode(postcodeString) {
   try {
     const response = await axios.get(
@@ -113,6 +150,18 @@ async function validatePostcode(postcodeString) {
   }
 }
 
+
+/**
+ * Processes a postcode object from the postcodes.io API and saves it to the database as a Postcode model.
+ * 
+ * @async
+ * @function processPostcode
+ * 
+ * @param {Object} postcodeObject - A mongoose object containing the details of a postcode.
+ * @returns {undefined} Nothing, the postcode is just saved to the database.
+ * 
+ * @see getPostcode
+ */
 async function processPostcode(postcodeObject) {
   logger.info(`Processing: ${postcodeObject.postcode}`);
 
