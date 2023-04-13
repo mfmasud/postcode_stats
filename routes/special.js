@@ -38,7 +38,7 @@ function publicAPI(ctx) {
 
 
 /**
- * A function which displays the details of the current user. If no user hsa been authenticated, a message is returned saying so.
+ * A function which displays the details of the current user. If no user has been authenticated, a message is returned saying so.
  * 
  * @function UserDetails
  * 

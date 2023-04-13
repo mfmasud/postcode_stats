@@ -9,7 +9,7 @@
  * 
  * @see {@link module:models/BusStop} for the BusStop model which is used by this model schema.
  * @see {@link module:models/Search} for the Search model which links this model.
- * @see {@link processCSV} for the function which processes data for this model. If the link is broken, the function is in helpers/AtcoCodes.js
+ * @see {@link module:helpers/AtcoCodes~processCSV} for the function which processes data for this model.
  * 
  */
 
