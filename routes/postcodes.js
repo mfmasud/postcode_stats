@@ -44,6 +44,8 @@ router.get("/:postcode", auth, getPostcodeRoute); // Search for specific valid p
  * @function getAllPostcodes
  * 
  * @param {Object} cnx - Koa context object
+ * @throws {Error} 401 if the user is not logged in.
+ * @throws {Error} 403 if the user is not authorised to view this resource.
  * @returns {undefined} Nothing, updates the context object with the postcodes from the database.
  * 
  * @see {@link getAllPostcodes} - fetches all the postcodes from the database.
@@ -60,6 +62,7 @@ async function getAllPostcodes(cnx) {
 
   if (ability.can("readAll", "Postcode")) {
     const postcodes = await Postcode.find();
+    cnx.status = 200;
     cnx.body = postcodes;
   } else {
     logger.error("[403] User is not authorised to view this resource.");
@@ -74,6 +77,8 @@ async function getAllPostcodes(cnx) {
  * @function getRandomPostcodeRoute
  * 
  * @param {Object} cnx - Koa context object
+ * @throws {Error} 401 if the user is not logged in.
+ * @throws {Error} 403 if the user is not authorised to view this resource.
  * @returns {undefined} Nothing, updates the context's response body with the random postcode returned from getRandomPostcode.
  * 
  * @see {@link getRandomPostcode} - fetches a random postcode using the postcode.io API.
@@ -94,8 +99,8 @@ async function getRandomPostcodeRoute(cnx) {
     logger.info(`returned postcode ${randompostcode.postcode}`);
     cnx.body = randompostcode;
   } else {
-    cnx.status = 403;
-    cnx.body = "You are not authorised to view this resource";
+    logger.error("[403] User is not authorised to view this resource.");
+    cnx.throw(403, "You are not authorised to view this resource");
   }
 }
 
@@ -106,6 +111,8 @@ async function getRandomPostcodeRoute(cnx) {
  * @function getPostcodeRoute
  * 
  * @param {Object} cnx - Koa context object
+ * @throws {Error} 400 if the postcode is not provided or is invalid.
+ * @throws {Error} 403 if the user is not authorised to view this resource.
  * @returns {undefined} Nothing, updates the response body with the postcode returned from getPostcode.
  * 
  * @see {@link getPostcode} - fetches a postcode using the postcode.io API, or a cached version from the database.
@@ -140,8 +147,8 @@ async function getPostcodeRoute(cnx) {
       cnx.throw(400, "Please provide a valid postcode.");
     }
   } else {
-    cnx.status = 403;
-    cnx.body = "You are not authorised to view this resource";
+    logger.error("[403] User is not authorised to view this resource.");
+    cnx.throw(403, "You are not authorised to view this resource");
   }
 }
 
