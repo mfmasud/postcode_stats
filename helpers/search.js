@@ -108,6 +108,8 @@ async function getRelatedCrimes(SearchModel) {
  * @param {mongoose.Object} SearchModel - The `Search` model to add the property data to.
  * @returns nothing, adds the property data to the `Search` model's `queryListings` field.
  * 
+ * @see {@link https://www.ubdc.ac.uk/data-services/data-catalogue/housing-data/zoopla-property-data/|Zoopla Property Data} provided by University of Glasgow's Urban Big Data Centre.
+ * 
  */
 async function getRelatedListings(SearchModel) {
   const { latitude, longitude } = SearchModel;

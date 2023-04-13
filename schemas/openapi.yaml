@@ -2,7 +2,9 @@ openapi: 3.0.0
 info:
   version: 1.0.0
   title: UK Location API!
-  description: A UK Location data API for my 6003CEM Portfolio coursework. Provides crime and transport details for a given postcode or WGS84 coordinate pair.
+  description: >
+    A UK Location data API for my 6003CEM Portfolio coursework.  
+    Provides crime and transport details for a given postcode or WGS84 coordinate pair.
   contact:
     name: Mohammed Fardhin Masud
     email: masudm6@coventry.ac.uk
@@ -14,9 +16,9 @@ tags:
     description: API endpoints for user management.
   - name: Postcodes
     description: API endpoints for Postcode collection operations.
-  -name: Searches
+  - name: Searches
     description: API endpoints to search data for locations.
-  -name: Specials
+  - name: Specials
     description: API endpoints for special operations. Primarily meant for testing.
 paths:
   /users/{id}:
@@ -31,6 +33,7 @@ paths:
       This reource represents the ability to perform actions on users via their
       ID.
     get:
+      summary: View details for a single user
       tags:
         - Users
       description: Get user by id.
@@ -44,9 +47,19 @@ paths:
         "404":
           description: User was not found in the DB.
     put:
+      summary: Update user details
       tags:
         - Users
       description: Update user by ID.
+      requestBody:
+        description: Edit fields with the names matching "firstName, lastName, about, password, email, avatarURL"
+        required: false
+        content:
+          application/json:
+            schema:
+              type: string
+              enum: 
+                - {firstName, lastName, about, password, email, avatarURL}
       responses:
         "200":
           description: Update confirmation showing a message with updated fields.
@@ -59,6 +72,7 @@ paths:
         "500":
           description: User update failed.
     delete:
+      summary: Delete a user by ID
       tags:
         - Users
       description: Delete user by ID.
@@ -76,6 +90,7 @@ paths:
   /users:
     description: Register new users and view all users
     post:
+      summary: Create a new user
       tags:
         - Users
       description: Create a new user.
@@ -87,6 +102,7 @@ paths:
         "500":
           description: User creation failed.
     get:
+      summary: View all users in the Users collection
       tags:
         - Users
       description: View all users
@@ -102,6 +118,7 @@ paths:
   /postcodes:
     description: Get all postcodes from the Postcodes collection. Admins only.
     get:
+      summary: View all postcodes in the Postcode collection
       tags:
         - Postcodes
       description: View all postcodes in the mongoDB Postcodes collection.
@@ -125,6 +142,7 @@ paths:
       The postcode is validated using the postcodes.io API and is stored in a condensed form as a Postcode model.
       The full details are returned in this route, but in the searches route, only the condensed form is used.
     get:
+      summary: Look for a specific postcode
       tags:
         - Postcodes
       description: Get postcode by validating the postcode in the URL.
@@ -138,6 +156,7 @@ paths:
   /postcodes/random:
     description: Get a random postcode using the postcodes.io API
     get:
+      summary: Look for a random postcode
       tags:
         - Postcodes
       description: Get a random postcode using the postcodes.io API
@@ -150,8 +169,61 @@ paths:
           description: User does not have permission to access this resource.
   /search:
     description: Search for a details of a location using a postcode or WGS84 coordinate pair.
+    post:
+      summary: Search using a pair of coordinates
+      tags:
+        - Searches
+      parameters:
+      - in: query
+        name: latitude
+        schema:
+          type: number
+        required: true
+        description: Latitude value to search for.
+      - in: query
+        name: longitude
+        schema:
+          type: number
+        required: true
+        description: Longitude value to search for.
+      description: Search for a location using a WGS84 coordinate pair (latitude and longitude).
+      responses:
+        "200":
+          description: View transport and crime details for the location.
+        "400":
+          description: Invalid coordinates entered.
+        "403":
+          description: User does not have permission to access this resource.
+    get:
+      tags:
+        - Searches
+      summary: Search using a postcode
+      requestBody:
+        description: Search for a location using a postcode.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: View transport and crime details for the location.
+        "400":
+          description: Invalid postcode entered.
+        "403":
+          description: User does not have permission to access this resource.
+  /search/random:
     
-
-
-        
-  
+    description: Get a random location using the postcodes.io API and search for details for that location.
+    get:
+      summary: Search a random postcode
+      tags:
+        - Searches
+      description: Get a random location using the postcodes.io API and search for details of that location.
+      responses:
+        "200":
+          description: View transport and crime details for the location.
+        "401":
+          description: User has not logged in.
+        "403":
+          description: User does not have permission to access this resource.
