@@ -54,8 +54,8 @@ const {
 } = require("../helpers/search");
 
 // routes
-router.post("/", auth, bodyParser(), searchArea); // POST - finds a postcode internally
-router.get("/", auth, bodyParser(), searchPostcode); // GET - verifies and searches using postcode from the request body
+router.get("/", auth, bodyParser(), searchArea); // GET - finds a postcode internally using latitude and longitude from the query parameters
+router.post("/", auth, bodyParser(), searchPostcode); // POST - verifies and searches using postcode from the request body
 router.get("/random", auth, searchRandom); // admins only - for testing
 
 /**
@@ -77,7 +77,7 @@ router.get("/random", auth, searchRandom); // admins only - for testing
  * 
  */
 async function searchArea(cnx, next) {
-  // POST and latitude/longitude in query params
+  // GET request with latitude/longitude in query params
   // allows anyone to search via a lat and long in the body of the request
   // returns a list of property listings, transport nodes and crime.
 
@@ -168,7 +168,7 @@ async function searchArea(cnx, next) {
  * 
  */
 async function searchPostcode(cnx, next) {
-  // GET and postcode in body.
+  // POST with postcode in the request body.
   // allows anyone to search via a postcode in the request body.
   // returns a list of property listings, transport nodes and crime data
 
