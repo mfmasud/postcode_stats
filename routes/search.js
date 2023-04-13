@@ -58,7 +58,24 @@ router.post("/", auth, bodyParser(), searchArea); // POST - finds a postcode int
 router.get("/", auth, bodyParser(), searchPostcode); // GET - verifies and searches using postcode from the request body
 router.get("/random", auth, searchRandom); // admins only - for testing
 
-// functions to handle the routes
+/**
+ * A function which searches location data using a pair of latitude and longitude values in the query parameters.  
+ * 
+ * @async
+ * @function searchArea
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The next middleware to be called.
+ * @throws {Error} 400 if the latitude or longitude values are missing or invalid.
+ * @throws {Error} 403 if the user does not have permission to search a location.
+ * @returns {undefined} cnx is modified with a 200 status code and a body containing the search results.
+ * 
+ * @see {@link findPostcodeFromWGS84} for more information on the function used to find the postcode from the lat-long pair.
+ * @see {@link searchPostcode} for more information on the primary function used to search postcodes, used internally in this function.
+ * 
+ * @todo Update the reverseLookup property to be false if the postcode is found via this function.
+ * 
+ */
 async function searchArea(cnx, next) {
   // POST and latitude/longitude in query params
   // allows anyone to search via a lat and long in the body of the request
@@ -73,8 +90,7 @@ async function searchArea(cnx, next) {
 
   // Check for empty values
   if (!lat || !long) {
-    cnx.status = 400;
-    cnx.body = "Please provide latitude and longitude values.";
+    cnx.throw(400, "Please provide valid latitude and longitude values.");
     return;
   }
 
@@ -83,8 +99,7 @@ async function searchArea(cnx, next) {
     var longFloat = parseFloat(long);
   } catch (error) {
     logger.error(error);
-    cnx.status = 400;
-    cnx.body = "Please provide valid latitude and longitude values.";
+    cnx.throw(400, "Please provide valid latitude and longitude values.");
     return;
   }
 
@@ -116,7 +131,7 @@ async function searchArea(cnx, next) {
   }
   const ability = createAbilityFor(user);
 
-  if (ability.can("read", "Search")) {
+  if (ability.can("create", "Search")) {
     // lookup lat long to postcode to generate data for postcode field, then search via postcode
 
     const findPostcode = await findPostcodeFromWGS84(locationObj);
@@ -128,11 +143,29 @@ async function searchArea(cnx, next) {
       await searchPostcode(cnx, next);
     }
   } else {
-    cnx.status = 403;
-    cnx.body = "You are not authorised to view this resource";
+    logger.error("User does not have permission to perform this action.");
+    cnx.throw(403, "You are not allowed to access this resource.");
   }
 }
 
+/**
+ * A function which searches location data using a postcode from the request body.
+ * 
+ * @async
+ * @function searchPostcode
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The next middleware to be called.
+ * @throws {Error} 400 if the postcode is missing or invalid.
+ * @throws {Error} 403 if the user does not have permission to search a location.
+ * @returns {undefined} cnx is modified with a 200 status code and a body containing the search results.
+ * 
+ * @see {@link validatePostcode} for postcode validation.
+ * @see {@link getPostcode} for postcode lookup using the postcodes.io API.
+ * @see {@link module:model/Search} for the Search model used.
+ * @see {@link module:permissions/search} for the permissions applied to this route.
+ * 
+ */
 async function searchPostcode(cnx, next) {
   // GET and postcode in body.
   // allows anyone to search via a postcode in the request body.
@@ -141,8 +174,8 @@ async function searchPostcode(cnx, next) {
   let { postcode } = cnx.request.body;
 
   if (!postcode) {
-    cnx.status = 400;
-    cnx.body = "Please provide a postcode.";
+    logger.info("No postcode provided.");
+    cnx.throw(400, "Please provide a valid postcode.");
     return;
   }
 
@@ -152,7 +185,7 @@ async function searchPostcode(cnx, next) {
   }
   const ability = createAbilityFor(user);
 
-  if (ability.can("read", "Search")) {
+  if (ability.can("create", "Search")) {
     const validPostcode = await validatePostcode(postcode);
 
     if (validPostcode) {
@@ -161,11 +194,12 @@ async function searchPostcode(cnx, next) {
         postcode: processedPostcode.postcode,
       });
 
-      // check for existing search by comparing northing
-      // TODO: move to function
+      // check for existing search by comparing northing and easting values
       const existingSearch = await Search.findOne({
         Northing: dbPostcode.northings,
+        Easting: dbPostcode.eastings,
       });
+
       if (!existingSearch) {
         logger.info("Saving new Search");
         // save the search to the database
@@ -189,37 +223,57 @@ async function searchPostcode(cnx, next) {
         latitude: dbPostcode.latitude,
       }).populate(["Postcode", "queryBusStops", "queryCrimes"]);
       const body = SearchModel;
+      // cnx.body = body + generateLinks(SearchModel);
       cnx.status = 200;
       cnx.body = body;
     } else {
       // invalid postcode
-      cnx.status = 400;
-      cnx.body = "Please provide a valid postcode.";
+      logger.info("Invalid postcode provided.");
+      cnx.throw(400, "Please provide a valid postcode.");
       return;
     }
   } else {
-    cnx.status = 403;
-    cnx.body = "You are not authorised to view this resource";
-    next();
+    logger.error("User does not have permission to perform this action.");
+    cnx.throw(403, "You are not allowed to access this resource.");
+    return;
   }
 }
 
+/**
+ * A function which searches location data using a randomly generated postcode.  
+ * Used for testing purposes, admins only.
+ * 
+ * @async
+ * @function searchRandom
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The next middleware to be called.
+ * @throws {Error} 403 if the user does not have permission to search a location.
+ * @returns {undefined} cnx is modified with a 200 status code and a body containing the random postcode search results.
+ * 
+ * @see {@link getRandomPostcode} for random postcode generation.
+ * @see {@link module:model/Search} for the Search model used.
+ * @see {@link module:permissions/search} for the permissions applied to this route.
+ * 
+ */
 async function searchRandom(cnx, next) {
   let { user } = cnx.state;
   if (!user) {
+    // I could just return here, but this route might be possible for other roles in the future.
     user = User({ role: await Role.findOne({ name: "none" }) });
   }
   const ability = createAbilityFor(user);
 
-  if (ability.can("read", "RandomSearch")) {
+  if (ability.can("create", "RandomSearch")) {
     const processedPostcode = await getRandomPostcode();
     const dbPostcode = await Postcode.findOne({
       postcode: processedPostcode.postcode,
     });
 
-    // check for existing search by comparing latitude - Extremely unlikely as random postcodes are generated
+    // check for existing search by comparing northing and easting values - extremely unlikely as random postcodes are generated
     const existingSearch = await Search.findOne({
-      latitude: dbPostcode.latitude,
+      Northing: dbPostcode.northings,
+      Easting: dbPostcode.eastings,
     });
 
     if (!existingSearch) {
@@ -250,8 +304,8 @@ async function searchRandom(cnx, next) {
     cnx.status = 200;
     cnx.body = body;
   } else {
-    cnx.status = 403;
-    cnx.body = "You are not authorised to view this resource";
+    logger.error("User does not have permission to perform this action.");
+    cnx.throw(403, "You are not allowed to access this resource.");
   }
 }
 module.exports = router;

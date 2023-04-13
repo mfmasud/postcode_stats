@@ -43,23 +43,28 @@ function defineAbilitiesFor(user) {
 
   // non authenticated users
   can("read", "Search");
+  can("create", "Search");
 
   // authenticated users
   // standard users
   if (user.role.name === "user") {
     //logger.info('standard user role')
+
+    
   }
 
   // paid users
   if (user.role.name === "paiduser") {
     //logger.info('paid user role')
+
+
   }
 
   // admin users
   if (user.role.name === "admin") {
     //logger.info('admin user role')
 
-    can("read", "RandomSearch");
+    can("create", "RandomSearch");
   }
 
   return build();
