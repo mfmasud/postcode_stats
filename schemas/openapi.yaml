@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   version: 1.0.0
-  title: Real Estate API!
-  description: A Real Estate Web API for my 6003CEM Portfolio coursework.
+  title: UK Location API!
+  description: A UK Location data API for my 6003CEM Portfolio coursework. Provides crime and transport details for a given postcode or WGS84 coordinate pair.
   contact:
     name: Mohammed Fardhin Masud
     email: masudm6@coventry.ac.uk
@@ -12,8 +12,12 @@ servers:
 tags:
   - name: Users
     description: API endpoints for user management.
-  - name: Listing
-    description: API endpoints for property listing operations
+  - name: Postcodes
+    description: API endpoints for Postcode collection operations.
+  -name: Searches
+    description: API endpoints to search data for locations.
+  -name: Specials
+    description: API endpoints for special operations. Primarily meant for testing.
 paths:
   /users/{id}:
     parameters:
@@ -33,8 +37,10 @@ paths:
       responses:
         "200":
           description: View user details.
+        "400":
+          description: Invalid ID supplied.
         "401":
-          description: Non-admin users can only view their own record.
+          description: User needs to log in.
         "404":
           description: User was not found in the DB.
     put:
@@ -43,9 +49,15 @@ paths:
       description: Update user by ID.
       responses:
         "200":
-          description: Update confirmation and link to record.
-        "404":
-          description: User was not found in the DB.
+          description: Update confirmation showing a message with updated fields.
+        "400":
+          description: Invalid ID supplied.
+        "401":
+          description: User needs to log in.
+        "403":
+          description: User does not have permission to access this resource or perform this action.
+        "500":
+          description: User update failed.
     delete:
       tags:
         - Users
@@ -53,10 +65,14 @@ paths:
       responses:
         "200":
           description: User deletion confirmation.
+        "400":
+          description: Invalid ID supplied.
         "401":
-          description: Only admin users can delete user accounts.
-        "404":
-          description: User was not found in the DB.
+          description: User needs to log in.
+        "403":
+          description: User does not have permission to access this resource or perform this action.
+        "500":
+          description: User deletion failed.
   /users:
     description: Register new users and view all users
     post:
@@ -67,6 +83,8 @@ paths:
         "201":
           description: User created.
         "400":
+          description: User already exists, or invalid data was entered.
+        "500":
           description: User creation failed.
     get:
       tags:
@@ -76,4 +94,64 @@ paths:
         "200":
           description: View details for all users
         "401":
-          description: Only admin users can view details for all users
+          description: User needs to log in to view all users.
+        "403":
+          description: User does not have permission to access this resource.
+        "404":
+          description: No users were found in the DB (should never happen).
+  /postcodes:
+    description: Get all postcodes from the Postcodes collection. Admins only.
+    get:
+      tags:
+        - Postcodes
+      description: View all postcodes in the mongoDB Postcodes collection.
+      responses:
+        "200":
+          description: View all postcodes.
+        "401":
+          description: Only admin users can view all postcodes.
+        "403":
+          description: User does not have permission to access this resource.
+  /postcodes/{postcode}:
+    parameters:
+      - in: path
+        name: postcode
+        schema:
+          type: string
+        required: true
+        description: Postcode to search for.
+    description: >
+      This resource represents the ability to collect information for a given postcode.
+      The postcode is validated using the postcodes.io API and is stored in a condensed form as a Postcode model.
+      The full details are returned in this route, but in the searches route, only the condensed form is used.
+    get:
+      tags:
+        - Postcodes
+      description: Get postcode by validating the postcode in the URL.
+      responses:
+        "200":
+          description: View postcode details for given postcode.
+        "400":
+          description: Postcode entered is invalid.
+        "403":
+          description: User does not have permission to access this resource.
+  /postcodes/random:
+    description: Get a random postcode using the postcodes.io API
+    get:
+      tags:
+        - Postcodes
+      description: Get a random postcode using the postcodes.io API
+      responses:
+        "200":
+          description: View postcode details for given postcode.
+        "401":
+          description: User has not logged in.
+        "403":
+          description: User does not have permission to access this resource.
+  /search:
+    description: Search for a details of a location using a postcode or WGS84 coordinate pair.
+    
+
+
+        
+  
