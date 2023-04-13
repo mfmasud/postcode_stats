@@ -59,7 +59,7 @@ paths:
             schema:
               type: string
               enum: 
-                - {firstName, lastName, about, password, email, avatarURL}
+                - { "firstName": "newFirstName","lastName": "newLastName","about": "New about me section","password": "newPassword","email": "newemail@example.com","avatarURL": "https://example.com/avatar.png"}
       responses:
         "200":
           description: Update confirmation showing a message with updated fields.
@@ -169,7 +169,7 @@ paths:
           description: User does not have permission to access this resource.
   /search:
     description: Search for a details of a location using a postcode or WGS84 coordinate pair.
-    post:
+    get:
       summary: Search using a pair of coordinates
       tags:
         - Searches
@@ -194,7 +194,7 @@ paths:
           description: Invalid coordinates entered.
         "403":
           description: User does not have permission to access this resource.
-    get:
+    post:
       tags:
         - Searches
       summary: Search using a postcode
@@ -205,6 +205,8 @@ paths:
           application/json:
             schema:
               type: string
+              example:
+                postcode: LU2 7EW
       responses:
         "200":
           description: View transport and crime details for the location.
@@ -248,3 +250,10 @@ paths:
           description: View ALL the current user's details, including role, dates and passwords.
         "401":
           description: User needs to log in.
+components:
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+security:
+  - Basic: []
