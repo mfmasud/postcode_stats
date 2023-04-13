@@ -52,9 +52,8 @@ router.get("/:postcode", auth, getPostcodeRoute); // Search for specific valid p
 async function getAllPostcodes(cnx) {
   const { user } = cnx.state;
   if (!cnx.state.user) {
-    cnx.status = 401;
     logger.error("[401] User needs to log in.");
-    cnx.body = { message: "You are not logged in." };
+    cnx.throw(401, "You are not logged in.");
     return;
   }
   const ability = createAbilityFor(user);
@@ -63,8 +62,8 @@ async function getAllPostcodes(cnx) {
     const postcodes = await Postcode.find();
     cnx.body = postcodes;
   } else {
-    cnx.status = 403;
-    cnx.body = "You are not authorised to view this resource";
+    logger.error("[403] User is not authorised to view this resource.");
+    cnx.throw(403, "You are not authorised to view this resource");
   }
 }
 
@@ -83,9 +82,8 @@ async function getAllPostcodes(cnx) {
 async function getRandomPostcodeRoute(cnx) {
   const { user } = cnx.state;
   if (!cnx.state.user) {
-    cnx.status = 401;
     logger.error("[401] User needs to log in.");
-    cnx.body = { message: "You are not logged in." };
+    cnx.throw(401, "You are not logged in.");
     return;
   }
   const ability = createAbilityFor(user);
@@ -118,8 +116,8 @@ async function getPostcodeRoute(cnx) {
   let { postcode } = cnx.params;
 
   if (!postcode) {
-    cnx.status = 400;
-    cnx.body = "Please provide a postcode.";
+    logger.error("No postcode provided.");
+    cnx.throw(400, "Please provide a postcode.");
     return;
   }
 
@@ -138,8 +136,8 @@ async function getPostcodeRoute(cnx) {
       logger.info(`returned postcode ${body.postcode}`);
       cnx.body = body;
     } else {
-      cnx.status = 400;
-      cnx.body = "Please provide a valid postcode.";
+      logger.error("Invalid postcode provided.");
+      cnx.throw(400, "Please provide a valid postcode.");
     }
   } else {
     cnx.status = 403;
