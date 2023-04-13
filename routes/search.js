@@ -90,6 +90,7 @@ async function searchArea(cnx, next) {
 
   // Check for empty values
   if (!lat || !long) {
+    logger.error("No latitude / longitude value provided");
     cnx.throw(400, "Please provide valid latitude and longitude values.");
     return;
   }
@@ -194,10 +195,9 @@ async function searchPostcode(cnx, next) {
         postcode: processedPostcode.postcode,
       });
 
-      // check for existing search by comparing northing and easting values
+      // check for existing search by comparing Postcode data
       const existingSearch = await Search.findOne({
-        Northing: dbPostcode.northings,
-        Easting: dbPostcode.eastings,
+        Postcode: dbPostcode,
       });
 
       if (!existingSearch) {
@@ -270,10 +270,9 @@ async function searchRandom(cnx, next) {
       postcode: processedPostcode.postcode,
     });
 
-    // check for existing search by comparing northing and easting values - extremely unlikely as random postcodes are generated
+    // check for existing search by comparing Postcode data
     const existingSearch = await Search.findOne({
-      Northing: dbPostcode.northings,
-      Easting: dbPostcode.eastings,
+      Postcode: dbPostcode,
     });
 
     if (!existingSearch) {

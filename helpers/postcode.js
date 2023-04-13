@@ -41,6 +41,8 @@ const Postcode = require("../models/Postcode");
  *
  * @returns {(String|undefined)} A UK postcode or undefined if one has not been found.
  *
+ * @see {@link searchArea } To see an implementation of this function
+ * 
  */
 async function findPostcodeFromWGS84(location) {
   const postcodeapi = "https://api.postcodes.io/postcodes"; // using bulk search as it works better for some reason, also more extensible
@@ -120,7 +122,7 @@ async function getRandomPostcode() {
  */ 
 async function getPostcode(validPostcodeString) {
   // check if postcode exists in db
-  const postcodeExists = await Postcode.exists({
+  const postcodeExists = await Postcode.findOne({
     postcode: validPostcodeString,
   });
 
