@@ -51,8 +51,7 @@ function UserDetails(ctx) {
 
   if (!user) {
     logger.info(`User not logged in`);
-    ctx.status = 200;
-    ctx.body = "No user details available. Please log in to see them."
+    ctx.throw(401, "No user details available. Please log in to see them.");
     return;
   }
 

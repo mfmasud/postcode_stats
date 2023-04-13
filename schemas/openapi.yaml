@@ -213,7 +213,6 @@ paths:
         "403":
           description: User does not have permission to access this resource.
   /search/random:
-    
     description: Get a random location using the postcodes.io API and search for details for that location.
     get:
       summary: Search a random postcode
@@ -227,3 +226,25 @@ paths:
           description: User has not logged in.
         "403":
           description: User does not have permission to access this resource.
+  /:
+    description: Return a welcome message from the API.
+    get:
+      summary: Return a welcome message from the API's public homepage
+      tags:
+        - Specials
+      description: Return a welcome message from the API.
+      responses:
+        "200":
+          description: Successfully returns "Hello and welcome to the UK Location API!".
+  /private:
+    description: View the current user's details. Used for testing authentication.
+    get:
+      summary: View the current user's details
+      tags:
+        - Specials
+      description: View the current user's details. Used for testing authentication.
+      responses:
+        "200":
+          description: View ALL the current user's details, including role, dates and passwords.
+        "401":
+          description: User needs to log in.
