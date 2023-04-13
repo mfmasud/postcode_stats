@@ -38,13 +38,30 @@ router.put("/:id([0-9]{1,})", auth, bodyParser(), updateUserById); // authentica
 // both roles are still subject to checks from the model e.g. invalid data.
 router.del("/:id([0-9]{1,})", auth, deleteUserById); // admins can delete any standard user, standard users can delete their own account.
 
+
+/**
+ * Retrieves all users from the database and returns them in the response body.  
+ * Verifies that the user is logged in and has permission to view all users using the permissions/users.js file.
+ * 
+ * @async
+ * @function getAllUsers
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
+ * @throws {Error} Throws an error with status code 401 if the user is not logged in.
+ * @throws {Error} Throws an error with status code 403 if the user does not have permission to view all users.
+ * @throws {Error} Throws an error with status code 404 if no users are found in the database.
+ * @returns {Promise} An empty Promise that resolves once the response has been sent.
+ * 
+ * @see {@link module:controllers/auth} for the auth middleware which verifies that the user is logged in.
+ * @see {@link module:permissions/users} for the permissions file which verifies that the user has permission to view this resource.
+ */
 async function getAllUsers(cnx, next) {
   logger.info("getAllUsers() called");
 
   if (!cnx.state.user) {
-    cnx.status = 401;
     logger.error("[401] User needs to log in.");
-    cnx.body = { message: "You are not logged in." };
+    cnx.throw(401, "You are not logged in.");
     return;
   }
 
@@ -54,15 +71,15 @@ async function getAllUsers(cnx, next) {
   //logger.info(`Permission: ${permission}`);
 
   if (!permission) {
+    logger.error("[403] User does not have permission to view all users.");
     cnx.throw(403, "You are not allowed to perform this action");
   } else {
     const users = await User.find().populate("role");
 
     if (!users) {
       // technically this should never happen as we are literally signing in with a user
-      cnx.status = 404;
       logger.error("[404] No users found in database.");
-      cnx.body = { message: "No users found." };
+      cnx.throw(404, "No users found in database.");
     } else {
       cnx.body = users;
       cnx.status = 200;
@@ -71,6 +88,23 @@ async function getAllUsers(cnx, next) {
   }
 }
 
+/**
+ * Creates a new user in the database and returns the username, email and role of the new user in the response body.
+ * 
+ * @async
+ * @function createUser
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
+ * @throws {Error} Throws an error with status code 400 if the username, password or email field is empty.
+ * @throws {Error} Throws an error with status code 400 if the username or email already exists.
+ * @throws {Error} Throws an error with status code 500 if the user could not be created.
+ * @returns {Promise} An empty Promise that resolves once the response has been sent.
+ * 
+ * @see {@link module:models/User} for the User model.
+ * @see {@link module:models/Role} for the Role model.
+ * 
+ */
 async function createUser(cnx, next) {
   // users register with a username, password and email
   // they are assigned the role of "user" by default
@@ -81,25 +115,22 @@ async function createUser(cnx, next) {
 
   // check if email, password, or username are empty
   if (!username || !password || !email) {
-    cnx.status = 400;
     logger.error("[400] Username, password or email field is empty.");
-    cnx.body = { message: "Username, password or email field is empty." };
+    cnx.throw(400, "Username, password or email field is empty.");
     return;
   }
 
   // check if username or email already exists
-  const usernameCheck = await User.findOne({ username: username });
-  const emailCheck = await User.findOne({ email: email });
+  const usernameCheck = await User.exists({ username: username });
+  const emailCheck = await User.exists({ email: email });
 
   if (usernameCheck) {
-    cnx.status = 400;
     logger.error("[400] Username already exists.");
-    cnx.body = { message: "Username already exists." };
+    cnx.throw(400, "Username already exists.");
     return;
   } else if (emailCheck) {
-    cnx.status = 400;
     logger.error("[400] Email already exists.");
-    cnx.body = { message: "Email already exists." };
+    cnx.throw(400, "Email already exists.");
     return;
   }
 
@@ -122,20 +153,33 @@ async function createUser(cnx, next) {
       role: savedUser.role.name,
     };
   } catch (error) {
-    cnx.status = 400;
-    logger.error(`[400] Error: User creation failed:\n${error}`);
-    cnx.body = { message: "User creation failed." };
+    logger.error(`[500] Error: User creation failed:\n${error}`);
+    cnx.throw(500, "User creation failed.");
   }
 }
 
+/**
+ * Retrieves a user from the database and returns various information about the user in the response body.  
+ * If the user has access to view the password of the user, the (hashed and salted) password is also returned in the response body.
+ * 
+ * @async
+ * @function getUserById
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
+ * @throws {Error} Throws an error with status code 401 if the user is not logged in.
+ * @throws {Error} Throws an error with status code 400 if the user ID entered is invalid.
+ * @throws {Error} Throws an error with status code 404 if the user is not found in the database.
+ * @returns {Promise} An empty Promise that resolves once the response has been sent.
+ * 
+ */
 async function getUserById(cnx, next) {
   logger.info("getUserById() called");
   const id = cnx.params.id;
 
   if (!cnx.state.user) {
-    cnx.status = 401;
     logger.error("[401] User needs to log in.");
-    cnx.body = { message: "You are not logged in." };
+    cnx.throw(401, "You are not logged in.");
     return;
   }
   const user = cnx.state.user;
@@ -143,26 +187,23 @@ async function getUserById(cnx, next) {
   logger.info(`Looking for User with ID: ${id}`);
 
   if (!(await isValidUserID(id))) {
-    cnx.status = 400;
     logger.error("[400] Invalid user ID: " + id);
-    cnx.body = { message: "Invalid user ID." };
+    cnx.throw(400, "Invalid user ID.");
     return;
   }
   const findUser = await User.findOne({ id: id }).populate("role");
 
   if (!findUser) {
-    cnx.status = 404;
     logger.error(`[404] User not found, ID: ${id}`);
-    cnx.body = { message: "User not found." };
+    cnx.throw(404, "User not found.");
     return;
   }
 
   const ability = createAbilityFor(user);
 
   if (!ability.can("read", findUser)) {
-    cnx.status = 403;
     logger.error("[403] User is not allowed to perform this action.");
-    cnx.body = { message: "You are not allowed to perform this action." };
+    cnx.throw(403, "You are not allowed to perform this action");
     return;
   } else {
     cnx.status = 200;
@@ -186,6 +227,22 @@ async function getUserById(cnx, next) {
   }
 }
 
+/**
+ * Updates a user in the database and returns a message showing the fields which were edited.
+ * 
+ * @async
+ * @function updateUserById
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
+ * @throws {Error} Throws an error with status code 401 if the user is not logged in.
+ * @throws {Error} Throws an error with status code 400 if the user ID entered is invalid.
+ * @throws {Error} Throws an error with status code 403 if the user is not allowed to perform this action.
+ * @throws {Error} Throws an error with status code 500 if the user could not be updated or there was an error.
+ * @returns {Promise} An empty Promise that resolves once the response has been sent.
+ * 
+ * @see isValidUserID
+ */
 async function updateUserById(cnx, next) {
   logger.info("updateUserByID() called");
 
@@ -193,21 +250,19 @@ async function updateUserById(cnx, next) {
   let { firstName, lastName, about, password, email, avatarURL } =
     cnx.request.body;
 
-  const updateVars = [firstName, lastName, about, password, email, avatarURL]; // not used
+  //const updateVars = [firstName, lastName, about, password, email, avatarURL]; // not used
 
   if (!cnx.state.user) {
-    cnx.status = 401;
     logger.error("[401] User needs to log in.");
-    cnx.body = { message: "You are not logged in." };
+    cnx.throw(401, "You are not logged in.");
     return;
   }
   const user = cnx.state.user;
 
   const ValidUserID = await isValidUserID(id);
   if (!ValidUserID) {
-    cnx.status = 400;
     logger.error(`[400] Invalid User ID: ${id}`);
-    cnx.body = { message: "Invalid user ID." };
+    cnx.throw(400, "Invalid User ID.");
     return;
   }
 
@@ -216,11 +271,10 @@ async function updateUserById(cnx, next) {
   const ability = createAbilityFor(user);
 
   if (!ability.can("update", updateUser)) {
-    cnx.status = 403;
     logger.error(
       `[403] User ${user.username} is not allowed to update user with ID: ${id}`
-    );
-    cnx.body = { message: "You are not allowed to update this user." };
+      );
+    cnx.throw(403, "You are not allowed to perform this action");
     return;
   } else {
     try {
@@ -260,21 +314,36 @@ async function updateUserById(cnx, next) {
         message: `Edited fields for user with ID: ${id}`,
       }; // fields would be replaced with the changes string
     } catch (error) {
-      cnx.status = 400;
-      logger.error(`[400] Error: User update failed with error:\n${error}`);
-      cnx.body = { message: "User update failed." };
+      logger.error(`[500] Error: User update failed with error:\n${error}`);
+      cnx.throw(500, "User update failed.");
     }
   }
 }
 
+/**
+ * Deletes a user from the database and returns a message indicating this in the response body.
+ * 
+ * @async
+ * @function deleteUserById
+ * 
+ * @param {Object} cnx - The Koa context object containing the request and response information.
+ * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
+ * @throws {Error} Throws an error with status code 401 if the user is not logged in.
+ * @throws {Error} Throws an error with status code 400 if the user ID entered is invalid.
+ * @throws {Error} Throws an error with status code 403 if the user is not allowed to perform this action.
+ * @throws {Error} Throws an error with status code 500 if the user cannot be deleted or an error occurs.
+ * @returns {Promise} An empty Promise that resolves once the response has been sent.
+ * 
+ * @see {@link isValidUserID} for more information on the isValidUserID function.
+ * 
+ */
 async function deleteUserById(cnx, next) {
   logger.info("deleteUserById() called");
   const id = cnx.params.id;
 
   if (!cnx.state.user) {
-    cnx.status = 401;
     logger.error("[401] User needs to log in.");
-    cnx.body = { message: "You are not logged in." };
+    cnx.throw(401, "You are not logged in.");
     return;
   }
   const user = cnx.state.user;
@@ -282,9 +351,8 @@ async function deleteUserById(cnx, next) {
   logger.info(`Looking for User with ID: ${id}`);
 
   if (!(await isValidUserID(id))) {
-    cnx.status = 400;
     logger.error(`[400] Invalid user ID: ${id}`);
-    cnx.body = { message: "Invalid user ID." };
+    cnx.throw(400, "Invalid user ID.");
     return;
   }
 
@@ -293,9 +361,8 @@ async function deleteUserById(cnx, next) {
   const ability = createAbilityFor(user);
 
   if (!ability.can("delete", deleteUser)) {
-    cnx.status = 403;
     logger.error("[403] User is not allowed to delete this user.");
-    cnx.body = { message: "You are not allowed to delete this user." };
+    cnx.throw(403, "You are not allowed to perform this action");
     return;
   } else {
     try {
@@ -307,15 +374,24 @@ async function deleteUserById(cnx, next) {
         message: "User deleted.",
       };
     } catch (error) {
-      cnx.status = 400;
-      logger.error(`[400] Error: User deletion failed:\n${error}`);
-      cnx.body = { message: "User deletion failed." };
+      logger.error(`[500] Error: User deletion failed:\n${error}`);
+      cnx.throw(500, "User deletion failed.");
     }
   }
 }
 
+/**
+ * Checks if a user ID is valid.
+ * 
+ * @async
+ * @function isValidUserID
+ * 
+ * @param {String} id - The user ID to check.
+ * @returns {Boolean} Returns true if the provided user ID is valid, false otherwise.
+ * 
+ */
 async function isValidUserID(id) {
-  const UserID = await User.findOne({ id: id });
+  const UserID = await User.exists({ id: id });
 
   if (UserID) {
     return true;

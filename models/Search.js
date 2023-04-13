@@ -69,7 +69,11 @@ const searchSchema = new mongoose.Schema({
   },
 });
 
-// query bus stops - selected bus stops matching a query e.g. within radius of lat and long.
+// HATEOAS links can be added to the schema in the future:
+// When a postcode is added to the search model, the search model will have a link to the postcode resource
+// e.g. Search._links.self = api/v1/search/{this.searchID};
+// e.g. Search._links.alternate = api/v1/search/?latitude={this.latitude}&longitude={this.longitude};
+// e.g. Search._links.postcode = api/v1/postcodes/{this.Postcode.postcode};
 
 searchSchema.pre("save", async function save(next) {
   if (this.isNew) {
