@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const logger = require("./utils/logger")
+const logger = require("./utils/logger");
 
 // logger.info(process.env)
 
@@ -8,7 +8,6 @@ const Koa = require("koa");
 const app = new Koa();
 
 const database = require("./helpers/database");
-
 
 const special = require("./routes/special");
 const postcodes = require("./routes/postcodes");

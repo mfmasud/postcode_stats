@@ -2,11 +2,11 @@
  * @file Contains the mongoose schema for the Search model. This model is used to store the results of a search query.
  * @module models/Search
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires mongoose
- * 
+ *
  * @exports Search
- * 
+ *
  * @see {@link module:models/Postcode} for the Postcode model which is used in this schema.
  * @see {@link module:models/BusStop} for the BusStop model which is used in this schema.
  * @see {@link module:models/Crime} for the Crime model which is used in this schema.
@@ -14,7 +14,7 @@
  * @See {@link module:models/CrimeList} for the CrimeList model which is used in this schema.
  * @see {@link module:helpers/search} for the helper files used to link data to the model.
  * @see {@link module:routes/search} for the routes which uses this model.
- * 
+ *
  */
 
 const mongoose = require("mongoose");
@@ -76,12 +76,12 @@ const searchSchema = new mongoose.Schema({
     postcode: {
       href: {
         type: String,
-      }
+      },
     },
     alternate: {
       href: {
         type: String,
-      }
+      },
     },
   },
 });

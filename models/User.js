@@ -2,19 +2,19 @@
  * @file Contains the User model schema and exported model used to authenticate users. Originally based off of 6003CEM lab work.
  * @module models/User
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires mongoose
  * @requires validator
  * @requires utils/logger
  * @requires bcrypt
- * 
+ *
  * @exports User
- * 
+ *
  * @see {@link module:routes/users} for the routes which perform CRUD operations on this model.
  * @see {@link module:models/Role} for the Role model used in this schema.
  * @see {@link module:controllers/auth} for the authentication middleware used in the routes.
  * @See {@link https://stackoverflow.com/a/28396238} for more on the approach used to validate email addresses.
- * 
+ *
  */
 
 const mongoose = require("mongoose");
@@ -25,7 +25,7 @@ https://pinoria.com/how-to-validate-email-syntax-with-mongoose/
 https://stackoverflow.com/a/28396238
 https://github.com/validatorjs/validator.js
 */
-const {isEmail} = require("validator");
+const { isEmail } = require("validator");
 
 const logger = require("../utils/logger");
 
@@ -60,7 +60,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    validate: [ isEmail, 'invalid email']
+    validate: [isEmail, "invalid email"],
   },
   role: { type: mongoose.Schema.Types.ObjectId, ref: "Role", required: true },
 });
@@ -105,7 +105,6 @@ userSchema.statics.findByUsername = async function findByUsername(username) {
     user = await user.populate("role");
     return user;
   }
-  
 };
 
 module.exports = mongoose.model("User", userSchema);

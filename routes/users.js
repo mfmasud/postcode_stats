@@ -2,7 +2,7 @@
  * @file This file contains the routes for the users API.
  * @module routes/users
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires koa-router
  * @requires koa-bodyparser
  * @requires utils/logger
@@ -11,7 +11,7 @@
  * @requires models/Role
  * @requires mongoose
  * @requires permissions/users
- * 
+ *
  * @exports router
  */
 
@@ -38,21 +38,20 @@ router.put("/:id([0-9]{1,})", auth, bodyParser(), updateUserById); // authentica
 // both roles are still subject to checks from the model e.g. invalid data.
 router.del("/:id([0-9]{1,})", auth, deleteUserById); // admins can delete any standard user, standard users can delete their own account.
 
-
 /**
- * Retrieves all users from the database and returns them in the response body.  
+ * Retrieves all users from the database and returns them in the response body.
  * Verifies that the user is logged in and has permission to view all users using the permissions/users.js file.
- * 
+ *
  * @async
  * @function getAllUsers
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
  * @throws {Error} Throws an error with status code 401 if the user is not logged in.
  * @throws {Error} Throws an error with status code 403 if the user does not have permission to view all users.
  * @throws {Error} Throws an error with status code 404 if no users are found in the database.
  * @returns {Promise} An empty Promise that resolves once the response has been sent.
- * 
+ *
  * @see {@link module:controllers/auth} for the auth middleware which verifies that the user is logged in.
  * @see {@link module:permissions/users} for the permissions file which verifies that the user has permission to view this resource.
  */
@@ -90,20 +89,20 @@ async function getAllUsers(cnx, next) {
 
 /**
  * Creates a new user in the database and returns the username, email and role of the new user in the response body.
- * 
+ *
  * @async
  * @function createUser
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
  * @throws {Error} Throws an error with status code 400 if the username, password or email field is empty.
  * @throws {Error} Throws an error with status code 400 if the username or email already exists.
  * @throws {Error} Throws an error with status code 500 if the user could not be created.
  * @returns {Promise} An empty Promise that resolves once the response has been sent.
- * 
+ *
  * @see {@link module:models/User} for the User model.
  * @see {@link module:models/Role} for the Role model.
- * 
+ *
  */
 async function createUser(cnx, next) {
   // users register with a username, password and email
@@ -159,19 +158,19 @@ async function createUser(cnx, next) {
 }
 
 /**
- * Retrieves a user from the database and returns various information about the user in the response body.  
+ * Retrieves a user from the database and returns various information about the user in the response body.
  * If the user has access to view the password of the user, the (hashed and salted) password is also returned in the response body.
- * 
+ *
  * @async
  * @function getUserById
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
  * @throws {Error} Throws an error with status code 401 if the user is not logged in.
  * @throws {Error} Throws an error with status code 400 if the user ID entered is invalid.
  * @throws {Error} Throws an error with status code 404 if the user is not found in the database.
  * @returns {Promise} An empty Promise that resolves once the response has been sent.
- * 
+ *
  */
 async function getUserById(cnx, next) {
   logger.info("getUserById() called");
@@ -229,10 +228,10 @@ async function getUserById(cnx, next) {
 
 /**
  * Updates a user in the database and returns a message showing the fields which were edited.
- * 
+ *
  * @async
  * @function updateUserById
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
  * @throws {Error} Throws an error with status code 401 if the user is not logged in.
@@ -240,7 +239,7 @@ async function getUserById(cnx, next) {
  * @throws {Error} Throws an error with status code 403 if the user is not allowed to perform this action.
  * @throws {Error} Throws an error with status code 500 if the user could not be updated or there was an error.
  * @returns {Promise} An empty Promise that resolves once the response has been sent.
- * 
+ *
  * @see isValidUserID
  */
 async function updateUserById(cnx, next) {
@@ -273,7 +272,7 @@ async function updateUserById(cnx, next) {
   if (!ability.can("update", updateUser)) {
     logger.error(
       `[403] User ${user.username} is not allowed to update user with ID: ${id}`
-      );
+    );
     cnx.throw(403, "You are not allowed to perform this action");
     return;
   } else {
@@ -322,10 +321,10 @@ async function updateUserById(cnx, next) {
 
 /**
  * Deletes a user from the database and returns a message indicating this in the response body.
- * 
+ *
  * @async
  * @function deleteUserById
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The Koa next function for passing control to the next middleware (unused).
  * @throws {Error} Throws an error with status code 401 if the user is not logged in.
@@ -333,9 +332,9 @@ async function updateUserById(cnx, next) {
  * @throws {Error} Throws an error with status code 403 if the user is not allowed to perform this action.
  * @throws {Error} Throws an error with status code 500 if the user cannot be deleted or an error occurs.
  * @returns {Promise} An empty Promise that resolves once the response has been sent.
- * 
+ *
  * @see {@link isValidUserID} for more information on the isValidUserID function.
- * 
+ *
  */
 async function deleteUserById(cnx, next) {
   logger.info("deleteUserById() called");
@@ -382,13 +381,13 @@ async function deleteUserById(cnx, next) {
 
 /**
  * Checks if a user ID is valid.
- * 
+ *
  * @async
  * @function isValidUserID
- * 
+ *
  * @param {String} id - The user ID to check.
  * @returns {Boolean} Returns true if the provided user ID is valid, false otherwise.
- * 
+ *
  */
 async function isValidUserID(id) {
   const UserID = await User.exists({ id: id });

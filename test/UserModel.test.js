@@ -30,7 +30,7 @@ describe("models/User.js", () => {
 
   afterEach(async () => {
     sinon.restore();
-  })
+  });
 
   after(async () => {
     await disconnectDB();
@@ -105,7 +105,9 @@ describe("models/User.js", () => {
         password: "password",
         role: Role({ name: "user" }),
       });
-      return expect(user.save()).to.eventually.be.rejectedWith("E11000 duplicate key error collection: test.users index: username_1 dup key: { username: \"TestUser1\" }");
+      return expect(user.save()).to.eventually.be.rejectedWith(
+        'E11000 duplicate key error collection: test.users index: username_1 dup key: { username: "TestUser1" }'
+      );
     });
 
     it("should throw an error if the email already exists", async () => {
@@ -115,7 +117,9 @@ describe("models/User.js", () => {
         password: "password",
         role: Role({ name: "user" }),
       });
-      return expect(user.save()).to.eventually.be.rejectedWith("E11000 duplicate key error collection: test.users index: email_1 dup key: { email: \"TestUser1@test.com\" }");
+      return expect(user.save()).to.eventually.be.rejectedWith(
+        'E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "TestUser1@test.com" }'
+      );
     });
   });
 
@@ -126,9 +130,11 @@ describe("models/User.js", () => {
         username: "",
         email: "example@example.com",
         password: "password",
-        role: Role({name: "user"})
+        role: Role({ name: "user" }),
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
+        mongoose.Error.ValidationError
+      );
     });
 
     it("should throw an error if the email is invalid (or empty)", async () => {
@@ -137,9 +143,11 @@ describe("models/User.js", () => {
         username: "example1",
         email: "example.com",
         password: "password",
-        role: Role({name: "user"})
+        role: Role({ name: "user" }),
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
+        mongoose.Error.ValidationError
+      );
     });
 
     it("should throw an error if password is empty", async () => {
@@ -147,16 +155,18 @@ describe("models/User.js", () => {
         username: "example2",
         email: "example@example.com",
         password: "",
-        role: Role({name: "user"})
+        role: Role({ name: "user" }),
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
+        mongoose.Error.ValidationError
+      );
     });
 
     it("should throw an error if role is not one of the 4 roles in the Role collection", async () => {
       // Roles have been assigned directly in the above tests, but the application actually fetches for it first
       // This forces the mongoose "enum" validation to check for the roles.
 
-      const invalidRole = Role.findOne({name: "invalid role"});
+      const invalidRole = Role.findOne({ name: "invalid role" });
 
       const invalidUser = new User({
         username: "example3",
@@ -164,8 +174,9 @@ describe("models/User.js", () => {
         password: "password",
         role: invalidRole,
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(mongoose.Error.ValidationError);
+      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
+        mongoose.Error.ValidationError
+      );
     });
-
   });
 });

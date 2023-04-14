@@ -2,14 +2,14 @@
  * @file Contains the mongoose Crime model schema. This model is used to store the results of a query made to the Police API into the Crimes collection.
  * @module models/Crime
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires mongoose
- * 
+ *
  * @exports Crime
- * 
+ *
  * @see {@link module:models/CrimeList} for the CrimeList model which uses these Crime models.
  * @see {@link module:helpers/crime} for the helper functions used to retrieve data for this model.
- * 
+ *
  */
 
 const mongoose = require("mongoose");

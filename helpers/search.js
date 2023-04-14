@@ -2,20 +2,20 @@
  * @file Contains the functions to link data related to a search to the Search model.
  * @module helpers/search
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires models/Atco
  * @requires models/CrimeList
  * @requires utils/logger
  * @requires helpers/AtcoCodes
  * @requires helpers/crime
- * 
+ *
  * @exports getRelatedStops
  * @exports getRelatedCrimes
  * @exports linkAtco
- * 
+ *
  * @see {@link module:routes/search} for the route which uses these functions.
  * @See {@link module:models/search} for more about the SearchModel parameter used throughout this file.
- * 
+ *
  */
 
 const Atco = require("../models/Atco");
@@ -26,27 +26,28 @@ const logger = require("../utils/logger");
 const { queryAtcoAPI } = require("../helpers/AtcoCodes");
 const { getCrimeData } = require("../helpers/crime");
 
-
 /**
-* Links a `CrimeList` to the `Search` model by comparing the latitude value used by both.  
-* populates the Search model's linkedCrimeList field with the returned `CrimeList` model.  
-*
-* @async
-* @function linkCrimeList
-*
-* @param {mongoose.Object} SearchModel - The `Search` model to link the `CrimeList` details to.
-* @returns nothing - this function only links the `CrimeList` to the `Search` model.
-*
-* @throws {Error} If no matching `CrimeList` is returned from the database.
-*
-* @see {@link linkAtco} - links associated busstops to the `Search` model
-* @see {@link getRelatedCrimes} - Adds the `Crime`s to the `Search` model.
-*/
+ * Links a `CrimeList` to the `Search` model by comparing the latitude value used by both.
+ * populates the Search model's linkedCrimeList field with the returned `CrimeList` model.
+ *
+ * @async
+ * @function linkCrimeList
+ *
+ * @param {mongoose.Object} SearchModel - The `Search` model to link the `CrimeList` details to.
+ * @returns nothing - this function only links the `CrimeList` to the `Search` model.
+ *
+ * @throws {Error} If no matching `CrimeList` is returned from the database.
+ *
+ * @see {@link linkAtco} - links associated busstops to the `Search` model
+ * @see {@link getRelatedCrimes} - Adds the `Crime`s to the `Search` model.
+ */
 async function linkCrimeList(SearchModel) {
   // links crime list to search model
   // can be linked by latitude - assuming it is available. If not, this should have been calculated beforehand.
 
-  const linkedCrimes = await CrimeList.findOne({latitude: SearchModel.latitude});
+  const linkedCrimes = await CrimeList.findOne({
+    latitude: SearchModel.latitude,
+  });
   if (linkedCrimes) {
     SearchModel.linkedCrimeList = linkedCrimes;
     logger.info("Successfully linked crime list to search");
@@ -59,15 +60,15 @@ async function linkCrimeList(SearchModel) {
 }
 
 /**
- * Adds related crime data to the `Search` model. Requires the `Search` model to have a linked `CrimeList` already.  
- * Populates the `Search` model's `queryCrimes` field with the `Crime`s from the `CrimeList.crimes` array.  
- * 
+ * Adds related crime data to the `Search` model. Requires the `Search` model to have a linked `CrimeList` already.
+ * Populates the `Search` model's `queryCrimes` field with the `Crime`s from the `CrimeList.crimes` array.
+ *
  * @async
  * @function getRelatedCrimes
- * 
+ *
  * @param {mongoose.Object} SearchModel - The `Search` model to add the `CrimeList` details to.
  * @returns nothing, adds the `CrimeList` to the `Search` model.
- * 
+ *
  * @see {@link getCrimeData} - fetches the crime data from the Police API, stores it as a `CrimeList` model.
  * @see {@link linkCrimeList} - links the `CrimeList` to the `Search` model for use in this function.
  */
@@ -83,14 +84,14 @@ async function getRelatedCrimes(SearchModel) {
   if (latitude && longitude) {
     await getCrimeData(latitude, longitude); // fetches the Police API
     await linkCrimeList(SearchModel); // Links the CrimeList data to the Search model
-    if (SearchModel.linkedCrimeList){
+    if (SearchModel.linkedCrimeList) {
       logger.info("Added crimes to search");
       SearchModel.queryCrimes = SearchModel.linkedCrimeList.crimes;
     } else {
       SearchModel.queryCrimes = []; // empty to indicate not found
     }
   } else {
-    logger.error("Need LAT/LONG Coordinates to use the Police API.")
+    logger.error("Need LAT/LONG Coordinates to use the Police API.");
     SearchModel.queryCrimes = []; // empty to indicate not found
   }
 
@@ -99,18 +100,18 @@ async function getRelatedCrimes(SearchModel) {
 }
 
 /**
- * Adds property data to the `Search` model.  
- * Currently unimplemented, as the Zoopla API is discontinued.  
- * The Urban Big Data Centre has a similar API which needs to be implemented.  
- * 
+ * Adds property data to the `Search` model.
+ * Currently unimplemented, as the Zoopla API is discontinued.
+ * The Urban Big Data Centre has a similar API which needs to be implemented.
+ *
  * @async
  * @function getRelatedListings
- * 
+ *
  * @param {mongoose.Object} SearchModel - The `Search` model to add the property data to.
  * @returns nothing, adds the property data to the `Search` model's `queryListings` field.
- * 
+ *
  * @see {@link https://www.ubdc.ac.uk/data-services/data-catalogue/housing-data/zoopla-property-data/|Zoopla Property Data} provided by University of Glasgow's Urban Big Data Centre.
- * 
+ *
  */
 async function getRelatedListings(SearchModel) {
   const { latitude, longitude } = SearchModel;
@@ -118,21 +119,20 @@ async function getRelatedListings(SearchModel) {
   return;
 }
 
-
 /**
- * Finds the related Atco model to link to a search.  
- * Takes the Postcode model and finds the related Atco model by searching the county, district, region and country values.  
- * This is necessary as region names are not consistent between the Postcode API and the Naptan API.  
- * Take for example the region "City Of London". The Postcode API returns this as the admin_district, but in the Naptan API returns this under "Greater London".  
- * 
+ * Finds the related Atco model to link to a search.
+ * Takes the Postcode model and finds the related Atco model by searching the county, district, region and country values.
+ * This is necessary as region names are not consistent between the Postcode API and the Naptan API.
+ * Take for example the region "City Of London". The Postcode API returns this as the admin_district, but in the Naptan API returns this under "Greater London".
+ *
  * @async
  * @function searchAtco
- * 
+ *
  * @param {mongoose.Object} PostcodeModel - The Postcode model object
  * @returns {mongoose.Object} The Atco model object to link to the Search
- * 
+ *
  * @todo Refactor this function to be more readable - A switch/case combined with a function to search for the Atco model would be better.
- * 
+ *
  * @see {@link linkAtco} - links associated busstops to the `Search` model
  * @see {@link getEnglandLocations} - Generates the `Atco` model's `other_names` field for England.
  * @see {@link getScotlandLocations} - Generates the `Atco` model's `other_names` field for Scotland.
@@ -203,7 +203,9 @@ async function searchAtco(PostcodeModel) {
 
   if (AtcoToLink) {
     // match found
-    logger.info(`Found matching ATCO: code ${AtcoToLink.code} matches ${AtcoToLink.location}, ${AtcoToLink.region}`);
+    logger.info(
+      `Found matching ATCO: code ${AtcoToLink.code} matches ${AtcoToLink.location}, ${AtcoToLink.region}`
+    );
     await queryAtcoAPI(AtcoToLink.code);
     return AtcoToLink;
   } else {
@@ -213,18 +215,18 @@ async function searchAtco(PostcodeModel) {
 }
 
 /**
- * Links the `Atco` model to the `Search` model.  
- * Currently called in the search route itself, instead of getRelatedStops, unlike linkCrimeList.  
- * 
+ * Links the `Atco` model to the `Search` model.
+ * Currently called in the search route itself, instead of getRelatedStops, unlike linkCrimeList.
+ *
  * @async
  * @function linkAtco
- * 
+ *
  * @param {mongoose.Object} SearchModel - The `Search` model to link the `Atco` model to.
  * @returns nothing, adds the `Atco` model to the `Search` model's `linkedATCO` field.
- * 
+ *
  * @see {@link linkCrimeList} - links associated crimes to the `Search` model using the `CrimeList` model.
  * @see {@link searchAtco} - Finds the correct `Atco` model to be linked.
- * 
+ *
  */
 async function linkAtco(SearchModel) {
   // links Search model to correct ATCO from available information.
@@ -251,20 +253,19 @@ async function linkAtco(SearchModel) {
   await SearchModel.save();
 }
 
-
 /**
- * Finds the related bus stops to a `Search` model.  
- * This is done by first finding and linking the associated `Atco` model using `linkAtco`.  
- * After this, the distance is calculated from `Atco.busstops` - the closest 5 `BusStop`s to the `Search` model's `latitute` and `longitude` fields.  
- * For now, only the first 5 `BusStop`s are returned as nothing is being calculated.  
- * 
+ * Finds the related bus stops to a `Search` model.
+ * This is done by first finding and linking the associated `Atco` model using `linkAtco`.
+ * After this, the distance is calculated from `Atco.busstops` - the closest 5 `BusStop`s to the `Search` model's `latitute` and `longitude` fields.
+ * For now, only the first 5 `BusStop`s are returned as nothing is being calculated.
+ *
  * @async
  * @function getRelatedStops
- * 
+ *
  * @param {mongoose.Object} SearchModel - The `Search` model to find the related bus stops for.
  * @param {number} radius - The radius in metres to search for bus stops in. Defaults to 1000m.
  * @returns nothing, adds the `BusStop` models to the `Search` model's `relatedStops` field.
- * 
+ *
  * @see {@link linkAtco} - Links the `Atco` model to the `Search` model.
  */
 async function getRelatedStops(SearchModel, radius = 1000) {
@@ -286,34 +287,36 @@ async function getRelatedStops(SearchModel, radius = 1000) {
   await SearchModel.save();
 }
 
-
 /**
- * Updates the links for a `Search` model.  
+ * Updates the links for a `Search` model.
  * The links are added to the `_links` field of the `Search` model and are used for HAL:JSON compliant API responses.
- * 
+ *
  * @async
  * @function updateLinks
- * 
+ *
  * @param {Object} context - The Koa context object
  * @param {mongoose.Object} SearchModel - The `Search` model to add resource-describing links to.
  * @returns {undefined} Nothing, updates the Search model with the links.
- * 
+ *
  * @see {@link https://en.wikipedia.org/wiki/HATEOAS} - HATEOAS compliant API responses.
  */
 async function updateLinks(context, SearchModel) {
-
   let lat = SearchModel.latitude;
   let long = SearchModel.longitude;
-  const postcode = SearchModel.Postcode.postcode
+  const postcode = SearchModel.Postcode.postcode;
   const hostname = context.req.headers.host;
-  
+
   SearchModel._links = {};
 
   // SearchModel._links.alternate = `${hostname}/api/v1/search/${searchModel.searchID}`;
-  SearchModel._links.postcode = {"href": `https://${hostname}/api/v1/postcodes/${postcode}`};
+  SearchModel._links.postcode = {
+    href: `https://${hostname}/api/v1/postcodes/${postcode}`,
+  };
 
   if (lat && long) {
-    SearchModel._links.self = {"href": `https://${hostname}/api/v1/search/?latitude=${lat}&longitude=${long}`};
+    SearchModel._links.self = {
+      href: `https://${hostname}/api/v1/search/?latitude=${lat}&longitude=${long}`,
+    };
   }
 
   try {
@@ -321,8 +324,7 @@ async function updateLinks(context, SearchModel) {
     await SearchModel.save();
   } catch (err) {
     logger.error(err);
-  };
-
+  }
 }
 
 module.exports = {

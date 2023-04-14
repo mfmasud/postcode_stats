@@ -2,14 +2,14 @@
  * @file Contains the functions to retrieve and process crime data from the Police API.
  * @module helpers/crime
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires utils/logger
  * @requires axios
  * @requires models/CrimeList
  * @requires models/Crime
- * 
+ *
  * @exports getCrimeData
- * 
+ *
  */
 
 // https://data.police.uk/docs/method/crime-street/ - Uk crime data by street
@@ -22,21 +22,20 @@ const CrimeList = require("../models/CrimeList");
 const Crime = require("../models/Crime");
 
 /**
- * Queries the Police API for crime data using a pair of latitude and longitude values.  
+ * Queries the Police API for crime data using a pair of latitude and longitude values.
  * The data is then processed into a CrimeList using processCrimeData.
- * 
+ *
  * @async
  * @function getCrimeData
- * 
+ *
  * @param {Number} lat - The latitude to pass to the Police API
  * @param {Number} long - The longitude to pass to the Police API
  * @returns {*} - Returns nothing
- * 
+ *
  * @see processCrimeData
- * 
+ *
  */
 async function getCrimeData(lat, long) {
-
   const url = `https://data.police.uk/api/crimes-street/all-crime?lat=${lat}&lng=${long}`;
   const response = await axios.get(url);
 
@@ -56,21 +55,20 @@ async function getCrimeData(lat, long) {
   return;
 }
 
-
 /**
- * Processes the crime data retrieved from the Police API into a CrimeList and Crime models.  
+ * Processes the crime data retrieved from the Police API into a CrimeList and Crime models.
  * This is currently capped at just the first 5 crimes per location to speed up the code.
- * 
+ *
  * @async
  * @function processCrimeData
- * 
+ *
  * @param {Number} lat - The latitude to pass to the Police API
  * @param {Number} long - The longitude to pass to the Police API
  * @param {*} rawCrimeData - The raw crime data to be processed, retrieved from getCrimeData
  * @returns {*} - Returns nothing
- * 
+ *
  * @see getCrimeData
- * 
+ *
  */
 async function processCrimeData(lat, long, rawCrimeData) {
   logger.info("Processing new crime list");
@@ -130,7 +128,6 @@ async function processCrimeData(lat, long, rawCrimeData) {
     newCrimes.push(newCrime);
 
     //logger.info(newCrime);
-
   }
 
   //logger.info(newCrimes);
@@ -143,14 +140,12 @@ async function processCrimeData(lat, long, rawCrimeData) {
       await newCrimeList.save();
 
       //logger.info(newCrimeList);
-
     } catch (error) {
       logger.error(error);
     }
   }
 
   logger.info("Finished processing new crime list");
-
 }
 
 module.exports = {

@@ -2,10 +2,10 @@
  * @file Defines the CASL ability builder for users accessing the /users route.
  * @module permissions/users
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires @casl/ability
  * @requires utils/logger
- * 
+ *
  * @exports defineAbilitiesFor
  */
 
@@ -22,7 +22,7 @@ const logger = require("../utils/logger");
  * @param {mongoose.Object} [UserModel] - Another (optional) User model to check permissions against.
  *
  * @returns A CASL ability object defining the user's permissions for the /users route.
- * 
+ *
  * @see {@link module:routes/users} for the route which uses this function.
  *
  */

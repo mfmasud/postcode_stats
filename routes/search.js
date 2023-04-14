@@ -2,7 +2,7 @@
  * @file Contains the main search routes for the API, allowing users to search for a postcode/lat-long pair and get related stops and crimes.
  * @module routes/search
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires koa-router
  * @requires koa-bodyparser
  * @requires controllers/auth
@@ -16,7 +16,7 @@
  * @requires permissions/search
  * @requires helpers/postcode
  * @requires helpers/search
- * 
+ *
  * @exports router
  */
 
@@ -60,22 +60,22 @@ router.post("/", auth, bodyParser(), searchPostcode); // POST - verifies and sea
 router.get("/random", auth, searchRandom); // admins only - for testing
 
 /**
- * A function which searches location data using a pair of latitude and longitude values in the query parameters.  
- * 
+ * A function which searches location data using a pair of latitude and longitude values in the query parameters.
+ *
  * @async
  * @function searchArea
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The next middleware to be called.
  * @throws {Error} 400 if the latitude or longitude values are missing or invalid.
  * @throws {Error} 403 if the user does not have permission to search a location.
  * @returns {undefined} cnx is modified with a 200 status code and a body containing the search results.
- * 
+ *
  * @see {@link findPostcodeFromWGS84} for more information on the function used to find the postcode from the lat-long pair.
  * @see {@link searchPostcode} for more information on the primary function used to search postcodes, used internally in this function.
- * 
+ *
  * @todo Update the reverseLookup property to be false if the postcode is found via this function.
- * 
+ *
  */
 async function searchArea(cnx, next) {
   // GET request with latitude/longitude in query params
@@ -121,7 +121,9 @@ async function searchArea(cnx, next) {
       ); // "value for x should be <=y"
     }
 
-    logger.error(`Lat/Long validation error: ${JSON.stringify(validateLatLong.errors[0])}`);
+    logger.error(
+      `Lat/Long validation error: ${JSON.stringify(validateLatLong.errors[0])}`
+    );
     cnx.status = 400;
     cnx.body = errorMessages.join("\n");
     return;
@@ -152,21 +154,21 @@ async function searchArea(cnx, next) {
 
 /**
  * A function which searches location data using a postcode from the request body.
- * 
+ *
  * @async
  * @function searchPostcode
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The next middleware to be called.
  * @throws {Error} 400 if the postcode is missing or invalid.
  * @throws {Error} 403 if the user does not have permission to search a location.
  * @returns {undefined} cnx is modified with a 200 status code and a body containing the search results.
- * 
+ *
  * @see {@link validatePostcode} for postcode validation.
  * @see {@link getPostcode} for postcode lookup using the postcodes.io API.
  * @see {@link module:model/Search} for the Search model used.
  * @see {@link module:permissions/search} for the permissions applied to this route.
- * 
+ *
  */
 async function searchPostcode(cnx, next) {
   // POST with postcode in the request body.
@@ -216,7 +218,7 @@ async function searchPostcode(cnx, next) {
         await linkAtco(newSearch);
         await getRelatedStops(newSearch); // get all bus stops for location and link to search model
         await getRelatedCrimes(newSearch); // get all crimes for location and link to search model
-        await updateLinks(cnx, newSearch) // add resource-describing links
+        await updateLinks(cnx, newSearch); // add resource-describing links
       } else {
         logger.info(`Existing search found, ID: ${existingSearch.searchID}`);
         await updateLinks(cnx, existingSearch);
@@ -242,21 +244,21 @@ async function searchPostcode(cnx, next) {
 }
 
 /**
- * A function which searches location data using a randomly generated postcode.  
+ * A function which searches location data using a randomly generated postcode.
  * Used for testing purposes, admins only.
- * 
+ *
  * @async
  * @function searchRandom
- * 
+ *
  * @param {Object} cnx - The Koa context object containing the request and response information.
  * @param {Function} next - The next middleware to be called.
  * @throws {Error} 403 if the user does not have permission to search a location.
  * @returns {undefined} cnx is modified with a 200 status code and a body containing the random postcode search results.
- * 
+ *
  * @see {@link getRandomPostcode} for random postcode generation.
  * @see {@link module:model/Search} for the Search model used.
  * @see {@link module:permissions/search} for the permissions applied to this route.
- * 
+ *
  */
 async function searchRandom(cnx, next) {
   let { user } = cnx.state;

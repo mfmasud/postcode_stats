@@ -2,7 +2,7 @@
  * @file Defines the route functions for the /postcodes route.
  * @module routes/postcodes
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires koa-router
  * @requires controllers/auth
  * @requires utils/logger
@@ -11,7 +11,7 @@
  * @requires models/Postcode
  * @requires permissions/postcodes
  * @requires helpers/postcode
- * 
+ *
  * @exports router
  */
 
@@ -39,17 +39,17 @@ router.get("/:postcode", auth, getPostcodeRoute); // Search for specific valid p
 
 /**
  * Allows admins (or anyone who can "readAll" "Postcode" objects) to view all the postcodes that have been saved in the `Postcodes` collection.
- * 
+ *
  * @async
  * @function getAllPostcodes
- * 
+ *
  * @param {Object} cnx - Koa context object
  * @throws {Error} 401 if the user is not logged in.
  * @throws {Error} 403 if the user is not authorised to view this resource.
  * @returns {undefined} Nothing, updates the context object with the postcodes from the database.
- * 
+ *
  * @see {@link getAllPostcodes} - fetches all the postcodes from the database.
- * 
+ *
  */
 async function getAllPostcodes(cnx) {
   const { user } = cnx.state;
@@ -72,17 +72,17 @@ async function getAllPostcodes(cnx) {
 
 /**
  * Returns a random postcode from the database. Only authenticated users can access this route.
- * 
+ *
  * @async
  * @function getRandomPostcodeRoute
- * 
+ *
  * @param {Object} cnx - Koa context object
  * @throws {Error} 401 if the user is not logged in.
  * @throws {Error} 403 if the user is not authorised to view this resource.
  * @returns {undefined} Nothing, updates the context's response body with the random postcode returned from getRandomPostcode.
- * 
+ *
  * @see {@link getRandomPostcode} - fetches a random postcode using the postcode.io API.
- * 
+ *
  */
 async function getRandomPostcodeRoute(cnx) {
   const { user } = cnx.state;
@@ -106,18 +106,18 @@ async function getRandomPostcodeRoute(cnx) {
 
 /**
  * Returns a postcode from the database. Only authenticated users can access this route.
- * 
+ *
  * @async
  * @function getPostcodeRoute
- * 
+ *
  * @param {Object} cnx - Koa context object
  * @throws {Error} 400 if the postcode is not provided or is invalid.
  * @throws {Error} 403 if the user is not authorised to view this resource.
  * @returns {undefined} Nothing, updates the response body with the postcode returned from getPostcode.
- * 
+ *
  * @see {@link getPostcode} - fetches a postcode using the postcode.io API, or a cached version from the database.
  * @see {@link validatePostcode} - validates the postcode using the postcode.io API.
- * 
+ *
  */
 async function getPostcodeRoute(cnx) {
   let { postcode } = cnx.params;

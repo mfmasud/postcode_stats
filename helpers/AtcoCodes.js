@@ -2,21 +2,21 @@
  * @file Contains functions to process ATCO codes and query the NAPTAN API for bus stops.
  * @module helpers/AtcoCodes
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires utils/logger
  * @requires axios
  * @requires jsdom
  * @requires csvtojson
  * @requires models/Atco
  * @requires models/BusStop
- * 
+ *
  * @exports getAtcoCodes
  * @exports queryAtcoAPI
  * @exports processAtcoString
  * @exports saveAtcoList
- * 
+ *
  * @see {@link https://www.twilio.com/blog/web-scraping-and-parsing-html-in-node-js-with-jsdom|web scraping and parsing HTML in javascript} for information on how to scrape HTML data.
- * 
+ *
  */
 
 /*
@@ -34,14 +34,14 @@ const Atco = require("../models/Atco");
 const BusStop = require("../models/BusStop");
 
 /**
- * Processes the list of ATCO codes for local authorities.  
+ * Processes the list of ATCO codes for local authorities.
  * Separated from saveAtcoList to allow for testing without saving codes to the database.
- * 
+ *
  * @async
  * @function getAtcoCodes
- * 
+ *
  * @returns {String[]} An array of ATCO codes
- * 
+ *
  * @see saveAtcoList
  */
 async function getAtcoCodes() {
@@ -69,13 +69,13 @@ async function getAtcoCodes() {
 
 /**
  * Saves the processed ATCO codes to the Atco collection.
- * 
- * @async 
+ *
+ * @async
  * @function saveAtcoList
- * 
+ *
  * @see getAtcoCodes
  * @see processAtcoString
- * 
+ *
  */
 async function saveAtcoList() {
   // run on db initialisation to get a list of searchable ATCOs.
@@ -88,15 +88,15 @@ async function saveAtcoList() {
 
 /**
  * Processes the ATCO codes into the format code:{location, region}. Run by saveAtcoList.
- * 
+ *
  * @async
  * @function processAtcoString
- * 
+ *
  * @param {String} data - The ATCO code to process
  * @returns nothing, saves the processed data to the Atco collection.
- * 
+ *
  * @see saveAtcoList
- * 
+ *
  * @example
  * const data = "Aberdeenshire / Scotland (630)"
  * // returns {630: {location: Aberdeenshire, region: Scotland}}
@@ -116,14 +116,13 @@ async function processAtcoString(data) {
     return; // skip creating another Atco for no reason.
   }
 
-   await Atco.create({
+  await Atco.create({
     code: atco,
     region: region,
     location: location,
     busstops: [],
     AllProcessed: false,
   });
-
 }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html
@@ -131,15 +130,15 @@ async function processAtcoString(data) {
 // 420 is Warwickshire / West Midlands.
 
 /**
- * Sends a request to the NAPTAN API to get the bus stops for a given ATCO code.  
+ * Sends a request to the NAPTAN API to get the bus stops for a given ATCO code.
  * The API returns CSV data which is then processed by processCSV.
- * 
+ *
  * @async
  * @function queryAtcoAPI
- * 
+ *
  * @param {String} code - The ATCO code to query the NAPTAN API
  * @returns {undefined}
- * 
+ *
  * @see processCSV
  */
 async function queryAtcoAPI(code) {
@@ -178,16 +177,16 @@ async function queryAtcoAPI(code) {
 
 /**
  * Processes the CSV data from the NAPTAN API into the BusStop collection and saves it to the relevant Atco collection.
- * 
+ *
  * @async
  * @function processCSV
- * 
+ *
  * @param {String} code - The ATCO code to process the CSV data for
  * @param {*} rawdata - The raw CSV data to process, retrieved from queryAtcoAPI
  * @returns {undefined} Nothing, saves the processed data to the BusStop collection and updates the relevant Atco collection.
- * 
+ *
  * @see queryAtcoAPI
- * 
+ *
  */
 async function processCSV(code, rawdata) {
   // this can take a while, should be run on startup of the server so users use processed mongodb models instead of processing them when a request is made
@@ -222,7 +221,7 @@ async function processCSV(code, rawdata) {
 
     const existingBusStop = await BusStop.exists({
       ATCO_long: row.ATCOCode,
-    })
+    });
     if (existingBusStop) {
       continue;
     }

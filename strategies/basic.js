@@ -2,22 +2,22 @@
  * @file Defines the basic authentication strategy for Koa/Passport. Uses bcrypt to verify passwords and returns a User object if successful.
  * @module strategies/basic
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires passport-http
  * @requires bcrypt
  * @requires module:utils/logger
  * @requires module:models/User
- * 
+ *
  * @exports BasicStrategy
- * 
+ *
  * @see {@link module:controllers/auth} for the authentication middleware which implements this strategy.
- * 
+ *
  */
 
 const BasicStrategy = require("passport-http").BasicStrategy;
 const bcrypt = require("bcrypt");
 
-const logger = require("../utils/logger")
+const logger = require("../utils/logger");
 
 const User = require("../models/User");
 
@@ -84,7 +84,7 @@ const checkUserAndPass = async (username, password, done) => {
     if (!user) {
       // no user found in database
       logger.info(`No user found with username ${username}`);
-      return( done(null, false))
+      return done(null, false);
     } else {
       // user found in database
       //logger.info(`Found user ${username}`);

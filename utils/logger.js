@@ -2,10 +2,10 @@
  * @file Creates a winston logger object which logs the info and error levels to the console and logs/ directory.
  * @module utils/logger
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires winston
  * @requires logform
- * 
+ *
  * @exports logger
  */
 

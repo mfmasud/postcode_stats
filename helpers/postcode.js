@@ -2,20 +2,20 @@
  * @file Contains functions for interacting with the postcodes.io API and processing and saving the data returned.
  * @module helpers/postcode
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires axios
  * @requires utils/logger
  * @requires models/Postcode
- * 
+ *
  * @exports findPostcodeFromWGS84
  * @exports getRandomPostcode
  * @exports getPostcode
  * @exports validatePostcode
  * @exports processPostcode
- * 
+ *
  * @see https://postcodes.io/docs
  * @see {@link module:routes/postcodes} for the route which uses this module.
- * 
+ *
  */
 
 const axios = require("axios");
@@ -42,7 +42,7 @@ const Postcode = require("../models/Postcode");
  * @returns {(String|undefined)} A UK postcode or undefined if one has not been found.
  *
  * @see {@link searchArea } To see an implementation of this function
- * 
+ *
  */
 async function findPostcodeFromWGS84(location) {
   const postcodeapi = "https://api.postcodes.io/postcodes"; // using bulk search as it works better for some reason, also more extensible
@@ -69,14 +69,14 @@ async function findPostcodeFromWGS84(location) {
 }
 
 /**
- * Gets a random UK postcode from the postcodes.io API.  
+ * Gets a random UK postcode from the postcodes.io API.
  * Postcodes are guaranteed to be valid as they are retreived from the API directly.
- * 
+ *
  * @async
  * @function getRandomPostcode
- * 
+ *
  * @returns {*} An object containing the details of the postcode.
- * 
+ *
  * @see https://postcodes.io/docs for documentation of the returned object.
  * @see getPostcode
  * @see getRandomPostcodeRoute
@@ -107,19 +107,19 @@ async function getRandomPostcode() {
 }
 
 /**
- * Gets a UK postcode from the postcodes.io API.  
+ * Gets a UK postcode from the postcodes.io API.
  * If the postcode is already in the database, it will return the existing Postcode document instead.
- * 
+ *
  * @async
  * @function getPostcode
- * 
+ *
  * @param {String} validPostcodeString - A valid UK postcode.
  * @returns {*} An object containing the details of the postcode.
- * 
+ *
  * @see https://postcodes.io/docs for documentation of the returned object.
  * @see getRandomPostcode
  * @see validatePostcode
- */ 
+ */
 async function getPostcode(validPostcodeString) {
   // check if postcode exists in db
   const postcodeExists = await Postcode.findOne({
@@ -144,13 +144,13 @@ async function getPostcode(validPostcodeString) {
 
 /**
  * Validates a UK postcode using the postcodes.io validation API.
- * 
+ *
  * @async
  * @function validatePostcode
- * 
- * @param {String} postcodeString 
+ *
+ * @param {String} postcodeString
  * @returns A boolean value indicating whether the postcode is valid or not.
- * 
+ *
  * @see getPostcode
  */
 async function validatePostcode(postcodeString) {
@@ -173,16 +173,15 @@ async function validatePostcode(postcodeString) {
   }
 }
 
-
 /**
  * Processes a postcode object from the postcodes.io API and saves it to the database as a Postcode model.
- * 
+ *
  * @async
  * @function processPostcode
- * 
+ *
  * @param {Object} postcodeObject - A mongoose object containing the details of a postcode.
  * @returns {undefined} Nothing, the postcode is just saved to the database.
- * 
+ *
  * @see getPostcode
  */
 async function processPostcode(postcodeObject) {

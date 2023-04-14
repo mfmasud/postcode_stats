@@ -2,10 +2,10 @@
  * @file Responsible for defining the abilities users have on the /search route.
  * @module permissions/search
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- * 
+ *
  * @requires @casl/ability
  * @requires utils/logger
- * 
+ *
  * @exports defineAbilitiesFor
  */
 
@@ -24,7 +24,7 @@ const logger = require("../utils/logger");
  * @returns A CASL ability object defining the user's permissions for the /search route.
  *
  * @see {@link module:routes/search} for the route which uses this function.
- * 
+ *
  * @example
  * // Example usage with a mongoose Search model (updating is not yet implemented in the routes - should be doable by admins)
  * const defineAbilitiesFor = require('./permissions/search')
@@ -49,15 +49,11 @@ function defineAbilitiesFor(user) {
   // standard users
   if (user.role.name === "user") {
     //logger.info('standard user role')
-
-    
   }
 
   // paid users
   if (user.role.name === "paiduser") {
     //logger.info('paid user role')
-
-
   }
 
   // admin users
