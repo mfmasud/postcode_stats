@@ -51,6 +51,7 @@ const {
   getRelatedStops,
   getRelatedCrimes,
   linkAtco,
+  updateLinks,
 } = require("../helpers/search");
 
 // routes
@@ -198,7 +199,7 @@ async function searchPostcode(cnx, next) {
       // check for existing search by comparing Postcode data
       const existingSearch = await Search.findOne({
         Postcode: dbPostcode,
-      });
+      }).populate("Postcode");
 
       if (!existingSearch) {
         logger.info("Saving new Search");
@@ -215,15 +216,16 @@ async function searchPostcode(cnx, next) {
         await linkAtco(newSearch);
         await getRelatedStops(newSearch); // get all bus stops for location and link to search model
         await getRelatedCrimes(newSearch); // get all crimes for location and link to search model
+        await updateLinks(cnx, newSearch) // add resource-describing links
       } else {
         logger.info(`Existing search found, ID: ${existingSearch.searchID}`);
+        await updateLinks(cnx, existingSearch);
       }
 
       const SearchModel = await Search.findOne({
         latitude: dbPostcode.latitude,
       }).populate(["Postcode", "queryBusStops", "queryCrimes"]);
       const body = SearchModel;
-      // cnx.body = body + generateLinks(SearchModel);
       cnx.status = 200;
       cnx.body = body;
     } else {
@@ -291,14 +293,15 @@ async function searchRandom(cnx, next) {
       await linkAtco(newSearch);
       await getRelatedStops(newSearch); // get all bus stops for location and link to search model
       await getRelatedCrimes(newSearch); // get all crimes for location and link to search model
+      await updateLinks(cnx, newSearch);
     } else {
       logger.info(`Existing search found, ID: ${existingSearch.searchID}`);
+      await updateLinks(cnx, existingSearch);
     }
 
     const SearchModel = await Search.findOne({
       latitude: dbPostcode.latitude,
     }).populate(["Postcode", "queryBusStops", "queryCrimes"]);
-
     const body = SearchModel;
     cnx.status = 200;
     cnx.body = body;

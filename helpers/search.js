@@ -14,6 +14,7 @@
  * @exports linkAtco
  * 
  * @see {@link module:routes/search} for the route which uses these functions.
+ * @See {@link module:models/search} for more about the SearchModel parameter used throughout this file.
  * 
  */
 
@@ -202,7 +203,7 @@ async function searchAtco(PostcodeModel) {
 
   if (AtcoToLink) {
     // match found
-    logger.info(`Matching ATCO:" ${AtcoToLink.code}`);
+    logger.info(`Found matching ATCO: code ${AtcoToLink.code} matches ${AtcoToLink.location}, ${AtcoToLink.region}`);
     await queryAtcoAPI(AtcoToLink.code);
     return AtcoToLink;
   } else {
@@ -229,7 +230,7 @@ async function linkAtco(SearchModel) {
   // links Search model to correct ATCO from available information.
   // Should be run when search is created / postcode is updated.
   // Does not return anything
-  logger.info("Looking to link Atco");
+  //logger.info("Looking to link Atco");
 
   var linkedAtco;
 
@@ -285,8 +286,48 @@ async function getRelatedStops(SearchModel, radius = 1000) {
   await SearchModel.save();
 }
 
+
+/**
+ * Updates the links for a `Search` model.  
+ * The links are added to the `_links` field of the `Search` model and are used for HAL:JSON compliant API responses.
+ * 
+ * @async
+ * @function updateLinks
+ * 
+ * @param {Object} context - The Koa context object
+ * @param {mongoose.Object} SearchModel - The `Search` model to add resource-describing links to.
+ * @returns {undefined} Nothing, updates the Search model with the links.
+ * 
+ * @see {@link https://en.wikipedia.org/wiki/HATEOAS} - HATEOAS compliant API responses.
+ */
+async function updateLinks(context, SearchModel) {
+
+  let lat = SearchModel.latitude;
+  let long = SearchModel.longitude;
+  const postcode = SearchModel.Postcode.postcode
+  const hostname = context.req.headers.host;
+  
+  SearchModel._links = {};
+
+  // SearchModel._links.alternate = `${hostname}/api/v1/search/${searchModel.searchID}`;
+  SearchModel._links.postcode = {"href": `https://${hostname}/api/v1/postcodes/${postcode}`};
+
+  if (lat && long) {
+    SearchModel._links.self = {"href": `https://${hostname}/api/v1/search/?latitude=${lat}&longitude=${long}`};
+  }
+
+  try {
+    //logger.info(JSON.stringify(SearchModel._links));
+    await SearchModel.save();
+  } catch (err) {
+    logger.error(err);
+  };
+
+}
+
 module.exports = {
   getRelatedStops,
   getRelatedCrimes,
   linkAtco,
+  updateLinks,
 };
