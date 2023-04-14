@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: helpers/crime.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: helpers/crime.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file Contains the functions to retrieve and process crime data from the Police API.
+ * @module helpers/crime
+ * @author Mohammed Fardhin Masud &lt;masudm6@coventry.ac.uk>
+ *
+ * @requires utils/logger
+ * @requires axios
+ * @requires models/CrimeList
+ * @requires models/Crime
+ *
+ * @exports getCrimeData
+ *
+ */
+
+// https://data.police.uk/docs/method/crime-street/ - Uk crime data by street
+// can search by lat and long and relate it to a search object.
+
+const logger = require("../utils/logger");
+const axios = require("axios");
+
+const CrimeList = require("../models/CrimeList");
+const Crime = require("../models/Crime");
+
+/**
+ * Queries the Police API for crime data using a pair of latitude and longitude values.
+ * The data is then processed into a CrimeList using processCrimeData.
+ *
+ * @async
+ * @function getCrimeData
+ *
+ * @param {Number} lat - The latitude to pass to the Police API
+ * @param {Number} long - The longitude to pass to the Police API
+ * @returns {*} - Returns nothing
+ *
+ * @see processCrimeData
+ *
+ */
+async function getCrimeData(lat, long) {
+  const url = `https://data.police.uk/api/crimes-street/all-crime?lat=${lat}&amp;lng=${long}`;
+  const response = await axios.get(url);
+
+  // Note: crimes appear lower for Scotland. Should be noted to end users.
+
+  // returns the crimes in the most recent month
+  const existingCrimeList = await CrimeList.exists({ latitude: lat });
+  if (existingCrimeList) {
+    logger.info(
+      `Existing crime list found, ID: ${existingCrimeList.crimeListID}`
+    );
+    return;
+  } else {
+    await processCrimeData(lat, long, response.data);
+  }
+
+  return;
+}
+
+/**
+ * Processes the crime data retrieved from the Police API into a CrimeList and Crime models.
+ * This is currently capped at just the first 5 crimes per location to speed up the code.
+ *
+ * @async
+ * @function processCrimeData
+ *
+ * @param {Number} lat - The latitude to pass to the Police API
+ * @param {Number} long - The longitude to pass to the Police API
+ * @param {*} rawCrimeData - The raw crime data to be processed, retrieved from getCrimeData
+ * @returns {*} - Returns nothing
+ *
+ * @see getCrimeData
+ *
+ */
+async function processCrimeData(lat, long, rawCrimeData) {
+  logger.info("Processing new crime list");
+  // model the Crime and categorise it too for paid / admins.
+  // lat long to differentiate crime lists
+
+  // logger.info(rawCrimeData); // can be empty
+  // below code can be edited to handle a minimum amount of crimes required e.g. 5
+  if (rawCrimeData.length === 0) {
+    logger.info("No crime data.");
+    CrimeList.create({
+      crimeListID: 1,
+      latitude: lat,
+      longitude: long,
+      count: 0,
+      date: "X",
+      emptydata: true,
+    });
+    // emptydata and the X here is used to indicate that there is no data.
+    return;
+  }
+
+  const newCrimeList = new CrimeList({
+    crimeListID: 1,
+    latitude: lat,
+    longitude: long,
+    count: rawCrimeData.length,
+    date: rawCrimeData[0].month,
+  });
+
+  // Only store 5 (or less) crimes to speed up operations. 5 is used by the search model.
+  // City Of London for example has 2309 crimes in the area.
+  rawCrimeData = rawCrimeData.slice(0, 5);
+
+  const newCrimes = [];
+  const ids = [];
+  for (const data of rawCrimeData) {
+    const existingCrime = await Crime.exists({ crimeID: data.id });
+    if (existingCrime) {
+      continue;
+    }
+
+    const newCrime = Crime({
+      crimeID: data.id,
+      latitude: data.location.latitude,
+      longitude: data.location.longitude,
+      crime_category: data.category,
+      crime_date: data.month,
+    });
+
+    if (data.outcome_status) {
+      newCrime.outcome_category = data.outcome_status.category;
+      newCrime.outcome_date = data.outcome_status.month;
+    }
+
+    ids.push(newCrime._id);
+    newCrimes.push(newCrime);
+
+    //logger.info(newCrime);
+  }
+
+  //logger.info(newCrimes);
+
+  if (newCrimes.length > 0) {
+    await Crime.insertMany(newCrimes);
+
+    try {
+      newCrimeList.crimes = ids;
+      await newCrimeList.save();
+
+      //logger.info(newCrimeList);
+    } catch (error) {
+      logger.error(error);
+    }
+  }
+
+  logger.info("Finished processing new crime list");
+}
+
+module.exports = {
+  getCrimeData,
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-controllers_auth.html">controllers/auth</a></li><li><a href="module-helpers_AtcoCodes.html">helpers/AtcoCodes</a></li><li><a href="module-helpers_crime.html">helpers/crime</a></li><li><a href="module-helpers_database.html">helpers/database</a></li><li><a href="module-helpers_locations.html">helpers/locations</a></li><li><a href="module-helpers_postcode.html">helpers/postcode</a></li><li><a href="module-helpers_search.html">helpers/search</a></li><li><a href="module-models_Atco.html">models/Atco</a></li><li><a href="module-models_BusStop.html">models/BusStop</a></li><li><a href="module-models_Crime.html">models/Crime</a></li><li><a href="module-models_CrimeList.html">models/CrimeList</a></li><li><a href="module-models_Nptg.html">models/Nptg</a></li><li><a href="module-models_Postcode.html">models/Postcode</a></li><li><a href="module-models_Role.html">models/Role</a></li><li><a href="module-models_Search.html">models/Search</a></li><li><a href="module-models_User.html">models/User</a></li><li><a href="module-permissions_postcodes.html">permissions/postcodes</a></li><li><a href="module-permissions_search.html">permissions/search</a></li><li><a href="module-permissions_users.html">permissions/users</a></li><li><a href="module-routes_postcodes.html">routes/postcodes</a></li><li><a href="module-routes_search.html">routes/search</a></li><li><a href="module-routes_special.html">routes/special</a></li><li><a href="module-routes_users.html">routes/users</a></li><li><a href="module-strategies_basic.html">strategies/basic</a></li><li><a href="module-utils_logger.html">utils/logger</a></li></ul><h3>Global</h3><ul><li><a href="global.html#startServer">startServer</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 4.0.2</a> on Fri Apr 14 2023 20:25:38 GMT+0000 (GMT)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
