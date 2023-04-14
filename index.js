@@ -37,7 +37,7 @@ let port = process.env.PORT;
  */
 async function startServer(app, port) {
   try {
-    // reset dummy dbs - not awaited yet
+    // reset dummy dbs in order
     await database.connectDB(true);
     await database.initUserDB();
     await database.resetDataDB();

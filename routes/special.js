@@ -29,7 +29,7 @@ router.get("/private", auth, UserDetails); // for testing purposes
  * @returns {undefined} This function does not return anything back, nor does it call the next middleware. It just updates the response body with a message and a status code.
  */
 function publicAPI(ctx) {
-  logger.info(`API homepage accessed from ${ctx.request.ip}`);
+  logger.info(`Incoming ${ctx.request.method} request from ${ctx.req.socket.remoteAddress} to ${ctx.req.headers.host}${ctx.request.url}`); // baseURl/api/v1
   ctx.status = 200;
   ctx.body = {
     message: "Hello and welcome to the UK Location API!",
