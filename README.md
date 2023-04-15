@@ -25,7 +25,7 @@ Run `npm install`. This will install the necessary dependencies.
 Type `npm start`. The console should now display the contents of `index.js`, starting the server.
 
 The server is now accessible on the port defined in the `.env` file, 3000 by default.
-**Note:** The initial startup may take time as the data is being intialised for the first time. This can take up to 10 minutes, as the `Nptg` takes time to process. To reduce the time taken to load this, it can safely be commented out from `helpers/database~initLocationDB` (`await getNptgData`) as it is not necessary for this project.
+**Note:** The initial startup may take time as the data is being intialised for the first time. This can take up to 10 minutes, as the `Nptg` collection takes time to process. To reduce the time taken to load this, it can safely be commented out from `helpers/database~initLocationDB` (`await getNptgData();`) as it is not necessary for this project.
 
 ### MongoDB Atlas Bugfixing
 - To get the database connection string on **MongoDB Atlas**, select `Database > Connect > Drivers` and copy the string starting with `mongodb+srv://`. Make sure to fill the username and password fields.
