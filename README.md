@@ -1,5 +1,21 @@
-# POR_10355929
-This repository holds my POR submission for the module 6003CEM - Web API Development.  
+# POR_10355929 (Improved!)
+This repository holds my improvements to my POR submission for the module 6003CEM - Web API Development.
+
+Now that I have an infinite amount of time, I can work on the feedback provided:
+
+1. **Testing**: Increase the robustness of tests by:
+   - Generating coverage reports to identify untested lines of code.
+   - Implementing mocking to conduct fine-grained checks on function arguments.
+
+2. **Caching**: Improve the efficiency and responsiveness of the application by:
+   - Implementing cache header setting/checking.
+   - Utilizing HTTP cache response codes, such as 304 (Not Modified), where appropriate.
+
+3. **Security**: Enhance the security of the application by:
+   - Implementing JWT (JSON Web Token) or other token-based authentication (replacing the current basic authentication approach).
+
+
+# **Everything below is outdated! I am going to be trying out new technologies and this will most likely affect the instructions below in some way.**
 
 ## Prerequisites
 Below are instructions on how to clone and prepare this repository for the project.  
