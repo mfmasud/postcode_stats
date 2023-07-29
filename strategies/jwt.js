@@ -22,7 +22,7 @@ const logger = require('../utils/logger');
 
 const User = require('../models/User');
 
-const { JWT_SECRET } = require('../env');
+let JWT_SECRET = process.env.JWT_SECRET;
 
 function generateToken(user) {
     const token = jwt.sign({
