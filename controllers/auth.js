@@ -14,11 +14,13 @@
 
 const passport = require("koa-passport");
 const basicAuth = require("../strategies/basic");
+const jwtAuth = require("../strategies/jwt");
 const AnonymousStrategy = require("passport-anonymous").Strategy;
 
 passport.use(new AnonymousStrategy()); // anonymous users e.g. not logged in
 passport.use(basicAuth); // HTTP basic auth strategy, may be changed to JWT/OAuth2
+passport.use(jwtAuth); // JWT auth strategy
 
-module.exports = passport.authenticate(["basic", "anonymous"], {
+module.exports = passport.authenticate(["anonymous", "basic", "jwt"], {
   session: false,
 });
