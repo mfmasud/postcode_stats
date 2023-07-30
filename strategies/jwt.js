@@ -24,32 +24,36 @@ const User = require('../models/User');
 
 let JWT_SECRET = process.env.JWT_SECRET;
 
+/**
+ * Generates a JWT token for the given user.
+ * 
+ * @function generateToken
+ * 
+ * @param {User} user - The user object to generate a token for.
+ * @returns {string} - The generated token.
+ */
 function generateToken(user) {
     const token = jwt.sign({
-        id: user.id,
+        _id: user._id,
     }, JWT_SECRET, { expiresIn: '1h' });
-    
-    logger.info(`Generated token for user ${user.id}: ${token}`);
 
     return token;
 }
 
 
-function verifyToken(payload, done) {
+async function verifyUser(decoded, done) {
     
-    if (!payload) {
+    if (!decoded) {
         // 401 
-        logger.info('No token provided');
+        logger.info('No data provided');
         return done(null, false);
     }
 
     try {
-        const decoded = jwt.verify(payload, JWT_SECRET);
-        logger.info(`Decoded token: ${JSON.stringify(decoded)}`);
-        const user = User.findById(decoded.id);
+        const user = await User.findById(decoded._id);
         
         if (!user) {
-            logger.info(`User id ${decoded.id} not found`);
+            logger.info(`User _id ${decoded._id} not found`);
             return done(null, false);
         }
 
@@ -68,6 +72,6 @@ const opts = {
     secretOrKey: JWT_SECRET,
 };
 
-const strategy = new JWTStrategy(opts, verifyToken);
+const strategy = new JWTStrategy(opts, verifyUser);
 
-module.exports = strategy;
+module.exports = {generateToken, strategy}
