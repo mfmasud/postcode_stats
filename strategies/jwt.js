@@ -54,11 +54,13 @@ async function verifyUser(decoded, done) {
     logger.info(`Verifying token _id [${decoded._id}]`);
     
     try {
-        const user = await User.findById(decoded._id);
+        let user = await User.findById(decoded._id);
         
         if (!user) {
-            logger.info(`User _id ${decoded._id} not found`);
+            logger.info(`User _id [${decoded._id}] not found`);
             return done(null, false);
+        } else {
+            user = await user.populate('role');
         }
 
         logger.info(`Successfully verified user ${user.username}`);
