@@ -92,7 +92,7 @@ async function loginUserJWT(ctx) {
     logger.info(`Token generated for User "${user.username}" in message body.`);
     ctx.status = 200;
     ctx.body = {
-        token
+      "jwt": token
     }
 }
 

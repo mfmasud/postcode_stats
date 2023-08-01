@@ -42,13 +42,17 @@ function generateToken(user) {
 
 
 async function verifyUser(decoded, done) {
+
+    logger.info('Verifying JWT...');
     
     if (!decoded) {
         // 401 
         logger.info('No data provided');
         return done(null, false);
     }
-
+    
+    logger.info(`Verifying token _id [${decoded._id}]`);
+    
     try {
         const user = await User.findById(decoded._id);
         
