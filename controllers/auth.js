@@ -4,7 +4,6 @@
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  *
  * @requires koa-passport
- * @requires module:strategies/basic
  * @requires module:strategies/jwt
  * @requires passport-anonymous
  *
@@ -14,12 +13,10 @@
  */
 
 const passport = require("koa-passport");
-//const basicAuth = require("../strategies/basic");
 const jwtAuth = require("../strategies/jwt").strategy;
 const AnonymousStrategy = require("passport-anonymous").Strategy;
 
 passport.use(new AnonymousStrategy()); // anonymous users e.g. not logged in
-//passport.use(basicAuth); // HTTP basic auth strategy
 passport.use(jwtAuth); // JWT auth strategy
 
 module.exports = passport.authenticate(["jwt", "anonymous"], {

@@ -43,11 +43,11 @@ function generateToken(user) {
 
 async function verifyUser(decoded, done) {
 
-    logger.info('Verifying JWT...');
+    //logger.info('Verifying JWT...');
     
     if (!decoded) {
         // 401 
-        logger.info('No data provided');
+        logger.info('Invalid JWT data provided');
         return done(null, false);
     }
     
@@ -57,7 +57,7 @@ async function verifyUser(decoded, done) {
         let user = await User.findById(decoded._id);
         
         if (!user) {
-            logger.info(`User _id [${decoded._id}] not found`);
+            logger.info(`User with _id [${decoded._id}] not found`);
             return done(null, false);
         } else {
             user = await user.populate('role');
