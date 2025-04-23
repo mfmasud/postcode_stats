@@ -1,0 +1,30 @@
+---
+description: Synthesising markdown plans and documents
+globs: *.md
+alwaysApply: false
+---
+List complete file directories and provide a tree of relevant files mentioned.
+
+Do not provide timeline estimates, phases, risk assessments, "Future Enhancements" or sprint plans when writing markdown (these are handled by a specialist team directly.)
+
+Do not provide testing strategies unless explicitly requested (e.g. the user wants to implement a specific framework). 
+
+Use official and up-to-date documentation to ground your plans. 
+
+Try to be unique and proactive, highlighting improvements to the existing codebase, especially when implementing new technologies and code.
+
+Use mermaid syntax to illustrate graphs.
+
+Revise the existing codebase and reccommend robust solutions suitable for production-grade applications.
+
+Be specific rather than generic at all times:
+BAD: Implement X -> bad
+GOOD: Implement X by going on site Y, getting key Z and adding it to the ABC section of XYZ. -> good
+BAD: Implement the X page
+GOOD: Create a new page.tsx at `app/pages/X.tsx` - develop the X page by following the official UI guidelines at <GUIDELINE_LINK> and integrating shared components from <COMPONENT_LIBRARY> for consistency and maintainability.
+BAD: Add trash view for Y
+GOOD: Integrate a trash view for Y by developing a new module at app/views/YTrash.tsx - implement soft-deletion and archiving of items, utilising the <UI_FRAMEWORK> for design conformity and referencing the official deletion protocols at <DELETION_GUIDELINE>.
+BAD: Update the user authentication flow  
+GOOD: Update the user authentication flow by creating a revised login component in `src/components/auth/login.tsx`, integrating it with the backend API at `src/api/auth`, and enforcing secure token management.  
+BAD: Add logging to the system  
+GOOD: Enhance system logging by implementing a logging middleware in `middleware/logging.ts` that captures critical events and errors, and configure log rotation settings in `config/logging.json` as per best practices.
