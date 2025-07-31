@@ -20,10 +20,11 @@ In addition to working on the feedback, this project also will also be moving to
 
 ### Prerequisites
 Below are instructions on how to clone and prepare this repository for the project.  
-The commands are valid for a system running **Ubuntu 24.04** with `git` installed.
-The codio box used to develop this project uses these versions of node and npm:  
+The commands are valid for a system running **Ubuntu 24.04** with `pnpm` and `node` installed. To install, see [`fnm`](https://github.com/Schniz/fnm) (a node version manager) and [`pnpm docs`](https://pnpm.io/installation).
+
+This project uses these versions of `node` and `pnpm`:  
 - **Node v24.4.1**
-- **npm 11.4.2**.    
+- **pnpm 10.13.1**.
 
 As part of my project, I also use `MongoDB Atlas`. This provides a mongodb database online (for free), but a local one can also be used for this project. See step 3 below.
 
@@ -39,7 +40,7 @@ To start the server from scratch, open a terminal and follow these instructions:
 4. Install the required packages  
    Run `npm install`. This will install the necessary dependencies.
 5. Start the server  
-   Type `npm start`. The console should now display the contents of `index.js`, starting the server.
+   Type `npm start`. The console should now display the contents of `index.js`, starting the server. If you don't see this, check the bugfixes below.
 
 The server is now accessible on the port defined in the `.env` file, **3000** by default.  
 **Note:** The initial startup may take time as the data is being initialized for the first time. This can take up to **10 minutes**, as the `Nptg` collection takes time to process. To reduce the time taken to load this, it can safely be commented out from `helpers/database~initLocationDB` (`await getNptgData();`) as it is not necessary for this project to run. However, atco codes will need to be fetched (and cached) once a query for the region is received.

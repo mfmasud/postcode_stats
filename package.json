@@ -11,7 +11,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "chai": "^4.2.1",
+    "chai": "^4.5.0",
     "chai-as-promised": "^8.0.1",
     "jsdoc": "^4.0.4",
     "mocha": "^10.8.2",
