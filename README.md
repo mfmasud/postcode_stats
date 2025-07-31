@@ -20,16 +20,12 @@ In addition to working on the feedback, this project also will also be moving to
 
 ### Prerequisites
 Below are instructions on how to clone and prepare this repository for the project.  
-The commands are valid for a codio system running **Ubuntu 18.04** with `git` installed.
+The commands are valid for a system running **Ubuntu 24.04** with `git` installed.
 The codio box used to develop this project uses these versions of node and npm:  
-- **Node v16.18.1**
-- **npm 8.19.2**.   
+- **Node v24.4.1**
+- **npm 11.4.2**.    
 
-As such, the `package.json` and `package-lock.json` files are using versions supported by this version of Node.js.  
-
-> **NOTE:** These were the original versions when starting this project, higher versions should work fine but these have been kept here for now as a reference.
-
-As part of my project, I also use `MongoDB Atlas`. This provides a mongodb database online (for free), but a local one can also be used for this project. See step 4 below.
+As part of my project, I also use `MongoDB Atlas`. This provides a mongodb database online (for free), but a local one can also be used for this project. See step 3 below.
 
 ### Instructions
 To start the server from scratch, open a terminal and follow these instructions:
@@ -46,7 +42,7 @@ To start the server from scratch, open a terminal and follow these instructions:
    Type `npm start`. The console should now display the contents of `index.js`, starting the server.
 
 The server is now accessible on the port defined in the `.env` file, **3000** by default.  
-**Note:** The initial startup may take time as the data is being initialized for the first time. This can take up to **10 minutes**, as the `Nptg` collection takes time to process. To reduce the time taken to load this, it can safely be commented out from `helpers/database~initLocationDB` (`await getNptgData();`) as it is not necessary for this project.
+**Note:** The initial startup may take time as the data is being initialized for the first time. This can take up to **10 minutes**, as the `Nptg` collection takes time to process. To reduce the time taken to load this, it can safely be commented out from `helpers/database~initLocationDB` (`await getNptgData();`) as it is not necessary for this project to run. However, atco codes will need to be fetched (and cached) once a query for the region is received.
 
 
 ### MongoDB Atlas Bugfixing
