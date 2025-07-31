@@ -3,7 +3,7 @@
  * @module routes/postcodes
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  *
- * @requires koa-router
+ * @requires @koa/router
  * @requires controllers/auth
  * @requires utils/logger
  * @requires models/User
@@ -15,9 +15,9 @@
  * @exports router
  */
 
-const Router = require("koa-router");
+const Router = require("@koa/router");
 const auth = require("../controllers/auth");
-const router = Router({ prefix: "/api/v1/postcodes" });
+const router = new Router({ prefix: "/api/v1/postcodes" });
 
 const logger = require("../utils/logger");
 

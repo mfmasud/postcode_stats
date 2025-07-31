@@ -3,7 +3,7 @@
  * @module routes/users
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  *
- * @requires koa-router
+ * @requires @koa/router
  * @requires koa-bodyparser
  * @requires utils/logger
  * @requires controllers/auth
@@ -15,13 +15,13 @@
  * @exports router
  */
 
-const Router = require("koa-router");
+const Router = require("@koa/router");
 const bodyParser = require("koa-bodyparser");
 
 const logger = require("../utils/logger");
 
 const auth = require("../controllers/auth");
-const router = Router({ prefix: "/api/v1/users" });
+const router = new Router({ prefix: "/api/v1/users" });
 
 const User = require("../models/User");
 const Role = require("../models/Role");

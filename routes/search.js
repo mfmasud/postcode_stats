@@ -3,7 +3,7 @@
  * @module routes/search
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  *
- * @requires koa-router
+ * @requires @koa/router
  * @requires koa-bodyparser
  * @requires controllers/auth
  * @requires utils/logger
@@ -20,10 +20,10 @@
  * @exports router
  */
 
-const Router = require("koa-router");
+const Router = require("@koa/router");
 const bodyParser = require("koa-bodyparser");
 const auth = require("../controllers/auth");
-const router = Router({ prefix: "/api/v1/search" });
+const router = new Router({ prefix: "/api/v1/search" });
 
 const logger = require("../utils/logger");
 const Ajv = require("ajv");

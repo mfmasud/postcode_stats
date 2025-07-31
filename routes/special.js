@@ -3,14 +3,14 @@
  * @module routes/special
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  *
- * @requires koa-router
+ * @requires @koa/router
  * @requires controllers/auth
  * @requires utils/logger
  *
  * @exports router
  */
 
-const Router = require("koa-router");
+const Router = require("@koa/router");
 
 const auth = require("../controllers/auth");
 
@@ -19,7 +19,7 @@ const {generateToken} = require("../strategies/jwt");
 
 const logger = require("../utils/logger");
 
-const router = Router({ prefix: "/api/v1" });
+const router = new Router({ prefix: "/api/v1" });
 router.get("/", publicAPI);
 router.get("/private", auth, UserDetails); // for testing purposes
 router.get("/login", loginUserJWT);
