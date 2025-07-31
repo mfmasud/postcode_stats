@@ -34,10 +34,10 @@ As part of my project, I also use `MongoDB Atlas`. This provides a mongodb datab
 ### Instructions
 To start the server from scratch, open a terminal and follow these instructions:
 1. Clone the repository  
-   Copy and paste `git clone https://github.coventry.ac.uk/6003CEM/POR_10355929.git` into the terminal.  
+   Copy and paste `git clone https://github.com/mfmasud/postcode_stats.git` into the terminal.  
    This uses HTTPS, but you can also use SSH.
 2. Switch into the newly cloned repository's directory  
-   Type `cd POR_10355929/` to change the current directory.
+   Type `cd postcode_stats/` to change the current directory.
 3. Edit and save the `.env` template  
    Copy and edit `.env.template` with a mongodb database connection string (`DB_STRING`). Save the new filename as `.env`.
 4. Install the required packages  
