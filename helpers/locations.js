@@ -233,7 +233,7 @@ async function getNptgData() {
 }
 
 /**
- * Procceses the NPTG API csv data.
+ * Processes the NPTG API csv data.
  * Checks for an existing cache to ensure data is not needlessly re-downloaded.
  *
  * @async
@@ -248,15 +248,13 @@ async function getNptgData() {
  *
  */
 async function processNptgCSV(rawdata) {
-  // TODO: speed this up like the code used to save bus stops / ATCOs.
-
   // check if Nptg collection is empty
-  const count = await Nptg.countDocuments();
-  if (count > 0) {
-    logger.info("Nptg data already saved.");
+  const count = await Nptg.estimatedDocumentCount();
+  if (count >= 43876) {
+    logger.info(`Nptg data already saved. All ${count} records found.`);
     return;
   } else {
-    logger.info("Processing Nptg data...");
+    logger.info(`${count}/43876 records found. Processing Nptg data...`);
   }
 
   // adatped from AtcoCodes.processCSV()
@@ -272,37 +270,24 @@ async function processNptgCSV(rawdata) {
     "QualifierName",
   ];
 
-  const filtered = data.map((row) => {
-    const filteredRow = {}; // create empty object to store new filtered records in
-    columns.forEach((column) => {
-      // for each column in columns
-      filteredRow[column] = row[column]; // add column:value pair to filteredRow
-    });
-    return filteredRow; // add back to filtered array
+  const NptgBulk = data.map(row => {
+    const doc = Object.fromEntries(columns.map(col => [col, row[col]]));
+
+    return new Nptg(doc);
   });
 
-  for (const row of filtered) {
-    //logger.info(row);
-    const newNptg = new Nptg({
-      NptgLocalityCode: row.NptgLocalityCode,
-      LocalityName: row.LocalityName,
-      ParentLocalityName: row.ParentLocalityName,
-      Northing: row.Northing,
-      Easting: row.Easting,
-      QualifierName: row.QualifierName,
-    });
-
-    // logger.info(newNptg);
-
-    try {
-      await newNptg.save();
-      //logger.info(`Saved Nptg code ${Nptg.NptgLocalityCode} to Nptg collection`);
-    } catch (error) {
+  try {
+    await Nptg.insertMany(NptgBulk, { ordered: false, skipDuplicates: true });
+  } catch (error) {
+    if (error.code === 11000) {
+      logger.info("Duplicate NPTG locality codes found. Skipping duplicates.");
+    } else {
       logger.error(error);
     }
   }
 
-  logger.info("Nptg data saved.");
+  const finalCount = await Nptg.estimatedDocumentCount();
+  logger.info(`NPTG data processed. Found ${finalCount} records.`);
 }
 
 module.exports = {

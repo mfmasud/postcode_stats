@@ -211,6 +211,29 @@ async function resetDataDB() {
 }
 
 /**
+ * Create the NPTG Collection with a unique index on NptgLocalityCode to prevent duplicates.
+ *
+ * @async
+ * @function initNptg
+ *
+ * @see initLocationDB
+ * @see getNptgData
+ *
+ */
+async function initNptg() {
+  try {
+    await Nptg.collection.createIndex(
+      { NptgLocalityCode: 1 },
+      { unique: true }
+    );
+    logger.info("Initialised NPTG Collection successfully!");
+  } catch (error) {
+    logger.error(`Error initialising NPTG Collection: ${error.message}`);
+  }
+}
+
+
+/**
  * Initialises the location database collections. Adds the `Nptg` data if not cached already.
  * Assigns `Atco` codes for Scoltand,England and Wales and related names for Scotland.
  *
@@ -221,10 +244,10 @@ async function resetDataDB() {
  *
  */
 async function initLocationDB() {
-  // 1 time download of NPTG locality database ~ 5mb csv. Is cached.
-  // Takes approximately 10 minutes (*on Codio) to save everything so this should be run on setup only.
-  // Needs to be optimised like the Atco saving code, using insertmany/bulkwrite.
-  await getNptgData();
+  
+  // Download and process NPTG data from NAPTAN
+  await initNptg();
+  await getNptgData(); // 1 time download of NPTG locality database ~ 5mb csv. Is cached after first run.
 
   // Get and process ATCO codes master list
   await saveAtcoList();
@@ -242,4 +265,5 @@ module.exports = {
   initUserDB,
   resetDataDB,
   initLocationDB,
+  initNptg,
 };
