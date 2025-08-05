@@ -9,7 +9,7 @@
     "start": "node index.js.old",
     "profile": "node --prof index.js.old",
     "fbuild": "tsc -p tsconfig.json",
-    "fstart": "node index.js"
+    "fstart": "node dist/index.js"
   },
   "author": "",
   "license": "ISC",
