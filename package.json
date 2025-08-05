@@ -3,21 +3,25 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "mocha --exit",
-    "start": "node index.js",
-    "profile": "node --prof index.js"
+    "fbuild": "tsc -p tsconfig.json",
+    "fstart": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@tsconfig/node24": "^24.0.1",
+    "@types/node": "^24.2.0",
     "chai": "^4.5.0",
     "chai-as-promised": "^8.0.1",
     "jsdoc": "^4.0.4",
     "mocha": "^10.8.2",
     "nodemon": "^3.1.10",
     "prettier": "3.6.2",
-    "sinon": "^21.0.0"
+    "sinon": "^21.0.0",
+    "typescript": "^5.9.2"
   },
   "dependencies": {
     "@casl/ability": "^6.7.3",
@@ -27,6 +31,7 @@
     "bcrypt": "^6.0.0",
     "csvtojson": "^2.0.10",
     "dotenv": "^17.2.1",
+    "fastify": "^5.4.0",
     "jsdom": "^26.1.0",
     "jsonwebtoken": "^9.0.2",
     "koa": "^3.0.1",
