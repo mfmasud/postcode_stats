@@ -9,7 +9,8 @@
     "start": "node index.js.old",
     "profile": "node --prof index.js.old",
     "fbuild": "tsc -p tsconfig.json",
-    "fstart": "node dist/index.js"
+    "fstart": "node dist/index.js",
+    "dev": "tsx watch index.ts"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +24,7 @@
     "nodemon": "^3.1.10",
     "prettier": "3.6.2",
     "sinon": "^21.0.0",
+    "tsx": "^4.20.3",
     "typescript": "^5.9.2"
   },
   "dependencies": {
