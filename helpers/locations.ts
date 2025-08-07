@@ -17,14 +17,14 @@
  *
  */
 
-const Nptg = require("../models/Nptg");
-const Atco = require("../models/Atco");
+import Nptg from "../models/Nptg.js";
+import Atco from "../models/Atco.js";
 
-const logger = require("../utils/logger");
+import logger from "../utils/logger.js";
 
-const axios = require("axios");
-const JSDOM = require("jsdom").JSDOM;
-const csvtojson = require("csvtojson");
+import axios from "axios";
+import { JSDOM } from "jsdom";
+import csvtojson from "csvtojson";
 
 /**
  * Processes the names for the 32 local goverments of Scotland in order to match the names from the government Atco list.
@@ -49,7 +49,11 @@ async function getScotlandLocations() {
 
   for (let index = 0; index < 32; index++) {
     const place = locations[index];
-    var text = place.textContent.trim();
+    let text = place?.textContent?.trim();
+    if (!text) {
+      logger.error("No text content found for place", place);
+      continue;
+    }
 
     // add alt names to ATCO list. e.g. other_names: Na h-Eileanan Siar
     // make this into a function? normalname - altnames
@@ -172,7 +176,7 @@ async function getEnglandLocations() {
   const london_response = await axios.get(london_url);
   const london_data = new JSDOM(london_response.data);
 
-  const english_places = [];
+  const english_places: string[] = [];
 
   logger.info(english_places);
 
@@ -203,10 +207,15 @@ async function getWalesLocations() {
     "table.wikitable li a"
   );
 
-  const names = [];
+  const names: string[] = [];
 
-  for (li of tabledata) {
-    names.push(li.textContent.trim());
+  for (const li of tabledata) {
+    const name = li?.textContent?.trim();
+    if (name) {
+      names.push(name);
+    } else {
+      logger.error("No text content found for li", li);
+    }
   }
 
   //logger.info(names)
@@ -247,7 +256,7 @@ async function getNptgData() {
  * @todo Speed this up like the code used to save BusStops and Crimes.
  *
  */
-async function processNptgCSV(rawdata) {
+async function processNptgCSV(rawdata: string) {
   // check if Nptg collection is empty
   const count = await Nptg.estimatedDocumentCount();
   if (count >= 43876) {
@@ -278,7 +287,7 @@ async function processNptgCSV(rawdata) {
 
   try {
     await Nptg.insertMany(NptgBulk, { ordered: false, skipDuplicates: true });
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === 11000) {
       logger.info("Duplicate NPTG locality codes found. Skipping duplicates.");
     } else {
@@ -290,7 +299,7 @@ async function processNptgCSV(rawdata) {
   logger.info(`NPTG data processed. Found ${finalCount} records.`);
 }
 
-module.exports = {
+export {
   getScotlandLocations,
   getEnglandLocations,
   getWalesLocations,
