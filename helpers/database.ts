@@ -26,31 +26,30 @@
  *
  */
 
-require("dotenv").config();
-const mongoose = require("mongoose");
+import dotenv from "dotenv";
+dotenv.config();
+
+import mongoose, { type ConnectOptions } from "mongoose";
 mongoose.set("strictQuery", true);
 //mongoose.set("debug", true);
 
-const logger = require("../utils/logger");
+import logger from "../utils/logger.js";
 
-const User = require("../models/User");
-const Role = require("../models/Role");
-const Atco = require("../models/Atco");
-const BusStop = require("../models/BusStop");
-const Postcode = require("../models/Postcode");
-const Nptg = require("../models/Nptg");
-const Search = require("../models/Search");
-const CrimeList = require("../models/CrimeList");
-const Crime = require("../models/Crime");
 
-const { saveAtcoList } = require("../helpers/AtcoCodes");
+import User from "../models/User.js";
+import Role from "../models/Role.js";
+import Atco from "../models/Atco.js";
+import BusStop from "../models/BusStop.js";
+import Postcode from "../models/Postcode.js";
+import Nptg from "../models/Nptg.js";
+import Search from "../models/Search.js";
+import CrimeList from "../models/CrimeList.js";
+import Crime from "../models/Crime.js";
 
-const {
-  getScotlandLocations,
-  getEnglandLocations,
-  getWalesLocations,
-  getNptgData,
-} = require("../helpers/locations");
+import { saveAtcoList } from "./AtcoCodes.js";
+
+import { getScotlandLocations, getEnglandLocations, getWalesLocations, getNptgData } from "./locations.js";
+
 
 const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file
 
@@ -65,18 +64,21 @@ const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it
  * @see disconnectDB
  *
  */
-async function connectDB(output = false) {
+async function connectDB(output: boolean = false) {
   try {
+    if (!MONGO_URI) {
+      throw new Error('Database connection string not found in environment variables');
+    }
     await mongoose.connect(MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-    });
+    } as ConnectOptions);
 
     if (output) {
       logger.info("Connected to database!");
     }
   } catch (error) {
-    logger.error(`Error connecting to database:\n\n${error.message}`);
+    logger.error(`Error connecting to database:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -91,7 +93,7 @@ async function connectDB(output = false) {
  * @see connectDB
  *
  */
-async function disconnectDB(output = false) {
+async function disconnectDB(output: boolean = false) {
   try {
     await mongoose.connection.close();
 
@@ -99,7 +101,7 @@ async function disconnectDB(output = false) {
       logger.info("Disconnected from database!");
     }
   } catch (error) {
-    logger.error(`Error disconnecting from database:\n\n${error.message}`);
+    logger.error(`Error disconnecting from database:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -176,7 +178,7 @@ async function initUserDB() {
 
     logger.info("Reset user data successfully!");
   } catch (error) {
-    logger.error(`Error resetting user data:\n\n${error.message}`);
+    logger.error(`Error resetting user data:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -206,7 +208,7 @@ async function resetDataDB() {
 
     logger.info("Reset location data successfully!");
   } catch (error) {
-    logger.error(`Error resetting location data:\n\n${error.message}`);
+    logger.error(`Error resetting location data:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
@@ -228,7 +230,7 @@ async function initNptg() {
     );
     logger.info("Initialised NPTG Collection successfully!");
   } catch (error) {
-    logger.error(`Error initialising NPTG Collection: ${error.message}`);
+    logger.error(`Error initialising NPTG Collection: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
