@@ -57,4 +57,4 @@ const postcodeSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Postcode", postcodeSchema);
+export default mongoose.model("Postcode", postcodeSchema);

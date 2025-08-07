@@ -45,4 +45,4 @@ const atcoSchema = new mongoose.Schema({
   ],
 });
 
-module.exports = mongoose.model("Atco", atcoSchema);
+export default mongoose.model("Atco", atcoSchema);

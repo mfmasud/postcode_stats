@@ -55,4 +55,4 @@ crimeListSchema.pre("save", async function save(next) {
   return next(); // next middleware in call stack
 });
 
-module.exports = mongoose.model("CrimeList", crimeListSchema);
+export default mongoose.model("CrimeList", crimeListSchema);

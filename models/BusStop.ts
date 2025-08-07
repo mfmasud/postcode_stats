@@ -51,4 +51,4 @@ const busStopSchema = new mongoose.Schema({
   });
   */
 
-module.exports = mongoose.model("BusStop", busStopSchema);
+export default mongoose.model("BusStop", busStopSchema);

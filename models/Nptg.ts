@@ -39,4 +39,4 @@ const NptgSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("Nptg", NptgSchema);
+export default mongoose.model("Nptg", NptgSchema);

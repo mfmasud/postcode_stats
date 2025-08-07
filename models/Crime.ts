@@ -43,4 +43,4 @@ const crimeSchema = new mongoose.Schema({
 // lat long from initial query.
 // count = response.data.length
 
-module.exports = mongoose.model("Crime", crimeSchema);
+export default mongoose.model("Crime", crimeSchema);

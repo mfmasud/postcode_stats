@@ -95,4 +95,4 @@ searchSchema.pre("save", async function save(next) {
   next();
 });
 
-module.exports = mongoose.model("Search", searchSchema);
+export default mongoose.model("Search", searchSchema);
