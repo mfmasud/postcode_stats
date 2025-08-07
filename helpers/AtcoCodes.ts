@@ -24,14 +24,14 @@ related note:
 docs/notes/atco_codes.txt
 */
 
-const logger = require("../utils/logger");
+import logger from "../utils/logger.js";
 
-const axios = require("axios");
-const JSDOM = require("jsdom").JSDOM;
-const csvtojson = require("csvtojson");
+import axios from "axios";
+import { JSDOM } from "jsdom";
+import csvtojson from "csvtojson";
 
-const Atco = require("../models/Atco");
-const BusStop = require("../models/BusStop");
+import Atco from "../models/Atco.js";
+import BusStop from "../models/BusStop.js";
 
 /**
  * Processes the list of ATCO codes for local authorities.
@@ -53,11 +53,15 @@ async function getAtcoCodes() {
     "#localAuthorityName option"
   );
 
-  const codes = [];
+  const codes: string[] = [];
 
   options.forEach((option) => {
-    const text = option.textContent.trim();
-    codes.push(text);
+    const text = option?.textContent?.trim();
+    if (text) {
+      codes.push(text);
+    } else {
+      logger.error("No text content found for option", option);
+    }
   });
 
   codes.shift();
@@ -81,7 +85,7 @@ async function saveAtcoList() {
   // run on db initialisation to get a list of searchable ATCOs.
   // Can integrate the functions in helpers/locations to add the alternative location names.
   const codeList = await getAtcoCodes();
-  for (code of codeList) {
+  for (const code of codeList) {
     await processAtcoString(code);
   }
 }
@@ -101,13 +105,18 @@ async function saveAtcoList() {
  * const data = "Aberdeenshire / Scotland (630)"
  * // returns {630: {location: Aberdeenshire, region: Scotland}}
  */
-async function processAtcoString(data) {
+async function processAtcoString(data: string) {
   const location = data.split(" / ")[0];
-  const region = data.split(" / ")[1].split(" (")[0];
-  const atco = data.split(" / ")[1].split(" (")[1].split(")")[0];
+  const region = data.split(" / ")[1]?.split(" (")[0];
+  const atco = data.split(" / ")[1]?.split(" (")[1]?.split(")")[0];
 
-  const processedData = {};
-  processedData[atco] = { location, region };
+  if (!atco) {
+    logger.error("Invalid ATCO code format", data);
+    return;
+  }
+
+  const processedData: Record<string, { location: string; region: string }> = {};
+  processedData[atco] = { location: location || "", region: region || "" };
   //logger.info(`${atco}: ${processedData[atco]}`);
 
   const existingAtco = await Atco.exists({ code: atco }); // can filter for e.g. busstops.length === 0 to check for empty codes
@@ -141,15 +150,14 @@ async function processAtcoString(data) {
  *
  * @see processCSV
  */
-async function queryAtcoAPI(code) {
+async function queryAtcoAPI(code: string) {
   // backend function to query the API for bus stops
   // run when linking ATCOs to searches (to find bus stops).
   // basic validation - not meant to be complete
-  format = "csv";
-  code = code.toString();
+  const format = "csv";
 
   const AtcoExists = await Atco.findOne({ code: code });
-  if (AtcoExists.AllProcessed) {
+  if (AtcoExists?.AllProcessed) {
     logger.info(`All ATCO ${code} BusStops found, not processing any further.`);
     return;
   }
@@ -188,7 +196,7 @@ async function queryAtcoAPI(code) {
  * @see queryAtcoAPI
  *
  */
-async function processCSV(code, rawdata) {
+async function processCSV(code: string, rawdata: string) {
   // this can take a while, should be run on startup of the server so users use processed mongodb models instead of processing them when a request is made
   const associatedAtco = await Atco.findOne({ code: code });
   if (!associatedAtco) {
@@ -254,9 +262,4 @@ async function processCSV(code, rawdata) {
   }
 }
 
-module.exports = {
-  getAtcoCodes,
-  queryAtcoAPI,
-  processAtcoString,
-  saveAtcoList,
-};
+export { getAtcoCodes, queryAtcoAPI, processAtcoString, saveAtcoList };
