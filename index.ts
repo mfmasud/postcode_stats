@@ -6,11 +6,11 @@ server.get('/ping', async (request: FastifyRequest, reply: FastifyReply) => {
     return 'pong\n';
 });
 
-//require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-//const logger = require("./utils/logger");
-
-// logger.info(process.env)
+import logger from "./utils/logger.js";
+//logger.info(JSON.stringify(process.env, null, 2));
 //const database = require("./helpers/database");
 
 import specialRoutes from './routes/special.js';
@@ -27,16 +27,8 @@ const port = parseInt(process.env.PORT || '8080');
 
 /**
  * Initializes the databases and starts the Fastify server.
- *
- * @async
- * @function startServer
- *
- * @param {Object} app - The Fastify server object.
- * @param {Number} port - The port to listen on for incoming requests.
- *
- * @returns {Promise} A Promise that resolves when the server is started/listening.
- * @throws {Error} Throws an error if the server fails to start.
- *
+ * @param server The Fastify server instance.
+ * @param port The port to listen on for incoming requests.
  */
 async function startServer(server: fastify.FastifyInstance, port: number) {
   try {
@@ -47,24 +39,16 @@ async function startServer(server: fastify.FastifyInstance, port: number) {
     //await database.initLocationDB();
 
     // start Fastify server
-    server.listen({ port: 8080, host: '0.0.0.0' }, (err, address) => {
-        if (err) {
-          console.error(err)
-          process.exit(1)
-        }
-        //logger.info(`Server listening at ${address}`)
-        console.log(`Server listening at ${address}`)
-      })
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      //logger.error(`Error starting server:\n${error.message}`);
-      console.error(`Error starting server:\n${error.message}`);
-    } else {
-      //logger.error('Error starting server: Unknown error occurred');
-      console.error('Error starting server: Unknown error occurred');
-    }
+    const address = await server.listen({ port, host: '0.0.0.0' });
+    //logger.info(`Server listening at ${address}`)
+    logger.info(`Server listening at ${address}`)
+  } catch (err) {
+    //logger.error(err);
+    logger.error(err);
+    process.exit(1);
   }
 }
+
 (async () => {
   await startServer(server, port);
 })();

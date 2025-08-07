@@ -1,5 +1,6 @@
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { Server, IncomingMessage, ServerResponse } from 'http';
+import logger from '../utils/logger.js';
 
 /**
  * @param {FastifyInstance} fastify
@@ -8,7 +9,7 @@ import { Server, IncomingMessage, ServerResponse } from 'http';
 async function specialRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
 
     fastify.get('/', async (request: FastifyRequest, reply: FastifyReply) => {
-        console.log(
+        logger.info(
           `Incoming ${request.method} request from ${request.socket.remoteAddress} to ${request.headers.host}${request.url}`
         );
         return {

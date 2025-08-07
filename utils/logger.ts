@@ -9,8 +9,8 @@
  * @exports logger
  */
 
-const winston = require("winston");
-const { format } = require("logform");
+import winston from "winston";
+import { format } from "logform";
 
 const logger = winston.createLogger({
   level: "info",
@@ -47,4 +47,4 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
-module.exports = logger;
+export default logger;
