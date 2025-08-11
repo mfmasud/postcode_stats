@@ -102,7 +102,7 @@ export type SearchDoc = HydratedDocument<SearchInferredSchema>;
 
 searchSchema.pre("validate", async function save(this: SearchDoc) {
   // if the document is not new, do not set a new ID
-  if (!this.isNew) return;
+  if (!this.isNew || this.searchID != null) return;
 
   let newID = await Counter.next('search'); // get the next ID
 

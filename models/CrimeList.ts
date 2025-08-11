@@ -62,7 +62,7 @@ export type CrimeListDoc = HydratedDocument<CrimeListInferredSchema>;
 
 crimeListSchema.pre('validate', async function (this: CrimeListDoc) {
   // if the document is not new, do not set a new ID
-  if (!this.isNew) return;
+  if (!this.isNew || this.crimeListID != null) return;
 
   let newID = await Counter.next('crimeList'); // get the next ID
 
