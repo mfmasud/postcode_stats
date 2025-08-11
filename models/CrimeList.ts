@@ -13,12 +13,22 @@
  *
  */
 
-const mongoose = require("mongoose");
+import {
+  Schema,
+  model,
+  type InferSchemaType,
+  type HydratedDocument,
+} from 'mongoose';
 
-const crimeListSchema = new mongoose.Schema({
+import Counter from './Counter.js';
+
+const crimeListSchema = new Schema({
   crimeListID: {
     type: Number,
     required: true,
+    unique: true,
+    index: true,
+    immutable: true,
   },
   latitude: {
     type: Number,
@@ -34,12 +44,12 @@ const crimeListSchema = new mongoose.Schema({
   },
   crimes: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Crime",
     },
   ],
   date: {
-    type: String,
+    type: String, // Move to a datetime in the future
   },
   emptydata: {
     type: Boolean,
@@ -47,12 +57,22 @@ const crimeListSchema = new mongoose.Schema({
   },
 });
 
-crimeListSchema.pre("save", async function save(next) {
-  if (this.isNew) {
-    const maxId = await this.constructor.find().sort("-crimeListID").limit(1);
-    this.id = maxId.length ? maxId[0].crimeListID + 1 : 1;
+export type CrimeList = InferSchemaType<typeof crimeListSchema>;
+export type CrimeListDoc = HydratedDocument<CrimeList>;
+
+crimeListSchema.pre('save', async function (this: CrimeListDoc) {
+  // if the document is not new, do not set a new ID
+  if (!this.isNew) return;
+
+  let newID = await Counter.next('crimeList');
+
+  const CrimeListModel = model<CrimeList>('CrimeList');
+  while (await CrimeListModel.exists({ crimeListID: newID })) {
+    newID = await Counter.next('crimeList'); // if this 
   }
-  return next(); // next middleware in call stack
+
+  this.crimeListID = newID;
 });
 
-export default mongoose.model("CrimeList", crimeListSchema);
+
+export default model<CrimeList>('CrimeList', crimeListSchema);

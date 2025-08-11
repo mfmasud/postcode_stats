@@ -11,6 +11,7 @@ const counterSchema = new Schema(
 
 
 counterSchema.statics.next = async function next(counterName: string): Promise<number> {
+  // find the counter by name and increment the value by 1
   const doc = await this.findOneAndUpdate(
     { counterName },
     { $inc: { seq: 1 } },
@@ -19,11 +20,13 @@ counterSchema.statics.next = async function next(counterName: string): Promise<n
   return doc!.seq;
 };
 
-export interface CounterModel extends Model<Counter> {
-    next(counterName: string): Promise<number>;
-  }
+export type CounterInferredSchema = InferSchemaType<typeof counterSchema>;
+export type CounterDoc = HydratedDocument<CounterInferredSchema>;
 
-export type Counter = InferSchemaType<typeof counterSchema>;
-export type CounterDoc = HydratedDocument<Counter>;
+export interface CounterModel extends Model<CounterInferredSchema> {
+  next(counterName: string): Promise<number>;
+}
 
-export default model<Counter, CounterModel>('Counter', counterSchema);
+const Counter = model<CounterInferredSchema, CounterModel>('Counter', counterSchema);
+
+export default Counter;
