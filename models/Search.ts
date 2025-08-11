@@ -17,11 +17,22 @@
  *
  */
 
-const mongoose = require("mongoose");
+import {
+  Schema,
+  model,
+  type InferSchemaType,
+  type HydratedDocument,
+} from 'mongoose';
 
-const searchSchema = new mongoose.Schema({
+import Counter from './Counter.js';
+
+const searchSchema = new Schema({
   searchID: {
     type: Number,
+    required: true,
+    unique: true,
+    index: true,
+    immutable: true,
   },
   latitude: {
     type: Number,
@@ -44,27 +55,27 @@ const searchSchema = new mongoose.Schema({
     default: false,
   },
   Postcode: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Postcode",
   },
   queryBusStops: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "BusStop",
     },
   ],
   queryCrimes: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+      type: Schema.Types.ObjectId,
       ref: "Crime",
     },
   ],
   linkedATCO: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "Atco",
   },
   linkedCrimeList: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: "CrimeList",
   },
   _links: {
@@ -86,13 +97,22 @@ const searchSchema = new mongoose.Schema({
   },
 });
 
-searchSchema.pre("save", async function save(next) {
-  if (this.isNew) {
-    // if this is a new search then set the id to the next available id
-    const maxId = await this.constructor.find().sort("-searchID").limit(1);
-    this.searchID = maxId.length ? maxId[0].searchID + 1 : 1;
+export type SearchInferredSchema = InferSchemaType<typeof searchSchema>;
+export type SearchDoc = HydratedDocument<SearchInferredSchema>;
+
+searchSchema.pre("validate", async function save(this: SearchDoc) {
+  // if the document is not new, do not set a new ID
+  if (!this.isNew) return;
+
+  let newID = await Counter.next('search'); // get the next ID
+
+  while (await Search.exists({ searchID: newID })) { // if the ID already exists, try again
+    newID = await Counter.next('search'); // increment the ID and try again
   }
-  next();
+
+  this.searchID = newID; // set the new ID
 });
 
-export default mongoose.model("Search", searchSchema);
+const Search = model<SearchInferredSchema>('Search', searchSchema);
+
+export default Search;
