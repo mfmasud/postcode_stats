@@ -57,22 +57,22 @@ const crimeListSchema = new Schema({
   },
 });
 
-export type CrimeList = InferSchemaType<typeof crimeListSchema>;
-export type CrimeListDoc = HydratedDocument<CrimeList>;
+export type CrimeListInferredSchema = InferSchemaType<typeof crimeListSchema>;
+export type CrimeListDoc = HydratedDocument<CrimeListInferredSchema>;
 
-crimeListSchema.pre('save', async function (this: CrimeListDoc) {
+crimeListSchema.pre('validate', async function (this: CrimeListDoc) {
   // if the document is not new, do not set a new ID
   if (!this.isNew) return;
 
   let newID = await Counter.next('crimeList'); // get the next ID
 
-  const CrimeListModel = model<CrimeList>('CrimeList');
-  while (await CrimeListModel.exists({ crimeListID: newID })) { // if the ID already exists,
+  while (await CrimeList.exists({ crimeListID: newID })) { // if the ID already exists,
     newID = await Counter.next('crimeList'); // increment the ID and try again
   }
 
   this.crimeListID = newID; // set the new ID
 });
 
+const CrimeList = model<CrimeListInferredSchema>('CrimeList', crimeListSchema);
 
-export default model<CrimeList>('CrimeList', crimeListSchema);
+export default CrimeList;
