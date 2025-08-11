@@ -13,9 +13,9 @@
  *
  */
 
-const mongoose = require("mongoose");
+import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
 
-const atcoSchema = new mongoose.Schema({
+const atcoSchema = new Schema({
   code: {
     type: String,
     required: true,
@@ -30,8 +30,8 @@ const atcoSchema = new mongoose.Schema({
   },
   busstops: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "BusStop",
+      type: Schema.Types.ObjectId,
+      ref: 'BusStop',
     },
   ],
   AllProcessed: {
@@ -45,4 +45,9 @@ const atcoSchema = new mongoose.Schema({
   ],
 });
 
-export default mongoose.model("Atco", atcoSchema);
+export type AtcoInferredSchema = InferSchemaType<typeof atcoSchema>;
+export type AtcoDoc = HydratedDocument<AtcoInferredSchema>;
+
+const Atco = model<AtcoInferredSchema>('Atco', atcoSchema);
+
+export default Atco;

@@ -12,9 +12,9 @@
  *
  */
 
-const mongoose = require("mongoose");
+import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
 
-const busStopSchema = new mongoose.Schema({
+const busStopSchema = new Schema({
   ATCO_long: {
     type: String,
     required: true,
@@ -44,11 +44,9 @@ const busStopSchema = new mongoose.Schema({
   },
 });
 
-/* commented out because I am now doing this when assigning the document fields in the first place.
-  busStopSchema.pre("save", async function (next) {
-      this.ATCO_short = this.ATCO_long.slice(0, 3);
-      next();
-  });
-  */
+export type BusStopInferredSchema = InferSchemaType<typeof busStopSchema>;
+export type BusStopDoc = HydratedDocument<BusStopInferredSchema>;
 
-export default mongoose.model("BusStop", busStopSchema);
+const BusStop = model<BusStopInferredSchema>('BusStop', busStopSchema);
+
+export default BusStop;

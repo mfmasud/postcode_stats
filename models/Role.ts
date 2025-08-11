@@ -11,9 +11,9 @@
  *
  */
 
-const mongoose = require("mongoose");
+import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
 
-const RoleSchema = new mongoose.Schema({
+const RoleSchema = new Schema({
   name: {
     type: String,
     required: true,
@@ -25,4 +25,9 @@ const RoleSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("Role", RoleSchema);
+export type RoleInferredSchema = InferSchemaType<typeof RoleSchema>;
+export type RoleDoc = HydratedDocument<RoleInferredSchema>;
+
+const Role = model<RoleInferredSchema>('Role', RoleSchema);
+
+export default Role;

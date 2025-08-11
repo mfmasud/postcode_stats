@@ -12,9 +12,9 @@
  * @See {@link module:helpers/postcodes} for the helper files which uses these models.
  */
 
-const mongoose = require("mongoose");
+import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
 
-const postcodeSchema = new mongoose.Schema({
+const postcodeSchema = new Schema({
   postcode: {
     type: String,
     required: true,
@@ -57,4 +57,9 @@ const postcodeSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("Postcode", postcodeSchema);
+export type PostcodeInferredSchema = InferSchemaType<typeof postcodeSchema>;
+export type PostcodeDoc = HydratedDocument<PostcodeInferredSchema>;
+
+const Postcode = model<PostcodeInferredSchema>('Postcode', postcodeSchema);
+
+export default Postcode;

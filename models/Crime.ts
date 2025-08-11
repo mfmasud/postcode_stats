@@ -12,9 +12,9 @@
  *
  */
 
-const mongoose = require("mongoose");
+import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
 
-const crimeSchema = new mongoose.Schema({
+const crimeSchema = new Schema({
   crimeID: {
     type: Number,
   },
@@ -40,7 +40,9 @@ const crimeSchema = new mongoose.Schema({
   },
 });
 
-// lat long from initial query.
-// count = response.data.length
+export type CrimeInferredSchema = InferSchemaType<typeof crimeSchema>;
+export type CrimeDoc = HydratedDocument<CrimeInferredSchema>;
 
-export default mongoose.model("Crime", crimeSchema);
+const Crime = model<CrimeInferredSchema>('Crime', crimeSchema);
+
+export default Crime;

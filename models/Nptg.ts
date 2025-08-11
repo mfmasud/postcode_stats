@@ -12,9 +12,9 @@
  *
  */
 
-const mongoose = require("mongoose");
+import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
 
-const NptgSchema = new mongoose.Schema({
+const NptgSchema = new Schema({
   NptgLocalityCode: {
     type: String,
     required: true,
@@ -39,4 +39,9 @@ const NptgSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("Nptg", NptgSchema);
+export type NptgInferredSchema = InferSchemaType<typeof NptgSchema>;
+export type NptgDoc = HydratedDocument<NptgInferredSchema>;
+
+const Nptg = model<NptgInferredSchema>('Nptg', NptgSchema);
+
+export default Nptg;
