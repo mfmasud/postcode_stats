@@ -251,11 +251,14 @@ async function processCSV(code: string, rawdata: string) {
 
   if (newBusStops.length > 0) {
     await BusStop.insertMany(newBusStops);
-
     try {
-      associatedAtco.busstops = ids;
-      associatedAtco.AllProcessed = true;
-      await associatedAtco.save();
+      if (associatedAtco) {
+        associatedAtco.busstops = ids;
+        associatedAtco.AllProcessed = true;
+        await associatedAtco.save();
+      } else {
+        logger.error("Associated ATCO code not found");
+      }
     } catch (error) {
       logger.error(error);
     }
