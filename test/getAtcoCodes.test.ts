@@ -11,15 +11,17 @@ Cheatsheet - https://devhints.io/chai
 */
 
 // code to test
-const { getAtcoCodes } = require("../helpers/AtcoCodes");
+import { getAtcoCodes } from "../helpers/AtcoCodes.js";
 
 // testing tools
-var chai = require("chai");
-var expect = chai.expect;
+//var chai = require("chai");
+//var expect = chai.expect;
+
+import { describe, it, expect, beforeAll } from "vitest";
 
 describe("helpers/AtcoCodes.js", function () {
-  let codes;
-  before(async function () {
+  let codes: string[];
+  beforeAll(async function () {
     // runs once before the first test in this block
     codes = await getAtcoCodes();
   });
