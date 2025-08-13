@@ -286,7 +286,7 @@ async function processNptgCSV(rawdata: string) {
   });
 
   try {
-    await Nptg.insertMany(NptgBulk, { ordered: false, skipDuplicates: true });
+    await Nptg.insertMany(NptgBulk, { ordered: false });
   } catch (error: any) {
     if (error.code === 11000) {
       logger.info("Duplicate NPTG locality codes found. Skipping duplicates.");

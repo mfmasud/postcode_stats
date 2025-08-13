@@ -261,7 +261,7 @@ async function initLocationDB() {
   logger.info("Successfully initialised Location Data");
 }
 
-module.exports = {
+export {
   connectDB,
   disconnectDB,
   initUserDB,

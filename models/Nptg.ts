@@ -18,6 +18,7 @@ const NptgSchema = new Schema({
   NptgLocalityCode: {
     type: String,
     required: true,
+    unique: true,
   },
   Easting: {
     type: Number,

@@ -49,6 +49,4 @@ async function startServer(server: fastify.FastifyInstance, port: number) {
   }
 }
 
-(async () => {
-  await startServer(server, port);
-})();
+export default startServer(server, port);
