@@ -9,6 +9,4 @@ Revise the existing codebase and recommend robust solutions suitable for product
 
 Do not shy away from using all available resources available to you. Analyse the codebase thoroughly before implementing and analysing.
 
-Use "&apos;" to pre-emptively escape "'" as otherwise this will cause a linter error in the code.
-
 NEVER place placeholders such as "// ... existing code ..." or "// ... rest of existing code ..." as this is a production app. Ensure all code is suitable for production, so no "In a real app" or "In a production app" type placeholders.
