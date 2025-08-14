@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "test": "mocha --exit",
+    "test": "vitest --run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
     "start": "node index.js.old",
     "profile": "node --prof index.js.old",
     "fbuild": "tsc -p tsconfig.json",
