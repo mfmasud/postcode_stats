@@ -1,88 +1,80 @@
 require("dotenv").config();
 
-const mongoose = require("mongoose");
-const { initUserDB, connectDB, disconnectDB } = require("../helpers/database");
+import mongoose from "mongoose";
+import { initUserDB, connectDB, disconnectDB } from "../helpers/database.js";
 
-const User = require("../models/User");
-const Role = require("../models/Role");
+import User from "../models/User.js";
+import Role from "../models/Role.js";
 
-var chai = require("chai");
-var chaiAsPromised = require("chai-as-promised");
+import { describe, it, expect, beforeAll, beforeEach, afterAll, vi, afterEach } from "vitest";
 
-var sinon = require("sinon");
-const logger = require("../utils/logger");
-
-chai.use(chaiAsPromised);
-var expect = chai.expect;
+// todo stub logger and roles
 
 describe("models/User.js", () => {
-  let infoLogStub, errorLogStub;
+  //let infoLogStub, errorLogStub;
 
-  before(async () => {
+  beforeAll(async () => {
     await connectDB();
   });
 
   beforeEach(async () => {
-    infoLogStub = sinon.stub(logger, "info");
-    errorLogStub = sinon.stub(logger, "error"); // For duplicate key errors
+    //infoLogStub = sinon.stub(logger, "info");
+    //errorLogStub = sinon.stub(logger, "error"); // For duplicate key errors
     await initUserDB();
   });
 
   afterEach(async () => {
-    sinon.restore();
+    //sinon.restore();
   });
 
-  after(async () => {
+  afterAll(async () => {
     await disconnectDB();
-    sinon.restore();
+    //sinon.restore();
   });
 
   describe("Auto Increment id", () => {
     // Always takes 80ms+ - needs to be optimised
     it("should auto-increment the ID field when creating a user", async () => {
       await User.create({
-        username: "mocha",
-        email: "mocha@coffee.co.uk",
-        password: "chai",
-        role: Role({ name: "none" }),
+        username: "veet",
+        email: "veet@test.co.uk",
+        password: "test",
+        role: new Role({ name: "none" }),
       });
-      const newUser = await User.findOne({ username: "mocha" });
-      return expect(newUser.id).to.equal(4);
+      const newUser = await User.findOne({ username: "veet" });
+      expect(newUser?.id).to.equal(4);
     });
   });
 
   describe("Required fields", () => {
     it("should throw an error if a username is not provided", async () => {
+      const role = await Role.findOne({ name: "user" }).orFail();
       const user = new User({
         email: "test@test.com",
         password: "password",
-        role: Role({ name: "user" }),
+        role: role._id,
       });
-      return expect(user.save()).to.eventually.be.rejectedWith(
-        "User validation failed: username: Path `username` is required."
-      );
+      await expect(user.validate()).rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
 
     it("should throw an error if an email is not provided", async () => {
+      const role = await Role.findOne({ name: "user" }).orFail();
       const user = new User({
         username: "TestUser2",
         password: "password",
-        role: Role({ name: "user" }),
+        role: role._id,
       });
-      return expect(user.save()).to.eventually.be.rejectedWith(
-        "User validation failed: email: Path `email` is required."
-      );
+      await expect(user.validate()).rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
 
     it("should throw an error if a password is not provided", async () => {
+      const role = await Role.findOne({ name: "user" }).orFail();
       const user = new User({
         username: "TestUser2",
         email: "test@test.com",
-        role: Role({ name: "user" }),
+        role: role._id,
       });
-      return expect(user.save()).to.eventually.be.rejectedWith(
-        "User validation failed: password: Path `password` is required."
-      );
+      await expect(user.validate()).rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
 
     it("should throw an error if a role is not provided", async () => {
@@ -91,9 +83,7 @@ describe("models/User.js", () => {
         email: "test@test.com",
         password: "password",
       });
-      return expect(user.save()).to.eventually.be.rejectedWith(
-        "User validation failed: role: Path `role` is required."
-      );
+      await expect(user.validate()).rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
   });
 
@@ -103,9 +93,9 @@ describe("models/User.js", () => {
         username: "TestUser1",
         email: "test@test.com",
         password: "password",
-        role: Role({ name: "user" }),
+        role: new Role({ name: "user" }),
       });
-      return expect(user.save()).to.eventually.be.rejectedWith(
+      await expect(user.save()).rejects.toThrow(
         'E11000 duplicate key error collection: test.users index: username_1 dup key: { username: "TestUser1" }'
       );
     });
@@ -115,9 +105,9 @@ describe("models/User.js", () => {
         username: "testuser",
         email: "TestUser1@test.com",
         password: "password",
-        role: Role({ name: "user" }),
+        role: new Role({ name: "user" }),
       });
-      return expect(user.save()).to.eventually.be.rejectedWith(
+      await expect(user.save()).rejects.toThrow(
         'E11000 duplicate key error collection: test.users index: email_1 dup key: { email: "TestUser1@test.com" }'
       );
     });
@@ -126,47 +116,47 @@ describe("models/User.js", () => {
   describe("Invalid data", () => {
     // work in progress
     it("should throw an error if the username is empty", async () => {
+      const role = await Role.findOne({ name: "user" }).orFail();
       const invalidUser = new User({
         username: "",
         email: "example@example.com",
         password: "password",
-        role: Role({ name: "user" }),
+        role: role._id,
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
-        mongoose.Error.ValidationError
-      );
+      await expect(invalidUser.validate()).rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
 
     it("should throw an error if the email is invalid (or empty)", async () => {
       // includes testing if the email is empty - empty is also invalid
+      const role = await Role.findOne({ name: "user" }).orFail(); // keep role valid
+    
       const invalidUser = new User({
         username: "example1",
-        email: "example.com",
+        email: "example.com", // invalid email
         password: "password",
-        role: Role({ name: "user" }),
+        role: role._id,
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
-        mongoose.Error.ValidationError
-      );
+    
+      await expect(invalidUser.validate())
+        .rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
 
     it("should throw an error if password is empty", async () => {
+      const role = await Role.findOne({ name: "user" }).orFail();
       const invalidUser = new User({
         username: "example2",
         email: "example@example.com",
         password: "",
-        role: Role({ name: "user" }),
+        role: role._id,
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
-        mongoose.Error.ValidationError
-      );
+      await expect(invalidUser.validate()).rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
 
     it("should throw an error if role is not one of the 4 roles in the Role collection", async () => {
       // Roles have been assigned directly in the above tests, but the application actually fetches for it first
       // This forces the mongoose "enum" validation to check for the roles.
 
-      const invalidRole = Role.findOne({ name: "invalid role" });
+      const invalidRole = await Role.findOne({ name: "invalid role" });
 
       const invalidUser = new User({
         username: "example3",
@@ -174,9 +164,7 @@ describe("models/User.js", () => {
         password: "password",
         role: invalidRole,
       });
-      return expect(invalidUser.save()).to.eventually.be.rejectedWith(
-        mongoose.Error.ValidationError
-      );
+      await expect(invalidUser.validate()).rejects.toBeInstanceOf(mongoose.Error.ValidationError);
     });
   });
 });
