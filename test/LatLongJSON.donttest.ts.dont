@@ -1,14 +1,16 @@
 // Test latitude and longitude validation
 
-const latlongSchema = require("../schemas/latlong.json");
+import latlongSchema from "../schemas/latlong.json";
 
-const Ajv = require("ajv");
+import Ajv from "ajv";
 const ajv = new Ajv();
 
 const validateLatLong = ajv.compile(latlongSchema);
 
-var chai = require("chai");
-var expect = chai.expect;
+//var chai = require("chai");
+//var expect = chai.expect;
+
+import { describe, it, expect } from "vitest";
 
 describe("schemas/latlong.json", function () {
   describe("Invalid Data Types", function () {
