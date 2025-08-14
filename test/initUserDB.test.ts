@@ -41,10 +41,8 @@ describe("helpers/database.js", function () {
 
     it("should create 4 roles (none/standard/paid/admin) in the Role collection", async () => {
       const roles = await Role.find();
-      expect(roles.length).to.equal(4);
-      
       const roleNames = roles.map((role) => role.name);
-      expect(roleNames).to.equal(["admin", "paiduser", "user", "none"]);
+      expect(roleNames).to.deep.equal(["admin", "paiduser", "user", "none"]);
     });
 
     it("should create a User with the role name set to 'user'", async () => {
