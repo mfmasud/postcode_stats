@@ -45,6 +45,7 @@ import Nptg from "../models/Nptg.js";
 import Search from "../models/Search.js";
 import CrimeList from "../models/CrimeList.js";
 import Crime from "../models/Crime.js";
+import Counter from "../models/Counter.js";
 
 import { saveAtcoList } from "./AtcoCodes.js";
 
@@ -122,6 +123,7 @@ async function initUserDB() {
     // Delete all documents in each collection
     await User.deleteMany();
     await Role.deleteMany();
+    await Counter.deleteOne({counterName: "user"});
 
     // Create roles
     const AdminRole = await Role.create({
@@ -205,6 +207,8 @@ async function resetDataDB() {
     await Search.deleteMany();
     await Crime.deleteMany();
     await CrimeList.deleteMany();
+    await Counter.deleteOne({counterName: "crimeList"});
+    await Counter.deleteOne({counterName: "search"});
 
     logger.info("Reset location data successfully!");
   } catch (error) {
