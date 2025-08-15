@@ -9,6 +9,7 @@
  * @requires csvtojson
  * @requires models/Atco
  * @requires models/BusStop
+ * @requires types/atco
  *
  * @exports getAtcoCodes
  * @exports queryAtcoAPI
@@ -32,6 +33,11 @@ import csvtojson from "csvtojson";
 
 import Atco from "../models/Atco.js";
 import BusStop from "../models/BusStop.js";
+import type { 
+  ProcessedAtcoCodes, 
+  RawAtcoString, 
+  AtcoCode 
+} from "../types/atco.js";
 
 /**
  * Processes the list of ATCO codes for local authorities.
@@ -40,7 +46,7 @@ import BusStop from "../models/BusStop.js";
  * @async
  * @function getAtcoCodes
  *
- * @returns {String[]} An array of ATCO codes
+ * @returns {String[]} An array of ATCO codes - codeList
  *
  * @see saveAtcoList
  */
@@ -53,22 +59,23 @@ async function getAtcoCodes() {
     "#localAuthorityName option"
   );
 
-  const codes: string[] = [];
+  const codeList: string[] = [];
 
   options.forEach((option) => {
     const text = option?.textContent?.trim();
     if (text) {
-      codes.push(text);
+      codeList.push(text);
     } else {
       logger.error("No text content found for option", option);
     }
   });
 
-  codes.shift();
+  // remove the pick a local authority option
+  codeList.shift();
 
-  //logger.info(codes);
+  //logger.info(codeList);
 
-  return codes;
+  return codeList;
 }
 
 /**
@@ -96,7 +103,7 @@ async function saveAtcoList() {
  * @async
  * @function processAtcoString
  *
- * @param {String} data - The ATCO code to process
+ * @param {RawAtcoString} data - The ATCO code to process
  * @returns nothing, saves the processed data to the Atco collection.
  *
  * @see saveAtcoList
@@ -105,7 +112,7 @@ async function saveAtcoList() {
  * const data = "Aberdeenshire / Scotland (630)"
  * // returns {630: {location: Aberdeenshire, region: Scotland}}
  */
-async function processAtcoString(data: string) {
+async function processAtcoString(data: RawAtcoString) {
   const location = data.split(" / ")[0];
   const region = data.split(" / ")[1]?.split(" (")[0];
   const atco = data.split(" / ")[1]?.split(" (")[1]?.split(")")[0];
@@ -115,7 +122,7 @@ async function processAtcoString(data: string) {
     return;
   }
 
-  const processedData: Record<string, { location: string; region: string }> = {};
+  const processedData: ProcessedAtcoCodes = {};
   processedData[atco] = { location: location || "", region: region || "" };
   //logger.info(`${atco}: ${processedData[atco]}`);
 
@@ -145,12 +152,12 @@ async function processAtcoString(data: string) {
  * @async
  * @function queryAtcoAPI
  *
- * @param {String} code - The ATCO code to query the NAPTAN API
- * @returns {undefined}
+ * @param {AtcoCode} code - The ATCO code to query the NAPTAN API
+ * @returns {Promise<void>} Nothing, processes the data and saves to database
  *
  * @see processCSV
  */
-async function queryAtcoAPI(code: string) {
+async function queryAtcoAPI(code: AtcoCode): Promise<void> {
   // backend function to query the API for bus stops
   // run when linking ATCOs to searches (to find bus stops).
   // basic validation - not meant to be complete
@@ -189,14 +196,14 @@ async function queryAtcoAPI(code: string) {
  * @async
  * @function processCSV
  *
- * @param {String} code - The ATCO code to process the CSV data for
- * @param {*} rawdata - The raw CSV data to process, retrieved from queryAtcoAPI
- * @returns {undefined} Nothing, saves the processed data to the BusStop collection and updates the relevant Atco collection.
+ * @param {AtcoCode} code - The ATCO code to process the CSV data for
+ * @param {string} rawdata - The raw CSV data to process, retrieved from queryAtcoAPI
+ * @returns {Promise<void>} Nothing, saves the processed data to the BusStop collection and updates the relevant Atco collection.
  *
  * @see queryAtcoAPI
  *
  */
-async function processCSV(code: string, rawdata: string) {
+async function processCSV(code: AtcoCode, rawdata: string): Promise<void> {
   // this can take a while, should be run on startup of the server so users use processed mongodb models instead of processing them when a request is made
   const associatedAtco = await Atco.findOne({ code: code });
   if (!associatedAtco) {
