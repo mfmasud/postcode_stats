@@ -33,12 +33,20 @@ import csvtojson from "csvtojson";
 
 import Atco from "../models/Atco.js";
 import BusStop from "../models/BusStop.js";
+
 import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
+
+// Get __dirname equivalent for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 import type { 
   ProcessedAtcoCode, 
   RawAtcoString, 
-  AtcoCode 
+  AtcoCode,
+  AtcoCodeInfo
 } from "../types/atco.js";
 
 /**
@@ -73,7 +81,7 @@ async function getAtcoCodes(): Promise<RawAtcoString[]> {
   });
 
   // remove the pick a local authority option
-  codeList.shift();
+  //codeList.shift();
 
   //logger.info(codeList);
 
@@ -94,10 +102,13 @@ async function getAtcoCodes(): Promise<RawAtcoString[]> {
  *
  */
 async function saveAtcoList(saveToJson: boolean = false): Promise<void> {
-
+  // Check if JSON file already exists when saving to JSON
   if (saveToJson) {
-    // check if the json file already exists, skip saving if it does.
-    return;
+    const jsonFilePath = path.join(path.dirname(__dirname), "data/atco_codes.json");
+    if (fs.existsSync(jsonFilePath)) {
+      logger.info("ATCO codes JSON file already exists, skipping retrieval and save");
+      return;
+    }
   }
 
   const codeList = await getAtcoCodes(); // array of strings
@@ -142,7 +153,7 @@ async function processAtcoString(rawdata: RawAtcoString): Promise<ProcessedAtcoC
   const atcoNumber = rawdata.split(" / ")[1]?.split(" (")[1]?.slice(0, -1); // split 11: "220)", remove the end bracket -> "220"
 
   if (!atcoNumber || !location || !region) {
-    const errorMsg = `Invalid ATCO code format: ${rawdata}. Expected format: "Location / Region (Code)"`;
+    const errorMsg = `Invalid ATCO code format: "${rawdata}". Expected format: "Location / Region (Code)"`;
     logger.error(errorMsg);
     throw new Error(errorMsg);
   }
@@ -167,7 +178,18 @@ async function processAtcoString(rawdata: RawAtcoString): Promise<ProcessedAtcoC
  * @see saveAtcoToDB
  */
 async function saveAtcoToJson(processedCodes: ProcessedAtcoCode[]): Promise<void> {
-  // TODO: Implement this function by adding the save Atco logic from processAtcoString and saving to ../schemas/atco.json
+  // Dump the processed codes to a json file
+  const jsonData = JSON.stringify(processedCodes, null, 2);
+  const filePath = path.join(path.dirname(__dirname), "data/atco_codes.json");
+  
+  // Ensure the data directory exists
+  const dataDir = path.dirname(filePath);
+  if (!fs.existsSync(dataDir)) {
+    fs.mkdirSync(dataDir, { recursive: true });
+  }
+  
+  fs.writeFileSync(filePath, jsonData);
+  logger.info(`Successfully saved ${processedCodes.length} ATCO codes to ${filePath}`);
 }
 
 /**
@@ -184,22 +206,25 @@ async function saveAtcoToJson(processedCodes: ProcessedAtcoCode[]): Promise<void
  * 
  */
 async function saveAtcoToDB(processedCodes: ProcessedAtcoCode[]): Promise<void> {
-  // TODO: Implement this function by adding the save Atco logic from processAtcoString and saving to the Atco collection
+  for (const processedCode of processedCodes) {
+    const atcocode : AtcoCode = Object.keys(processedCode)[0] as AtcoCode;
+    const { location, region } : AtcoCodeInfo = processedCode[atcocode] as AtcoCodeInfo;
 
-  const existingAtco = await Atco.exists({ code: atcocode }); // can filter for e.g. busstops.length === 0 to check for empty codes
-  if (existingAtco) {
-    //logger.info(`ATCO ${atco} already exists in db`);
-    return; // skip creating another Atco for no reason.
+    const existingAtco = await Atco.exists({ code: atcocode }); // can filter for e.g. busstops.length === 0 to check for empty codes
+    if (existingAtco) {
+      //logger.info(`ATCO ${atco} already exists in db`);
+      return; // skip creating another Atco for no reason.
+    }
+
+    await Atco.create({
+      code: atcocode,
+      region: region,
+      location: location,
+      busstops: [],
+      AllProcessed: false,
+    });
   }
-
-  await Atco.create({
-    code: atcocode,
-    region: region,
-    location: location,
-    busstops: [],
-    AllProcessed: false,
-  });
-
+  logger.info(`Saved ${processedCodes.length} ATCO codes to the Atco collection`);
 }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html

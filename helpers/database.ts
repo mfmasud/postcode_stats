@@ -255,7 +255,7 @@ async function initLocationDB() {
   await initNptg();
   await getNptgData(); // 1 time download of NPTG locality database ~ 5mb csv. Is cached after first run.
 
-  // Get and process ATCO codes master list
+  // Get and process ATCO codes master list into the Atco collection
   await saveAtcoList();
 
   await getScotlandLocations(); // adds alternative names to scottish location names
