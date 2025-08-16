@@ -33,8 +33,10 @@ import csvtojson from "csvtojson";
 
 import Atco from "../models/Atco.js";
 import BusStop from "../models/BusStop.js";
+import path from "path";
+
 import type { 
-  ProcessedAtcoCodes, 
+  ProcessedAtcoCode, 
   RawAtcoString, 
   AtcoCode 
 } from "../types/atco.js";
@@ -46,11 +48,11 @@ import type {
  * @async
  * @function getAtcoCodes
  *
- * @returns {String[]} An array of ATCO codes - codeList
+ * @returns {RawAtcoString[]} An array of ATCO codes - codeList
  *
  * @see saveAtcoList
  */
-async function getAtcoCodes() {
+async function getAtcoCodes(): Promise<RawAtcoString[]> {
   const url = "https://beta-naptan.dft.gov.uk/download/la";
   const response = await axios.get(url);
   const dom = new JSDOM(response.data);
@@ -59,7 +61,7 @@ async function getAtcoCodes() {
     "#localAuthorityName option"
   );
 
-  const codeList: string[] = [];
+  const codeList: RawAtcoString[] = [];
 
   options.forEach((option) => {
     const text = option?.textContent?.trim();
@@ -79,66 +81,125 @@ async function getAtcoCodes() {
 }
 
 /**
- * Saves the processed ATCO codes to the Atco collection.
+ * Fetches and saves ATCO codes into the Atco collection or to a json file.
  *
  * @async
  * @function saveAtcoList
+ * 
+ * @param {boolean} saveToJson - Whether to save the ATCO codes to a json file
+ * @returns {Promise<void>} Nothing, saves the processed data to the Atco collection or json file
  *
  * @see getAtcoCodes
  * @see processAtcoString
  *
  */
-async function saveAtcoList() {
-  // run on db initialisation to get a list of searchable ATCOs.
-  // Can integrate the functions in helpers/locations to add the alternative location names.
-  const codeList = await getAtcoCodes();
+async function saveAtcoList(saveToJson: boolean = false): Promise<void> {
+
+  if (saveToJson) {
+    // check if the json file already exists, skip saving if it does.
+    return;
+  }
+
+  const codeList = await getAtcoCodes(); // array of strings
+  const processedCodes: ProcessedAtcoCode[] = [];
   for (const code of codeList) {
-    await processAtcoString(code);
+    try {
+      const processedData: ProcessedAtcoCode = await processAtcoString(code); // process 1 code at a time
+      processedCodes.push(processedData);
+    } catch (error) {
+      logger.error(`Failed to process ATCO code "${code}":`, error);
+      // Continue processing other codes even if one fails
+    }
+  }
+  
+  // all codes processed with no errors
+  if (saveToJson) {
+    await saveAtcoToJson(processedCodes);
+  } else {
+    await saveAtcoToDB(processedCodes);
   }
 }
 
 /**
- * Processes the ATCO codes into the format code:{location, region}. Run by saveAtcoList.
+ * Processes a single ATCO code into the format code:{location, region}.
  *
  * @async
  * @function processAtcoString
  *
- * @param {RawAtcoString} data - The ATCO code to process
- * @returns nothing, saves the processed data to the Atco collection.
+ * @param {RawAtcoString} rawdata - The ATCO code to process
+ * @returns {ProcessedAtcoCode} data parsed into the format code:{location, region}
  *
  * @see saveAtcoList
- *
- * @example
+ * 
+ *  *  @example
  * const data = "Aberdeenshire / Scotland (630)"
  * // returns {630: {location: Aberdeenshire, region: Scotland}}
  */
-async function processAtcoString(data: RawAtcoString) {
-  const location = data.split(" / ")[0];
-  const region = data.split(" / ")[1]?.split(" (")[0];
-  const atco = data.split(" / ")[1]?.split(" (")[1]?.split(")")[0];
+async function processAtcoString(rawdata: RawAtcoString): Promise<ProcessedAtcoCode> {
+  // example: rawdata = "East Riding of Yorkshire / Yorkshire (220)"
+  const location = rawdata.split(" / ")[0]; // 0: "East Riding of Yorkshire", 1: "Yorkshire (220)"
+  const region = rawdata.split(" / ")[1]?.split(" (")[0]; // split 10: "Yorkshire", split 11: "220)"
+  const atcoNumber = rawdata.split(" / ")[1]?.split(" (")[1]?.slice(0, -1); // split 11: "220)", remove the end bracket -> "220"
 
-  if (!atco) {
-    logger.error("Invalid ATCO code format", data);
-    return;
+  if (!atcoNumber || !location || !region) {
+    const errorMsg = `Invalid ATCO code format: ${rawdata}. Expected format: "Location / Region (Code)"`;
+    logger.error(errorMsg);
+    throw new Error(errorMsg);
   }
+  
+  const processedData: ProcessedAtcoCode = {};
+  processedData[atcoNumber] = { location, region };
+  //logger.info(`${atcoNumber}: ${processedData[atcoNumber]}`);
 
-  const processedData: ProcessedAtcoCodes = {};
-  processedData[atco] = { location: location || "", region: region || "" };
-  //logger.info(`${atco}: ${processedData[atco]}`);
+  return processedData;
+}
 
-  const existingAtco = await Atco.exists({ code: atco }); // can filter for e.g. busstops.length === 0 to check for empty codes
+/**
+ * Saves the processed ATCO codes to a JSON file.
+ *
+ * @async
+ * @function saveAtcoToJson
+ *
+ * @param {ProcessedAtcoCode[]} processedCodes - The processed ATCO codes to save to the JSON file
+ * @returns {Promise<void>} Nothing, saves the processed data to the JSON file
+ *
+ * @see processAtcoString
+ * @see saveAtcoToDB
+ */
+async function saveAtcoToJson(processedCodes: ProcessedAtcoCode[]): Promise<void> {
+  // TODO: Implement this function by adding the save Atco logic from processAtcoString and saving to ../schemas/atco.json
+}
+
+/**
+ * Saves the processed ATCO codes to the Atco collection.
+ *
+ * @async
+ * @function saveAtcoToDB
+ *
+ * @param {ProcessedAtcoCode[]} processedCodes - The processed ATCO codes to save to the Atco collection
+ * @returns {Promise<void>} Nothing, saves the processed data to the Atco collection
+ *
+ * @see processAtcoString
+ * @see saveAtcoToJson
+ * 
+ */
+async function saveAtcoToDB(processedCodes: ProcessedAtcoCode[]): Promise<void> {
+  // TODO: Implement this function by adding the save Atco logic from processAtcoString and saving to the Atco collection
+
+  const existingAtco = await Atco.exists({ code: atcocode }); // can filter for e.g. busstops.length === 0 to check for empty codes
   if (existingAtco) {
     //logger.info(`ATCO ${atco} already exists in db`);
     return; // skip creating another Atco for no reason.
   }
 
   await Atco.create({
-    code: atco,
+    code: atcocode,
     region: region,
     location: location,
     busstops: [],
     AllProcessed: false,
   });
+
 }
 
 // API for transport nodes: https://naptan.api.dft.gov.uk/swagger/index.html

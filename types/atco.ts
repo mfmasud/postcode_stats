@@ -18,11 +18,11 @@ export interface AtcoCodeInfo {
 }
 
 /**
- * A collection of ATCO codes mapped to their location and region information
+ * A single ATCO code mapped to its location and region information
  * Key: ATCO code (e.g., "630")
  * Value: Location and region information
  */
-export type ProcessedAtcoCodes = Record<string, AtcoCodeInfo>;
+export type ProcessedAtcoCode = Record<string, AtcoCodeInfo>;
 
 /**
  * Raw ATCO string format as received from the API
@@ -35,13 +35,3 @@ export type RawAtcoString = string;
  * Example: "630"
  */
 export type AtcoCode = string;
-
-/**
- * Configuration for ATCO data persistence
- */
-export interface AtcoSaveOptions {
-  /** Whether to overwrite existing ATCO codes */
-  overwrite?: boolean;
-  /** Whether to validate codes before saving */
-  validate?: boolean;
-} 
