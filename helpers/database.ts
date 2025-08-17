@@ -252,7 +252,7 @@ async function initNptg() {
 async function initLocationDB() {
   
   // Download and process NPTG data from NAPTAN
-  await initNptg();
+  await initNptg(); // set up the NPTG collection on the database
   await getNptgData(); // 1 time download of NPTG locality database ~ 5mb csv. Is cached after first run.
 
   // Get and process ATCO codes master list into the Atco collection

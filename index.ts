@@ -1,46 +1,31 @@
-import fastify, { type FastifyReply, type FastifyRequest } from 'fastify'
-
-const server = fastify()
-
-server.get('/ping', async (request: FastifyRequest, reply: FastifyReply) => {
-    return 'pong\n';
-});
+import buildServer from "./app.js";
 
 import dotenv from "dotenv";
 dotenv.config();
 
 import logger from "./utils/logger.js";
 //logger.info(JSON.stringify(process.env, null, 2));
-//const database = require("./helpers/database");
 
-import specialRoutes from './routes/special.js';
-// const postcodes = require("./routes/postcodes");
-// const users = require("./routes/users");
-// const search = require("./routes/search");
+import { connectDB, initUserDB, resetDataDB, initLocationDB } from "./helpers/database.js";
 
-server.register(specialRoutes, { prefix: '/api/v2' });
-// app.use(postcodes.routes());
-// app.use(users.routes());
-// app.use(search.routes());
+const server = buildServer();
 
-const port = parseInt(process.env.PORT || '8080');
+const port = parseInt(process.env.PORT || "8080");
 
 /**
- * Initializes the databases and starts the Fastify server.
- * @param server The Fastify server instance.
+ * Initialises the databases and starts the Fastify server.
  * @param port The port to listen on for incoming requests.
  */
-async function startServer(server: fastify.FastifyInstance, port: number) {
+async function startServer( port: number) {
   try {
     // reset dummy dbs in order
-    //await database.connectDB(true);
-    //await database.initUserDB();
-    //await database.resetDataDB();
-    //await database.initLocationDB();
+    await connectDB(true);
+    await initUserDB();
+    await resetDataDB();
+    await initLocationDB();
 
     // start Fastify server
-    const address = await server.listen({ port, host: '0.0.0.0' });
-    //logger.info(`Server listening at ${address}`)
+    const address = await server.listen({ port, host: "0.0.0.0" });
     logger.info(`Server listening at ${address}`)
   } catch (err) {
     //logger.error(err);
@@ -49,4 +34,4 @@ async function startServer(server: fastify.FastifyInstance, port: number) {
   }
 }
 
-export default startServer(server, port);
+export default startServer(port);
