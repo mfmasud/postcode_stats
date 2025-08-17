@@ -76,7 +76,7 @@ async function getAtcoCodes(): Promise<RawAtcoString[]> {
     if (text) {
       codeList.push(text);
     } else {
-      logger.error("No text content found for option", option);
+      logger.warn(`No text content found for option: "${JSON.stringify(option)}"`);
     }
   });
 

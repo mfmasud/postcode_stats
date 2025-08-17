@@ -51,7 +51,7 @@ async function getScotlandLocations() {
     const place = locations[index];
     let text = place?.textContent?.trim();
     if (!text) {
-      logger.error("No text content found for place", place);
+      logger.error(`No text content found for place: "${place}"`);
       continue;
     }
 
@@ -214,7 +214,7 @@ async function getWalesLocations() {
     if (name) {
       names.push(name);
     } else {
-      logger.error("No text content found for li", li);
+      logger.error(`No text content found for li: "${li}"`);
     }
   }
 

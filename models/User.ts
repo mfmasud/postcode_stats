@@ -35,7 +35,7 @@ https://pinoria.com/how-to-validate-email-syntax-with-mongoose/
 https://stackoverflow.com/a/28396238
 https://github.com/validatorjs/validator.js
 */
-import { isEmail } from "validator";
+import validator from "validator";
 
 import bcrypt from "bcrypt"; // https://www.npmjs.com/package/bcrypt
 const saltRounds = 10;
@@ -70,7 +70,7 @@ const userSchema = new Schema({
     type: String,
     required: true,
     unique: true,
-    validate: [isEmail, "invalid email"],
+    validate: [validator.isEmail, "invalid email"],
   },
   role: { type: Schema.Types.ObjectId, ref: "Role", required: true },
 });
