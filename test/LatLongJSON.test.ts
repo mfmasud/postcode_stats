@@ -1,8 +1,8 @@
 // Test latitude and longitude validation
 
-import latlongSchema from "../schemas/latlong.json";
+import latlongSchema from "../schemas/latlong.json" with { type: "json" };
 
-import Ajv from "ajv";
+import { Ajv } from "ajv";
 const ajv = new Ajv();
 
 const validateLatLong = ajv.compile(latlongSchema);
