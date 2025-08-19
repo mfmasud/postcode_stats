@@ -8,10 +8,8 @@
     "test": "vitest --run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
-    "start": "node index.js.old",
-    "profile": "node --prof index.js.old",
-    "fbuild": "tsc -p tsconfig.json",
-    "fstart": "node dist/index.js",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
     "dev": "tsx watch index.ts"
   },
   "author": "",
