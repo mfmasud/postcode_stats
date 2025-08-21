@@ -1,7 +1,7 @@
-import fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from "fastify";
+import fastify, { type FastifyInstance } from "fastify";
 
 // Plugins
-import dbPlugin from "./src/plugins/db.js";
+import initDBPlugin from "./src/plugins/initDB.js";
 
 // Routes
 import specialRoutes from "./routes/special.js";
@@ -12,9 +12,9 @@ import specialRoutes from "./routes/special.js";
 function buildServer(): FastifyInstance {
     const app = fastify()
 
-    app.register(dbPlugin);
+    app.register(initDBPlugin);
 
-    app.get("/ping", async (request: FastifyRequest, reply: FastifyReply) => {
+    app.get("/ping", async () => {
         return "pong\n"
     })
 

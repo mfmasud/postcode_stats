@@ -1,5 +1,4 @@
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import { Server, IncomingMessage, ServerResponse } from 'http';
 import logger from '../utils/logger.js';
 
 /**
