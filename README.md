@@ -70,3 +70,6 @@ And **JSDoc** documentation highlighting dependencies and methods:
 
 ![JSDoc Documentation](./docs/images/6003cem_jsdoc.png)
 
+## Useful Links
+
+- [doogal.co.uk/links](https://www.doogal.co.uk/links) - A great collection of links for UK-specific data.

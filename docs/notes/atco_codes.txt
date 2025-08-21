@@ -4,7 +4,9 @@ Shows Local Authority names and respective Atco Area codes.
 ATCO code can be used for data here: https://naptan.api.dft.gov.uk/swagger/index.html
 Then data can be edited / formatted to get lat long and other information, which can be used by the API.
 
-Significant server side processing and data manipulation required to conform the region/location names.
+Significant server side processing and data manipulation required to conform the region/location names due to differences in naming areas between different systems.
+
+https://mullinscr.github.io/naptan/atco_codes/ - About ATCO Codes (List is not up to date)
 
 The first number in the code represents the country e.g. Scotland = 6
 
