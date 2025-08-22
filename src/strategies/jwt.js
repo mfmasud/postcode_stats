@@ -18,9 +18,9 @@ const jwt = require('jsonwebtoken');
 const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJwt = require('passport-jwt').ExtractJwt;
 
-const logger = require('../utils/logger');
+const logger = require('../../utils/logger');
 
-const User = require('../models/User');
+const User = require('../../models/User');
 
 let JWT_SECRET = process.env.JWT_SECRET;
 
