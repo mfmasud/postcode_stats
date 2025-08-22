@@ -12,12 +12,12 @@
 
 const Router = require("@koa/router");
 
-const auth = require("../controllers/auth");
+const auth = require("../../controllers/auth");
 
-const User = require("../models/User");
-const {generateToken} = require("../strategies/jwt");
+const User = require("../../models/User");
+const {generateToken} = require("../../strategies/jwt");
 
-const logger = require("../utils/logger");
+const logger = require("../../utils/logger");
 
 const router = new Router({ prefix: "/api/v1" });
 router.get("/", publicAPI);

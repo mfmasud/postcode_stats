@@ -4,7 +4,7 @@ import fastify, { type FastifyInstance } from "fastify";
 import initDBPlugin from "./src/plugins/initDB.js";
 
 // Routes
-import specialRoutes from "./routes/special.js";
+import specialRoutes from "./src/routes/special.js";
 // const postcodes = require("./routes/postcodes");
 // const users = require("./routes/users");
 // const search = require("./routes/search");

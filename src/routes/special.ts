@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import logger from '../utils/logger.js';
+import logger from '../../utils/logger.js';
 
 /**
  * @param {FastifyInstance} fastify
