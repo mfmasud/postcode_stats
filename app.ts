@@ -5,14 +5,14 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-
+const prefix = "/api/v2"
 
 
 // Plugins
-import initDBPlugin from "./src/plugins/util/initDB.js";
+//import initDBPlugin from "./src/plugins/util/initDB.js";
 
 // Routes
-import specialRoutes from "./src/routes/special.js";
+// import specialRoutes from "./src/plugins/special/special.js";
 // const postcodes = require("./routes/postcodes");
 // const users = require("./routes/users");
 // const search = require("./routes/search");
@@ -20,14 +20,15 @@ import specialRoutes from "./src/routes/special.js";
 function buildServer(): FastifyInstance {
     const app = fastify()
     
-    app.register(initDBPlugin);
+    //app.register(initDBPlugin);
 
     app.get("/ping", async () => {
         return "pong\n"
     })
 
     app.register(autoLoad, {
-        dir: join(__dirname, 'src/plugins')
+        dir: join(__dirname, 'src/plugins'),
+        options: {prefix: prefix}
     })
 
     //app.register(specialRoutes, { prefix: "/api/v2" });
