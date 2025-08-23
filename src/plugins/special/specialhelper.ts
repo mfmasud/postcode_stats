@@ -1,27 +1,21 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import logger from '../../../utils/logger.js';
+import type { RoleDoc } from '../../../models/Role.js';
 
-export interface UserOut {
-    username: string;
-    id: string;
-}
-
-// Extend FastifyRequest to include user property
-declare module 'fastify' {
-  interface FastifyRequest {
-    user?: UserOut;
-  }
-}
-
-export async function addUser(request: FastifyRequest): Promise<void> {
+export async function addUser(request: FastifyRequest, reply: FastifyReply): Promise<void> {
   // mock data - simulates a user being authenticated and added to the request object
   const token = 1
   
   if (token) {
     // Mock user data
     request.user = {
+      _id: "12345",
       username: "John Doe",
-      id: "user123"
+      id: "12345",
+      role: {
+        name: "none",
+        description: "Test role"
+      } as RoleDoc
     };
   }
 }

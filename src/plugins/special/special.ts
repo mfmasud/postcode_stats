@@ -6,9 +6,7 @@ import { addUser, UserDetails } from './specialhelper.js';
  * @param {Object} options
  */
 async function specialRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-
-  fastify.decorateRequest('user', undefined);
-
+  
     fastify.get('/user', {
         preHandler: [addUser],
     }, UserDetails);

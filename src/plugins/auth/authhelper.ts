@@ -1,15 +1,26 @@
-// This file will setup the auth middleware and expose a login route
-// Using fastify-jwt plugin for JWT authentication
+import fp from 'fastify-plugin';
+import type { FastifyInstance } from 'fastify';
+import { type RoleDoc } from '../../../models/Role.js';
 
-// SETUP PHASE:
-// 1. Register fastify-jwt plugin with JWT_SECRET from environment
-// 2. Configure JWT extraction from Authorization Bearer header
-// 3. Setup token verification options (expiry, algorithm, etc.)
+// Interface for authenticated user data
+export interface AuthenticatedUser {
+  _id: string;
+  username: string;
+  role?: RoleDoc;
+  id?: string;
+}
 
-// AUTHENTICATION MIDDLEWARE:
-// 1. Create preHandler hook that verifies JWT token
-// 2. Extract user ID from decoded JWT payload
-// 3. Look up user in database using User.findById() 
-// 4. Populate user role information if needed
-// 5. Attach verified user object to request context
-// 6. Handle authentication failures with appropriate error responses
+/**
+ * Auth helper plugin for Fastify
+ * This plugin now simply provides TypeScript interfaces and extends request type
+ * The actual JWT functionality is handled by the main JWT plugin
+ */
+async function authPlugin(fastify: FastifyInstance) {
+  // No implementation needed - JWT registration and authentication
+  // is now handled by the main JWT plugin in src/plugins/external/fastify-jwt.ts
+}
+
+export default fp(authPlugin, {
+  name: 'auth-helper',
+  dependencies: ['jwt-plugin'] // Ensure JWT plugin is loaded first
+});

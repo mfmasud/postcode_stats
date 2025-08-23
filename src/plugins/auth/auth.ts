@@ -1,34 +1,175 @@
-// This file will use the auth middleware in a getuserdetails route
+import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
+import type { AuthenticatedUser } from './authhelper.js';
+import fp from 'fastify-plugin';
 
-// USERDETAILS ROUTE WITH JWT PREAUTH HANDLER:
+import User from '../../../models/User.js';
+import Role from '../../../models/Role.js';
+import { type UserDoc } from '../../../models/User.js';
+import { type RoleDoc } from '../../../models/Role.js';
+import logger from '../../../utils/logger.js';
 
-// Route: GET /api/v2/private
-// Purpose: Return authenticated user's details
+// Interface for login query parameters
+interface LoginQuery {
+  id?: string;
+}
 
-// JWT PREAUTH HANDLER:
-// 1. Extract JWT token from Authorization header (Bearer format)
-// 2. Verify token using jsonwebtoken.verify() with JWT_SECRET OR fastify-jwt.verify() [Research Point 1]
-// 3. Decode payload to get user._id
-// 4. Query database: User.findById(decoded._id)
-// 5. If user found, attach to request.user property (pre-decorated request object)
-// 6. If token invalid/expired or user not found, throw 401 error
+/**
+ * Authentication routes plugin
+ * Provides /login and /private endpoints
+ */
+async function authRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
+  
+  /**
+   * Login route - generates JWT token for a given user ID
+   * GET /login?id=<user_id>
+   */
+  fastify.get<{ Querystring: LoginQuery }>('/login', {
+    schema: {
+      querystring: {
+        type: 'object',
+        required: ['id'],
+        properties: {
+          id: {
+            type: 'string'
+          }
+        }
+      },
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            jwt: { type: 'string' }
+          }
+        },
+        400: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+            message: { type: 'string' }
+          }
+        },
+        401: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+            message: { type: 'string' }
+          }
+        },
+        500: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+            message: { type: 'string' }
+          }
+        }
+      }
+    }
+  }, async (request: FastifyRequest<{ Querystring: LoginQuery }>, reply: FastifyReply) => {
+    const { id } = request.query;
+    
+    logger.info(`loginUserJWT accessed from ${request.ip} for user id ${id}`);
+    
+    if (!id) {
+      logger.info('No user ID provided');
+      return reply.code(400).send({
+        error: 'Bad Request',
+        message: 'User ID is required'
+      });
+    }
 
-// USERDETAILS HANDLER FUNCTION:
-// 1. Access authenticated user from request.user (set by preauth handler)
-// 2. Return user details in response body
-// 3. Include user.username, user.role
-// 4. Return 200 status with user object
+    try {
+      const user = await User.findOne({ id });
 
-// AUTHENTICATION FLOW:
-// Client -> Authorization: Bearer <token> -> PreAuth Handler -> Verify Token -> 
-// Look up User -> Attach to Request -> UserDetails Handler -> Return User Data
+      if (!user) {
+        logger.info(`User not found for id: ${id}`);
+        return reply.code(401).send({
+          error: 'Unauthorized',
+          message: 'User not found'
+        });
+      }
 
-// EXAMPLE USAGE FLOW:
-// 1. User gets a token from /api/v2/login and sets it in the Authorization header
-// 2. User accesses a protected route with a set Authorization: Bearer <token>
-// 3. PreAuth handler validates token and loads user
-// 4. route handler/middleware returns user information for the associated user.
+      // Generate token using improved Fastify JWT plugin
+      const token = await fastify.generateToken(reply, user);
 
-// RESEARCH POINTS:
-// [1] - How to use fastify-jwt.verify() to verify the token?
-// This should be implemented into the authhelper.ts file.
+      logger.info(`Token generated for User "${user.username}" in message body.`);
+      
+      return reply.code(200).send({
+        jwt: token
+      });
+      
+    } catch (error: any) {
+      logger.error(`Error during login: ${error.message}`);
+      return reply.code(500).send({
+        error: 'Internal Server Error',
+        message: 'Failed to process login request'
+      });
+    }
+  });
+
+  /**
+   * Private route - returns authenticated user details
+   * GET /private
+   * Requires: Authorization: Bearer <jwt_token>
+   */
+  fastify.get('/private', {
+    preHandler: [fastify.authenticate],
+    schema: {
+      security: [{ bearerAuth: [] }],
+      response: {
+        200: {
+          type: 'object',
+          properties: {
+            user: {
+              type: 'object',
+              properties: {
+                _id: { type: 'string' },
+                username: { type: 'string' },
+                id: { type: 'string' },
+                role: { 
+                  type: 'object',
+                  additionalProperties: true
+                }
+              },
+              required: ['_id', 'username', 'id']
+            }
+          }
+        },
+        401: {
+          type: 'object',
+          properties: {
+            error: { type: 'string' },
+            message: { type: 'string' }
+          }
+        }
+      }
+    }
+  }, async (request: FastifyRequest, reply: FastifyReply) => {
+    logger.info(`UserDetails accessed from ${request.ip}`);
+    
+    const user = request.user as AuthenticatedUser | undefined;
+
+    if (!user) {
+      logger.info(`User not logged in - this should not happen if authenticate preHandler works correctly`);
+      return reply.code(401).send({
+        error: 'Unauthorized',
+        message: 'No user details available. Please log in to see them.'
+      });
+    }
+
+    logger.info(`Details returned for User "${user.username}" in message body.`);
+    
+    return reply.code(200).send({
+      user: {
+        _id: user._id,
+        username: user.username,
+        id: user.id,
+        role: user.role
+      }
+    });
+  });
+}
+
+export default fp(authRoutes, {
+  name: 'auth-routes',
+  dependencies: ['jwt-plugin'] // Ensure JWT plugin is loaded first
+});
