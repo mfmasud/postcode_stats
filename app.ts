@@ -1,12 +1,11 @@
 import fastify, { type FastifyInstance } from "fastify";
 import autoLoad from '@fastify/autoload'
+import { apiPrefix } from './src/config/global.js'
 
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
-const prefix = "/api/v2"
-
 
 // Plugins
 //import initDBPlugin from "./src/plugins/util/initDB.js";
@@ -19,6 +18,10 @@ const prefix = "/api/v2"
 
 function buildServer(): FastifyInstance {
     const app = fastify()
+
+    app.decorate("conf", {
+        v2apiPrefix: apiPrefix
+    })
     
     //app.register(initDBPlugin);
 
@@ -28,7 +31,7 @@ function buildServer(): FastifyInstance {
 
     app.register(autoLoad, {
         dir: join(__dirname, 'src/plugins'),
-        options: {prefix: prefix}
+        options: {prefix: apiPrefix}
     })
 
     //app.register(specialRoutes, { prefix: "/api/v2" });
