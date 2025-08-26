@@ -3,7 +3,7 @@ description: Guidelines for working with TypeScript files
 globs: *.tsx,*.ts
 alwaysApply: false
 ---
-Avoid linting errors, for example by ensuring strict type definitions and usage. Solve "Unexpected any. Specify a different type," by explicitly defining types for variables, parameters, and return values instead of using any. Never use any or unknown - search the internet and study the codebase to find the correct type.
+Avoid linting errors, for example by ensuring strict type definitions and usage. Solve "Unexpected any. Specify a different type," by explicitly defining types for variables, parameters, and return values instead of using any. Never use any or unknown - search the internet and study the codebase to find the correct type. This is especially important as you should NEVER write "a as unknown as b" typed assignments - a lethal antipattern.
 
 Revise the existing codebase and recommend robust solutions suitable for production-grade applications. Use official and up-to-date documentation to ground your implementation by searching the web.
 
