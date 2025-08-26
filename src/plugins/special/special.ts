@@ -1,5 +1,5 @@
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
-import { addUser, UserDetails } from './specialhelper.js';
+import { UserDetails } from './specialhelper.js';
 
 /**
  * @param {FastifyInstance} fastify
@@ -7,8 +7,8 @@ import { addUser, UserDetails } from './specialhelper.js';
  */
 async function specialRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
   
-    fastify.get('/user', {
-        preHandler: [addUser],
+    fastify.get('/private', {
+        preHandler: [fastify.authenticate],
     }, UserDetails);
 }
 

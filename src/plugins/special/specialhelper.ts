@@ -1,24 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import logger from '../../../utils/logger.js';
-import type { RoleDoc } from '../../../models/Role.js';
-
-export async function addUser(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  // mock data - simulates a user being authenticated and added to the request object
-  const token = 1
-  
-  if (token) {
-    // Mock user data
-    request.user = {
-      _id: "12345",
-      username: "John Doe",
-      id: "12345",
-      role: {
-        name: "none",
-        description: "Test role"
-      } as RoleDoc
-    };
-  }
-}
 
 /**
  * A function which displays the details of the current user. If no user has been authenticated, a message is returned saying so.
