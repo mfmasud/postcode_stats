@@ -4,9 +4,9 @@ import type { FastifyInstance } from "fastify";
 
 export default fp(async (fastify: FastifyInstance) => {
   await connectDB(true);
-  await initUserDB();
-  await resetDataDB();
-  await initLocationDB();
+  //await initUserDB();
+  //await resetDataDB();
+  //await initLocationDB();
 
   fastify.log.info("✅ Databases initialised");
 

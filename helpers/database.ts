@@ -29,7 +29,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import mongoose, { type ConnectOptions } from "mongoose";
+import mongoose from "mongoose";
 mongoose.set("strictQuery", true);
 //mongoose.set("debug", true);
 
@@ -70,10 +70,7 @@ async function connectDB(output: boolean = false) {
     if (!MONGO_URI) {
       throw new Error('Database connection string not found in environment variables');
     }
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    } as ConnectOptions);
+    await mongoose.connect(MONGO_URI);
 
     if (output) {
       logger.info("Connected to database!");
