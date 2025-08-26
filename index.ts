@@ -5,7 +5,7 @@ dotenv.config();
 import logger from "./utils/logger.js";
 import buildServer from "./app.js";
 
-const server = buildServer();
+const server = await buildServer();
 const port = parseInt(process.env.PORT || "8080");
 
 /**
