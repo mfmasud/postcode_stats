@@ -9,14 +9,14 @@ import logger from '../../../utils/logger.js';
  * @param {FastifyRequest} request - The context for the function call, representing the request made to it.
  */
 export async function UserDetails(request: FastifyRequest, reply: FastifyReply): Promise<void> {
-  const user = request.user;
+  const user = request.authUser;
   
   logger.info(`UserDetails accessed from ${request.ip}`);
   //logger.info(user);
 
   if (!user) {
-    logger.info(`User not logged in`);
-    reply.status(401).send("No user details available. Please log in to see them.");
+    logger.info('User not logged in');
+    reply.status(401).send({ error: 'Unauthorized', message: 'No user details available. Please log in to see them.' });
     return;
   }
 

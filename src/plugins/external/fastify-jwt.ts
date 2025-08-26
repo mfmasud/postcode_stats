@@ -1,37 +1,22 @@
 import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import type { UserDoc } from '../../../models/User.js';
-import type { RoleDoc } from '../../../models/Role.js';
+import type { UserInferredSchema } from '../../../models/User.js';
+import type { RoleInferredSchema } from '../../../models/Role.js';
 
 import User from '../../../models/User.js';
-import Role from '../../../models/Role.js';
 
 import logger from '../../../utils/logger.js';
 
-// Interface for user with populated role
-interface PopulatedUserDoc extends Omit<UserDoc, 'role'> {
-  role: RoleDoc;
-}
+// Define a lean type for the authenticated user with populated role
+interface AuthUser extends Omit<UserInferredSchema, 'role'> { role: RoleInferredSchema }
+
+type JwtDecodedPayload = { _id?: string };
 
 // TypeScript declaration merging for FastifyJWT interface
 declare module "@fastify/jwt" {
   interface FastifyJWT {
-    payload: { _id: string; iat?: number; exp?: number }; // payload type is used for signing and verifying
-    user: {
-      _id: string;
-      username: string;
-      id: string;
-      role?: RoleDoc;
-    }; // user type is return type of `request.user` object
+    payload: { _id: string };
   }
-}
-
-// Interface for JWT options that can be passed to token generation
-interface TokenOptions {
-  expiresIn?: string | number;
-  audience?: string | string[];
-  issuer?: string;
-  subject?: string;
 }
 
 /**
@@ -67,61 +52,45 @@ async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
     }
   });
 
+  // Decorate request with authUser holder to avoid clashing with fastify-jwt's request.user
+  fastify.decorateRequest('authUser', null);
+
   /**
-   * Generates a JWT token for the given user using reply.jwtSign()
+   * Generates a JWT token for a provided user id using reply.jwtSign()
    * Following @fastify/jwt best practices
    * 
    * @param {FastifyReply} reply - The Fastify reply object
-   * @param {UserDoc} user - The user object to generate a token for
-   * @param {TokenOptions} options - Optional token signing options
+   * @param {string} userId - The raw user id (_id) to generate a token for
    * @returns {Promise<string>} - The generated JWT token
    */
-  async function generateToken(reply: FastifyReply, user: UserDoc, options?: TokenOptions): Promise<string> {
+  async function generateToken(reply: FastifyReply, userId: string): Promise<string> {
     const payload = { 
-      _id: user._id.toString(),
-      // Add user context for better security
-      username: user.username
+      _id: userId
     };
     
-    // Merge default options with provided options
-    const signOptions = {
-      ...(options || {}),
-      // Always include these for security
-      jti: `${user._id}-${Date.now()}`, // JWT ID for tracking
-      sub: user._id.toString() // Subject
-    };
-    
-    return reply.jwtSign(payload, signOptions);
+    return reply.jwtSign(payload);
   }
 
   /**
-   * Enhanced authentication decorator function
-   * Verifies JWT token and populates request.user with authenticated user data
+   * Verifies JWT token and populates request.authUser with authenticated user data
    */
   async function authenticate(request: FastifyRequest, reply: FastifyReply): Promise<void> {
     try {
       // Verify JWT token using @fastify/jwt
-      const payload = await request.jwtVerify() as { _id: string; iat?: number; exp?: number; jti?: string };
+      const payload = await request.jwtVerify<{ _id: string }>();
       
       if (!payload || !payload._id) {
         logger.info('Invalid JWT payload: missing _id');
         throw new Error('Invalid token payload');
       }
 
-      // Add security check for token age (optional)
-      if (payload.iat && payload.exp) {
-        const tokenAge = Date.now() / 1000 - payload.iat;
-        const maxAge = 24 * 60 * 60; // 24 hours max
-        if (tokenAge > maxAge) {
-          logger.info(`Token too old: ${tokenAge} seconds`);
-          throw new Error('Token expired due to age');
-        }
-      }
+      logger.info(`Verifying token _id [${payload._id}]`);
 
-      logger.info(`Verifying token _id [${payload._id}]${payload.jti ? ` with JTI [${payload.jti}]` : ''}`);
-
-      // Look up user in database and populate role with proper typing
-      const user = await User.findById(payload._id).populate<{ role: RoleDoc }>('role') as PopulatedUserDoc | null;
+      // Look up user in database and populate role, then lean to a plain object
+      const user = await User.findById(payload._id)
+        .populate('role')
+        .lean<AuthUser>()
+        .exec();
       
       if (!user) {
         logger.info(`User with _id [${payload._id}] not found`);
@@ -131,18 +100,14 @@ async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
         });
       }
 
-      // Attach verified user to request object with proper typing
-      request.user = {
-        _id: user._id.toString(),
-        username: user.username,
-        role: user.role,
-        id: user.id || user._id.toString()
-      };
+      // Attach verified user to request object under authUser
+      request.authUser = user;
 
       logger.info(`Successfully verified user ${user.username}`);
       
-    } catch (error: any) {
-      logger.error(`Authentication failed: ${error.message}`);
+    } catch (error: unknown) {
+      const err = error as { code?: string; message?: string };
+      logger.error(`Authentication failed: ${err?.message ?? 'Unknown error'}`);
       
       // Handle specific @fastify/jwt errors with proper status codes
       const errorResponses = {
@@ -163,7 +128,7 @@ async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
         },
         'FST_JWT_BAD_REQUEST': {
           code: 400,
-          error: 'Bad Request',
+          error: 'Bad Request', 
           message: 'Format is Authorization: Bearer [token]'
         },
         'FAST_JWT_INVALID_AUDIENCE': {
@@ -181,9 +146,9 @@ async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
           error: 'Bad Request', 
           message: 'Malformed JWT token'
         }
-      };
+      } as const;
 
-      const errorResponse = errorResponses[error.code as keyof typeof errorResponses];
+      const errorResponse = errorResponses[(err?.code ?? '') as keyof typeof errorResponses];
       if (errorResponse) {
         return reply.code(errorResponse.code).send({
           error: errorResponse.error,
@@ -194,7 +159,7 @@ async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
       // Generic authentication failure
       return reply.code(401).send({
         error: 'Unauthorized',
-        message: 'Authentication failed'
+        message: `Authentication failed - ${err?.message ?? 'Unknown error'}`
       });
     }
   }
@@ -203,13 +168,14 @@ async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
    * Utility function to decode JWT without verification (for debugging/logging)
    * 
    * @param {FastifyRequest} request - The Fastify request object
-   * @returns {Promise<any>} - The decoded payload (unverified)
+   * @returns {Promise<JwtDecodedPayload>} - The decoded payload (unverified)
    */
-  async function decodeToken(request: FastifyRequest): Promise<any> {
+  async function decodeToken(request: FastifyRequest): Promise<JwtDecodedPayload> {
     try {
-      return await request.jwtDecode();
-    } catch (error: any) {
-      logger.error(`Token decode failed: ${error.message}`);
+      return request.jwtDecode() as JwtDecodedPayload;
+    } catch (error: unknown) {
+      const err = error as { message?: string };
+      logger.error(`Token decode failed: ${err?.message ?? 'Unknown error'}`);
       throw error;
     }
   }
@@ -220,12 +186,15 @@ async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
   fastify.decorate("decodeToken", decodeToken);
 }
 
-// Extend FastifyInstance to include new decorators with proper typing
+// Extend Fastify types to include new decorators with proper typing
 declare module 'fastify' {
   interface FastifyInstance {
-    generateToken: (reply: FastifyReply, user: UserDoc, options?: TokenOptions) => Promise<string>;
+    generateToken: (reply: FastifyReply, userId: string) => Promise<string>;
     authenticate: (request: FastifyRequest, reply: FastifyReply) => Promise<void>;
-    decodeToken: (request: FastifyRequest) => Promise<any>;
+    decodeToken: (request: FastifyRequest) => Promise<JwtDecodedPayload>;
+  }
+  interface FastifyRequest {
+    authUser: AuthUser | null;
   }
 }
 
@@ -233,5 +202,3 @@ export default fp(jwtPlugin, {
   name: 'jwt-plugin',
   dependencies: []
 });
-
-export type { TokenOptions };
