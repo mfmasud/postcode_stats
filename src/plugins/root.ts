@@ -1,5 +1,4 @@
-import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import logger from '../../utils/logger.js';
+import type { FastifyInstance, FastifyPluginOptions, FastifyRequest } from 'fastify';
 
 /**
  * @param {FastifyInstance} fastify
@@ -14,10 +13,6 @@ async function rootRoutes(fastify: FastifyInstance, options: FastifyPluginOption
 
 // This function is independent of Fastify's route registration
 export function Welcome(request: FastifyRequest) {
-    logger.info(
-      `Incoming ${request.method} request from ${request.ip} to ${request.headers.host}${request.url}`
-    );
-  
     return {
       message: 'Hello and welcome to the UK Location API!',
     };
