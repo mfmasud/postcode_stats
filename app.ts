@@ -27,12 +27,13 @@ async function buildServer(): Promise<FastifyInstance> {
         return "pong\n"
     })
 
-    app.register(autoLoad, {
-        dir: join(__dirname, 'src/plugins'),
-        dirNameRoutePrefix: false,
-        forceESM: true,
-        options: { prefix: v2apiPrefix },
-    })
+    app.register(async (instance) => {
+        instance.register(autoLoad, {
+            dir: join(__dirname, 'src/plugins'),
+            dirNameRoutePrefix: false,
+            forceESM: true,
+        })
+    }, { prefix: v2apiPrefix })
 
     //app.register(rootRoutes);
     // app.register(specialRoutes);
