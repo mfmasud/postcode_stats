@@ -1,7 +1,7 @@
-const postcode = require("../helpers/postcode");
-const database = require("../helpers/database");
+const postcode = require("../../src/helpers/postcode");
+const database = require("../../src/helpers/database");
 
-const logger = require("../utils/logger");
+const logger = require("../../src/utils/logger");
 
 database.connectDB();
 

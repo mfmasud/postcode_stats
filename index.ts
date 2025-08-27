@@ -2,7 +2,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import logger from "./utils/logger.js";
+import logger from "./src/utils/logger.js";
 import buildServer from "./app.js";
 
 const server = await buildServer();

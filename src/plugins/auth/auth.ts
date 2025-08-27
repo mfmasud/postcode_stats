@@ -1,7 +1,7 @@
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
 import { LoginUserJWT } from './authhelper.js';
 import fp from 'fastify-plugin';
-import logger from '../../../utils/logger.js';
+import logger from '../../utils/logger.js';
 
 // Interface for login query parameters
 interface LoginQuery {

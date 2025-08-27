@@ -1,5 +1,5 @@
 import type { FastifyRequest, FastifyReply } from 'fastify';
-import logger from '../../../utils/logger.js';
+import logger from '../../utils/logger.js';
 
 /**
  * A function which displays the details of the current user. If no user has been authenticated, a message is returned saying so.

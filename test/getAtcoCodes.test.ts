@@ -11,8 +11,8 @@ Cheatsheet - https://devhints.io/chai
 */
 
 // code to test
-import { getAtcoCodes, processAtcoString } from "../helpers/AtcoCodes.js";
-import type { ProcessedAtcoCode, AtcoCode } from "../types/atco.js";
+import { getAtcoCodes, processAtcoString } from "../src/helpers/AtcoCodes.js";
+import type { ProcessedAtcoCode, AtcoCode } from "../src/types/atco.js";
 
 import { describe, it, expect, beforeAll } from "vitest";
 

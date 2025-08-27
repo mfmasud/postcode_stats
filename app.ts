@@ -1,7 +1,7 @@
 import fastify, { type FastifyInstance } from "fastify";
 import autoLoad from '@fastify/autoload'
 import { v2apiPrefix } from './src/config/global.js'
-import logger from './utils/logger.js'
+import logger from './src/utils/logger.js'
 
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'

@@ -1,11 +1,7 @@
 import fp from 'fastify-plugin';
 import type { FastifyInstance, FastifyReply } from 'fastify';
-import { type RoleDoc } from '../../../models/Role.js';
-import User from '../../../models/User.js';
-import { type UserDoc } from '../../../models/User.js';
-import logger from '../../../utils/logger.js';
-
-//TODO: wrap this in a plugin
+import User from '../../models/User.js';
+import logger from '../../utils/logger.js';
 
 /**
  * Generates a JWT token for a given user id by performing a DB lookup
@@ -16,11 +12,9 @@ import logger from '../../../utils/logger.js';
  * @returns The signed JWT token string
  */
 export async function LoginUserJWT(reply: FastifyReply, id: string) {
-  // TODO: Implement login logic from src/routes/special.koa.js and partial implementation in src/plugins/auth/auth.ts
-  // This generates a JWT token for a given user, with the id extracted from the request query.
 
-  logger.info(`loginUserJWT generating JWT token for user id ${id}`);
-  const user = await User.findOne({ id });
+    logger.info(`loginUserJWT generating JWT token for user id ${id}`);
+    const user = await User.findOne({ id });
 
     if (!user) {
         logger.info(`User not found`);

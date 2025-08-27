@@ -1,11 +1,11 @@
 import fp from "fastify-plugin";
 import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import type { UserInferredSchema } from '../../../models/User.js';
-import type { RoleInferredSchema } from '../../../models/Role.js';
+import type { UserInferredSchema } from '../../models/User.js';
+import type { RoleInferredSchema } from '../../models/Role.js';
 
-import User from '../../../models/User.js';
+import User from '../../models/User.js';
 
-import logger from '../../../utils/logger.js';
+import logger from '../../utils/logger.js';
 
 // Define a lean type for the authenticated user with populated role
 interface AuthUser extends Omit<UserInferredSchema, 'role'> { role: RoleInferredSchema }

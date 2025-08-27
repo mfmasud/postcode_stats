@@ -1,10 +1,10 @@
 require("dotenv").config();
 
 import mongoose from "mongoose";
-import { initUserDB, connectDB, disconnectDB } from "../helpers/database.js";
+import { initUserDB, connectDB, disconnectDB } from "../src/helpers/database.js";
 
-import User from "../models/User.js";
-import Role from "../models/Role.js";
+import User from "../src/models/User.js";
+import Role from "../src/models/Role.js";
 
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi, afterEach } from "vitest";
 

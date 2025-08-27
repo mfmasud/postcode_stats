@@ -1,11 +1,11 @@
 require("dotenv").config();
 
 import mongoose from "mongoose";
-import { initUserDB, connectDB, disconnectDB } from "../helpers/database.js";
+import { initUserDB, connectDB, disconnectDB } from "../src/helpers/database.js";
 
-import User from "../models/User.js";
-import Role from "../models/Role.js";
-import type { RoleDoc } from "../models/Role.js";
+import User from "../src/models/User.js";
+import Role from "../src/models/Role.js";
+import type { RoleDoc } from "../src/models/Role.js";
 
 // stub logger commands using vi -> https://12tech.io/12tech-blog/unit-testing-with-jest-and-vitest
 //var sinon = require("sinon");
@@ -14,7 +14,7 @@ import type { RoleDoc } from "../models/Role.js";
 //var expect = chai.expect;
 
 import { describe, it, expect, beforeAll, beforeEach, afterAll, vi } from "vitest";
-import logger from "../utils/logger.js";
+import logger from "../src/utils/logger.js";
 
 describe("helpers/database.js", function () {
   let infoLogStub: ReturnType<typeof vi.spyOn>;

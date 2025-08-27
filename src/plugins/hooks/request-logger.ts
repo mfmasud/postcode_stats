@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import type { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { randomUUID } from 'node:crypto';
-import logger from '../../../utils/logger.js';
+import logger from '../../utils/logger.js';
 
 async function requestLoggerPlugin(fastify: FastifyInstance) {
   fastify.decorateRequest('correlationId', '');
