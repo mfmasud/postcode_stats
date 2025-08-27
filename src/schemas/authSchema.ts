@@ -1,5 +1,7 @@
 import { Type, type Static } from "@sinclair/typebox";
 
+import { ErrorResponseSchema } from "./commonSchema.js";
+
 export const LoginQuerySchema = Type.Object({
     id: Type.String({
         minLength: 1,
@@ -11,11 +13,6 @@ export const LoginResponseSchema = Type.Object({
   jwt: Type.String({
     description: "JWT token for the user",
   }),
-});
-
-export const ErrorResponseSchema = Type.Object({
-  error: Type.String(),
-  message: Type.String(),
 });
 
 export const LoginRouteSchema = {
