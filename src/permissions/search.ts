@@ -9,9 +9,11 @@
  * @exports defineAbilitiesFor
  */
 
-const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
+import { AbilityBuilder, createMongoAbility } from "@casl/ability";
 
-const logger = require("../utils/logger");
+import logger from "../utils/logger.js";
+
+import type { UserDocWithRole } from "../models/User.js";
 
 /**
  * Defines the user's permissions for the /search route.
@@ -35,7 +37,7 @@ const logger = require("../utils/logger");
  *  logger.info("user is not allowed update this Search.")
  * }
  */
-function defineAbilitiesFor(user) {
+function defineAbilitiesFor(user: UserDocWithRole) {
   // can use Search Model in the future.
   //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
@@ -48,22 +50,21 @@ function defineAbilitiesFor(user) {
   // authenticated users
   // standard users
   if (user.role.name === "user") {
-    //logger.info('standard user role')
+    //carry on permissions from non authenticated users
   }
 
   // paid users
   if (user.role.name === "paiduser") {
-    //logger.info('paid user role')
+    //carry on permissions from non authenticated users
   }
 
   // admin users
   if (user.role.name === "admin") {
-    //logger.info('admin user role')
-
+    //add admin specific permissions on top of other permissions
     can("create", "RandomSearch");
   }
 
   return build();
 }
 
-module.exports = defineAbilitiesFor;
+export default defineAbilitiesFor;

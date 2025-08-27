@@ -9,9 +9,11 @@
  * @exports defineAbilitiesFor
  */
 
-const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
+import { AbilityBuilder, createMongoAbility } from "@casl/ability";
 
-const logger = require("../utils/logger");
+import logger from "../utils/logger.js";
+
+import type { UserDocWithRole } from "../models/User.js";
 
 /**
  * Defines the user's permissions for the /postcodes route.
@@ -26,7 +28,7 @@ const logger = require("../utils/logger");
  * @see {@link module:routes/postcodes} for the route which uses this function.
  *
  */
-function defineAbilitiesFor(user) {
+function defineAbilitiesFor(user: UserDocWithRole) {
   //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
   const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
@@ -36,22 +38,16 @@ function defineAbilitiesFor(user) {
   // authenticated users
   // standard users
   if (user.role.name === "user") {
-    //logger.info('standard user role')
-
     can("read", "Postcode");
   }
 
   // paid users
-  if (user.role.name === "user") {
-    //logger.info('standard user role')
-
+  if (user.role.name === "paiduser") {
     can("read", "Postcode");
   }
 
   // admin users
   if (user.role.name === "admin") {
-    //logger.info('admin user role')
-
     can("readAll", "Postcode");
     can("read", "Postcode");
   }
@@ -59,4 +55,4 @@ function defineAbilitiesFor(user) {
   return build();
 }
 
-module.exports = defineAbilitiesFor;
+export default defineAbilitiesFor;
