@@ -1,4 +1,5 @@
 import type { FastifyInstance, FastifyPluginOptions } from 'fastify';
+import fp from 'fastify-plugin';
 import { UserDetails } from './specialhelper.js';
 
 /**
@@ -6,10 +7,12 @@ import { UserDetails } from './specialhelper.js';
  * @param {Object} options
  */
 async function specialRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
-  
-    fastify.get('/private', {
-        preHandler: [fastify.authenticate],
-    }, UserDetails);
+  fastify.get('/private', {
+    preHandler: [fastify.authenticate],
+  }, UserDetails);
 }
 
-export default specialRoutes;
+export default fp(specialRoutes, {
+  name: 'special-routes',
+  dependencies: ['jwt-plugin']
+});
