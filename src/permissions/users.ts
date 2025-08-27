@@ -4,14 +4,17 @@
  * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
  *
  * @requires @casl/ability
- * @requires utils/logger
+ * 
+ * @requires models/User
  *
  * @exports defineAbilitiesFor
  */
 
-const { AbilityBuilder, createMongoAbility } = require("@casl/ability");
+import { AbilityBuilder, createMongoAbility } from "@casl/ability";
 
-const logger = require("../utils/logger");
+import logger from "../utils/logger.js";
+
+import type { UserDocWithRole } from "../models/User.js";
 
 /**
  * Defines a user's permissions/abilities for the /users route. Also incorporates the readAll permission for admins.
@@ -26,7 +29,7 @@ const logger = require("../utils/logger");
  * @see {@link module:routes/users} for the route which uses this function.
  *
  */
-function defineAbilitiesFor(user) {
+function defineAbilitiesFor(user: UserDocWithRole) {
   /*
   if (user.username && user.role.name) {
     logger.info(`current user: ${user.username}`);
@@ -55,7 +58,7 @@ function defineAbilitiesFor(user) {
   }
 
   // paid users
-  if (user.role.name === "paid") {
+  if (user.role.name === "paiduser") {
     //logger.info('paid user role')
 
     can("read", "User", { _id: user._id }); // can read own details except for password/passwordSalt
@@ -82,4 +85,4 @@ function defineAbilitiesFor(user) {
   return build();
 }
 
-module.exports = defineAbilitiesFor;
+export default defineAbilitiesFor;

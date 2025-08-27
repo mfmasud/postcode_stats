@@ -28,6 +28,7 @@ import {
   type HydratedDocument,
   type Model,
 } from 'mongoose';
+import type { RoleDoc } from './Role.js';
 
 /* validation: 
 https://mongoosejs.com/docs/validation.html
@@ -77,6 +78,7 @@ const userSchema = new Schema({
 
 export type UserInferredSchema = InferSchemaType<typeof userSchema>;
 export type UserDoc = HydratedDocument<UserInferredSchema>;
+export type UserDocWithRole = UserDoc & { role: RoleDoc };
 
 userSchema.pre("validate", async function preValidate(this: UserDoc) {
   if (!this.isNew || this.id != null) {
