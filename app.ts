@@ -1,5 +1,7 @@
 import fastify, { type FastifyInstance } from "fastify";
 import autoLoad from '@fastify/autoload'
+import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+
 import { v2apiPrefix } from './src/config/global.js'
 import logger from './src/utils/logger.js'
 
@@ -19,7 +21,7 @@ const __dirname = dirname(__filename)
 // const search = require("./routes/search");
 
 async function buildServer(): Promise<FastifyInstance> {
-    const app = fastify({ ignoreTrailingSlash: true })
+    const app = fastify({ ignoreTrailingSlash: true }).withTypeProvider<TypeBoxTypeProvider>()
 
     //app.register(initDBPlugin);
 

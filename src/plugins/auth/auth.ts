@@ -1,52 +1,63 @@
-import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import { LoginUserJWT } from './authhelper.js';
 import fp from 'fastify-plugin';
 import logger from '../../utils/logger.js';
-import type { Static } from '@sinclair/typebox';
-import { LoginRouteSchema, LoginQuerySchema } from '../../schemas/auth.js';
+
+import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
+
+import { LoginUserJWT } from './authhelper.js';
+import { LoginRouteSchema } from '../../schemas/auth.js';
 
 /**
  * Authentication routes plugin
  * Provides /login endpoint
  */
-async function authRoutes(fastify: FastifyInstance, options: FastifyPluginOptions) {
+const authRoutes: FastifyPluginAsyncTypebox = async(fastify) => {
   /**
    * Login route - generates JWT token for a given user ID
    * GET /login?id=<user_id>
    */
-  fastify.get<{ Querystring: Static<typeof LoginQuerySchema> }>('/login', {
+  fastify.get('/login', {
     schema: LoginRouteSchema
-  }, GetJWTfromID);
-}
+  }, async (request, reply) => {
+    const { id } = request.query;
 
-async function GetJWTfromID (request: FastifyRequest<{ Querystring: Static<typeof LoginQuerySchema> }>, reply: FastifyReply) {
-  const { id } = request.query;
+    logger.info(`GetJWTfromID accessed from ${request.ip} for user id ${id}`);
 
-  if (!id) {
-    logger.info('No user ID provided');
-    return reply.code(400).send({
-      error: 'Bad Request',
-      message: 'User ID is required'
-    });
-  }
+    try {
+      if (!id) {
+        reply.code(400).send({
+          error: 'Bad Request',
+          message: 'Query parameter id is required'
+        });
+        return;
+      }
 
-  logger.info(`GetJWTfromID accessed from ${request.ip} for user id ${id}`);
-  
-  try {
-    const token = await LoginUserJWT(reply, id);
-    logger.info('Token generated and returned in response body.');
-    return reply.code(200).send({
-      jwt: token
-    });
-    
-  } catch (error: any) {
-    logger.error(`Error during login: ${error.message}`);
-    return reply.code(500).send({
-      error: 'Internal Server Error',
-      message: 'Failed to process login request'
-    });
-  }
-}
+      const token = await LoginUserJWT(reply, id);
+
+      if (typeof token !== 'string') {
+        reply.code(401).send({
+          error: 'Unauthorized',
+          message: 'Failed to generate token'
+        });
+        return;
+      }
+
+      logger.info('Token generated and returned in response body.');
+      reply.code(200).send({
+        jwt: token
+      });
+      return;
+
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      logger.error(`Error during login: ${message}`);
+      reply.code(500).send({
+        error: 'Internal Server Error',
+        message: 'Failed to process login request'
+      });
+      return;
+    }
+  });
+};
 
 export default fp(authRoutes, {
   name: 'auth-routes',
