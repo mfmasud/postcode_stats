@@ -2,11 +2,8 @@ import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyRepl
 import { LoginUserJWT } from './authhelper.js';
 import fp from 'fastify-plugin';
 import logger from '../../utils/logger.js';
-
-// Interface for login query parameters
-interface LoginQuery {
-  id?: string;
-}
+import type { Static } from '@sinclair/typebox';
+import { LoginRouteSchema, LoginQuerySchema } from '../../schemas/auth.js';
 
 /**
  * Authentication routes plugin
@@ -17,51 +14,12 @@ async function authRoutes(fastify: FastifyInstance, options: FastifyPluginOption
    * Login route - generates JWT token for a given user ID
    * GET /login?id=<user_id>
    */
-  fastify.get<{ Querystring: LoginQuery }>('/login', {
-    schema: {
-      querystring: {
-        type: 'object',
-        required: ['id'],
-        properties: {
-          id: {
-            type: 'string'
-          }
-        }
-      },
-      response: {
-        200: {
-          type: 'object',
-          properties: {
-            jwt: { type: 'string' }
-          }
-        },
-        400: {
-          type: 'object',
-          properties: {
-            error: { type: 'string' },
-            message: { type: 'string' }
-          }
-        },
-        401: {
-          type: 'object',
-          properties: {
-            error: { type: 'string' },
-            message: { type: 'string' }
-          }
-        },
-        500: {
-          type: 'object',
-          properties: {
-            error: { type: 'string' },
-            message: { type: 'string' }
-          }
-        }
-      }
-    }
+  fastify.get<{ Querystring: Static<typeof LoginQuerySchema> }>('/login', {
+    schema: LoginRouteSchema
   }, GetJWTfromID);
 }
 
-async function GetJWTfromID (request: FastifyRequest<{ Querystring: LoginQuery }>, reply: FastifyReply) {
+async function GetJWTfromID (request: FastifyRequest<{ Querystring: Static<typeof LoginQuerySchema> }>, reply: FastifyReply) {
   const { id } = request.query;
 
   if (!id) {
