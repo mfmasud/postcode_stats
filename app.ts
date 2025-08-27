@@ -19,7 +19,7 @@ const __dirname = dirname(__filename)
 // const search = require("./routes/search");
 
 async function buildServer(): Promise<FastifyInstance> {
-    const app = fastify()
+    const app = fastify({ ignoreTrailingSlash: true })
 
     //app.register(initDBPlugin);
 
