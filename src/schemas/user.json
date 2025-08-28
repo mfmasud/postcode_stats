@@ -24,11 +24,6 @@
           "type": "string",
           "format": "email"
         },
-        "avatarURL": {
-          "description": "URL of avatar image",
-          "type": "string",
-          "format": "uri"
-        },
         "username": {
           "description": "Unique username",
           "type": "string",
@@ -38,9 +33,13 @@
           "description": "Password for registration",
           "type": "string",
           "minLength": 6
+        },
+        "role": {
+          "description": "Role of the user",
+          "type": "string"
         }
       },
-      "required": ["username", "email", "password"],
+      "required": ["username", "email", "password", "role"],
       "additionalProperties": false
     }
   }

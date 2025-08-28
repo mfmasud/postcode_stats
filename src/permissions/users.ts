@@ -53,7 +53,7 @@ function defineAbilitiesFor(user: UserDocWithRole) {
     cannot("read", "AllUsers"); // cannot read other user's details
     cannot("read", "UserPassword");
 
-    can("update", "User", { _id: user._id }); // only for the fields: ‘firstName’, ‘lastName’, ‘about’, ‘password’, ‘email’, ‘avatarURL’
+    can("update", "User", { _id: user._id }); // only for the fields: ‘firstName’, ‘lastName’, ‘about’, ‘password’, ‘email’
     can("delete", "User", { _id: user._id });
   }
 
@@ -65,7 +65,7 @@ function defineAbilitiesFor(user: UserDocWithRole) {
     cannot("read", "AllUsers"); // cannot read other user's details
     cannot("read", "UserPassword");
 
-    can("update", "User", { _id: user._id }); // only for the fields: ‘firstName’, ‘lastName’, ‘about’, ‘password’, ‘email’, ‘avatarURL’
+    can("update", "User", { _id: user._id }); // only for the fields: ‘firstName’, ‘lastName’, ‘about’, ‘password’, ‘email’
     can("delete", "User", { _id: user._id });
   }
 
