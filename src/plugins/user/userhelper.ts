@@ -63,7 +63,7 @@ async function getAllUsers(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const ability = createAbilityFor(dbUser);
+  const ability = createAbilityFor(dbUser as UserDocWithRole);
   const permission = ability.can("read", "AllUsers");
 
   if (!permission) {
@@ -214,7 +214,7 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const ability = createAbilityFor(dbUser);
+  const ability = createAbilityFor(dbUser as UserDocWithRole);
   interface ReturnData {
     id: string;
     firstName: string;
@@ -316,7 +316,7 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const ability = createAbilityFor(dbUser);
+  const ability = createAbilityFor(dbUser as UserDocWithRole);
 
   if (!ability.can("update", updateUser)) {
     logger.error(
@@ -421,7 +421,7 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const ability = createAbilityFor(dbUser);
+  const ability = createAbilityFor(dbUser as UserDocWithRole);
 
   if (!ability.can("delete", deleteUser)) {
     logger.error("[403] User is not allowed to delete this user.");

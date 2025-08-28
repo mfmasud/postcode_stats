@@ -1,6 +1,6 @@
 import fastify, { type FastifyInstance } from "fastify";
 import autoLoad from '@fastify/autoload'
-import type { TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
+import { TypeBoxValidatorCompiler, type TypeBoxTypeProvider } from "@fastify/type-provider-typebox";
 
 import { v2apiPrefix } from './src/config/global.js'
 import logger from './src/utils/logger.js'
@@ -10,20 +10,8 @@ import { dirname, join } from 'node:path'
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
-// Plugins
-//import initDBPlugin from "./src/plugins/util/initDB.js";
-
-// Routes
-// import specialRoutes from "./src/plugins/special/special.js";
-// import rootRoutes from "./src/plugins/root.js";
-// const postcodes = require("./routes/postcodes");
-// const users = require("./routes/users");
-// const search = require("./routes/search");
-
 async function buildServer(): Promise<FastifyInstance> {
-    const app = fastify({ ignoreTrailingSlash: true }).withTypeProvider<TypeBoxTypeProvider>()
-
-    //app.register(initDBPlugin);
+    const app = fastify({ ignoreTrailingSlash: true }).setValidatorCompiler(TypeBoxValidatorCompiler).withTypeProvider<TypeBoxTypeProvider>()
 
     app.get("/ping", async () => {
         return "pong\n"
@@ -37,10 +25,7 @@ async function buildServer(): Promise<FastifyInstance> {
         })
     }, { prefix: v2apiPrefix })
 
-    //app.register(rootRoutes);
-    // app.register(specialRoutes);
     // app.use(postcodes.routes());
-    // app.use(users.routes());
     // app.use(search.routes());
 
     await app.ready();
