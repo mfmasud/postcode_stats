@@ -1,18 +1,25 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
+import type { Static } from "@sinclair/typebox";
 
 import logger from "../../utils/logger.js";
 
+import User from "../../models/User.js";
+import Role from "../../models/Role.js";
 import type { UserDoc, UserDocWithRole, AuthUser, UserInferredSchema } from "../../models/User.js";
 import type { RoleDoc } from "../../models/Role.js";
 
-import User from "../../models/User.js";
-import Role from "../../models/Role.js";
+import { 
+  UserIdParamSchema,
+  CreateUserSchema, 
+  UpdateUserByIdSchema,
+  type CreateUserBody,
+  type UpdateUserBody
+} from "../../schemas/userSchema.js";
+
+// Extract the param types
+type UserIdParams = Static<typeof UserIdParamSchema>;
 
 import createAbilityFor from "../../permissions/users.js";
-
-function hasPopulatedRole(user: UserDoc | null): user is UserDocWithRole {
-  return !!user && !!user.populated("role");
-}
 
 /**
  * Retrieves all users from the database and returns them in the response body.
@@ -48,9 +55,9 @@ async function getAllUsers(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const dbUser = await User.findOne({ id: userID }).populate("role");
+  const dbUser = await User.findOne({ id: userID }).populate<{ role: RoleDoc }>("role");
 
-  if (!hasPopulatedRole(dbUser)) {
+  if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
     reply.status(401).send({ error: "You are not logged in." });
     return;
@@ -98,8 +105,7 @@ async function createUser(request: FastifyRequest, reply: FastifyReply) {
   // they are assigned the role of "user" by defaultt
 
   logger.info("createUser() called");
-
-  const { username, password, email } = request.body;
+  const { username, password, email } = request.body as CreateUserBody;
 
   // check if email, password, or username are empty
   if (!username || !password || !email) {
@@ -170,7 +176,7 @@ async function createUser(request: FastifyRequest, reply: FastifyReply) {
  */
 async function getUserById(request: FastifyRequest, reply: FastifyReply) {
   logger.info("getUserById() called");
-  const id = request.id;
+  const { id } = request.params as UserIdParams;
 
   if (!request.authUser) {
     logger.error("[401] User needs to log in.");
@@ -185,9 +191,9 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const dbUser = await User.findOne({ id: userID }).populate("role");
+  const dbUser = await User.findOne({ id: userID }).populate<{ role: RoleDoc }>("role");
 
-  if (!hasPopulatedRole(dbUser)) {
+  if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
     reply.status(401).send({ error: "You are not logged in." });
     return;
@@ -200,7 +206,7 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
     reply.status(400).send({ error: "Invalid user ID." });
     return;
   }
-  const findUser = await User.findOne({ id: id }).populate("role");
+  const findUser = await User.findOne({ id: id }).populate<{ role: RoleDoc }>("role");
 
   if (!findUser) {
     logger.error(`[404] User not found, ID: ${id}`);
@@ -267,9 +273,9 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
 async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
   logger.info("updateUserByID() called");
 
-  let id = request.id;
-  let { firstName, lastName, about, password, email } =
-    request.body;
+  const { id } = request.params as UserIdParams;
+  const { firstName, lastName, about, password, email } =
+    request.body as UpdateUserBody;
 
   //const updateVars = [firstName, lastName, about, password, email]; // not used
 
@@ -289,6 +295,12 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
 
   const updateUser = await User.findOne({ id: id });
 
+  if (!updateUser) {
+    logger.error(`[404] User not found, ID: ${id}`);
+    reply.status(404).send({ error: "User not found." });
+    return;
+  }
+
   const userID = request.authUser.id;
   if (userID == null) {
     logger.error("[401] Authenticated user missing id.");
@@ -296,9 +308,9 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const dbUser = await User.findOne({ id: userID }).populate("role");
+  const dbUser = await User.findOne({ id: userID }).populate<{ role: RoleDoc }>("role");
 
-  if (!hasPopulatedRole(dbUser)) {
+  if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
     reply.status(401).send({ error: "You are not logged in." });
     return;
@@ -370,7 +382,7 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
  */
 async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
   logger.info("deleteUserById() called");
-  const id = request.id;
+  const { id } = request.params as UserIdParams;
 
   if (!request.authUser) {
     logger.error("[401] User needs to log in.");
@@ -385,9 +397,9 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
     return;
   }
 
-  const dbUser = await User.findOne({ id: userID }).populate("role");
+  const dbUser = await User.findOne({ id: userID }).populate<{ role: RoleDoc }>("role");
 
-  if (!hasPopulatedRole(dbUser)) {
+  if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
     reply.status(401).send({ error: "You are not logged in." });
     return;
@@ -402,6 +414,12 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
   }
 
   const deleteUser = await User.findOne({ id: id });
+
+  if (!deleteUser) {
+    logger.error(`[404] User not found, ID: ${id}`);
+    reply.status(404).send({ error: "User not found." });
+    return;
+  }
 
   const ability = createAbilityFor(dbUser);
 

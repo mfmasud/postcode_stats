@@ -99,7 +99,11 @@ export const DeleteUserByIdSchema = {
 };
 
 // ---- Types (for compile-time) ----
-export type UserIdParams = Static<typeof UserIdParamSchema>;
+
+// Bodies
+export type CreateUserBody = Static<typeof CreateUserSchema.body>;
+export type UpdateUserBody = Static<typeof UpdateUserByIdSchema.body>;
+
 export type GetUserResponse = Static<typeof GetUserResponseSchema>;
 export type UpdateUserResponse = Static<typeof UpdateUserResponseSchema>;
 export type DeleteUserResponse = Static<typeof DeleteUserResponseSchema>;
