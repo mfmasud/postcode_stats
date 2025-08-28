@@ -28,6 +28,7 @@ import {
   type InferSchemaType,
   type HydratedDocument,
   type Model,
+  type Types,
 } from 'mongoose';
 
 /* validation: 
@@ -77,8 +78,14 @@ const userSchema = new Schema({
 });
 
 export type UserInferredSchema = InferSchemaType<typeof userSchema>;
-export type UserDoc = HydratedDocument<UserInferredSchema>;
-export type UserDocWithRole = UserDoc & { role: RoleDoc };
+
+export type UserDoc = HydratedDocument<
+  UserInferredSchema & { role: Types.ObjectId | RoleDoc }
+>;
+
+export type UserDocWithRole = HydratedDocument<
+  UserInferredSchema & { role: RoleDoc }
+>;
 
 export interface AuthUser extends Omit<UserInferredSchema, 'role'> { role: RoleInferredSchema }
 
