@@ -1,4 +1,10 @@
 # postcode_stats
+
+> ⚠️ **MIGRATION IN PROGRESS** ⚠️  
+> This project is currently undergoing a major architectural migration from Koa to Fastify with TypeScript. Some routes may be temporarily unavailable or incomplete during this transition period.
+
+> note: rather than maintaining two sets of dependencies (Koa + Fastify) and serving both via something like nginx or caddy, I am implementing things one by one directly.
+
 This repository holds my improvements to my POR submission for the module **6003CEM - Web API Development**. The original submission can be found here: https://github.coventry.ac.uk/masudm6/improved_POR
 
 Now that I have an infinite amount of time, I can work on the feedback provided by my lecturer:
