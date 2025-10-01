@@ -44,14 +44,14 @@ async function getAllUsers(request: FastifyRequest, reply: FastifyReply) {
 
   if (!request.authUser) {
     logger.error("[401] User needs to log in.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
   const userID = request.authUser.id;
   if (userID == null) {
     logger.error("[401] Authenticated user missing id.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -59,7 +59,7 @@ async function getAllUsers(request: FastifyRequest, reply: FastifyReply) {
 
   if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -68,14 +68,14 @@ async function getAllUsers(request: FastifyRequest, reply: FastifyReply) {
 
   if (!permission) {
     logger.error("[403] User does not have permission to view all users.");
-    reply.status(403).send({ error: "You are not allowed to perform this action" });
+    reply.status(403).send({ error: "Forbidden", message: "You are not allowed to perform this action." });
   } else {
     const users = await User.find().populate("role");
 
     if (!users) {
       // technically this should never happen as we are literally signing in with a user
       logger.error("[404] No users found in database.");
-      reply.status(404).send({ error: "No users found in database." });
+      reply.status(404).send({ error: "Not Found", message: "No users found in database." });
     } else {
       reply.status(200).send(users);
       logger.info("[200] All users from database returned.");
@@ -110,7 +110,7 @@ async function createUser(request: FastifyRequest, reply: FastifyReply) {
   // check if email, password, or username are empty
   if (!username || !password || !email) {
     logger.error("[400] Username, password or email field is empty.");
-    reply.status(400).send({ error: "Username, password or email field is empty." });
+    reply.status(400).send({ error: "Bad Request", message: "Username, password or email field is empty." });
     return;
   }
 
@@ -120,18 +120,18 @@ async function createUser(request: FastifyRequest, reply: FastifyReply) {
 
   if (usernameCheck) {
     logger.error("[400] Username already exists.");
-    reply.status(400).send({ error: "Username already exists." });
+    reply.status(400).send({ error: "Bad Request", message: "Username already exists." });
     return;
   } else if (emailCheck) {
     logger.error("[400] Email already exists.");
-    reply.status(400).send({ error: "Email already exists." });
+    reply.status(400).send({ error: "Bad Request", message: "Email already exists." });
     return;
   }
 
   const roleDoc : RoleDoc | null = await Role.findOne({ name: "user" });
 
   if (!roleDoc) {
-    reply.status(400).send({ error: "Role not found" });
+    reply.status(400).send({ error: "Bad Request", message: "Role not found" });
     return;
   }
 
@@ -154,7 +154,7 @@ async function createUser(request: FastifyRequest, reply: FastifyReply) {
     });
   } catch (error) {
     logger.error(`[500] Error: User creation failed:\n${error}`);
-    reply.status(500).send({ error: "User creation failed." });
+    reply.status(500).send({ error: "Internal Server Error", message: "User creation failed." });
   }
 }
 
@@ -180,14 +180,14 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!request.authUser) {
     logger.error("[401] User needs to log in.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
   const userID = request.authUser.id;
   if (userID == null) {
     logger.error("[401] Authenticated user missing id.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -195,7 +195,7 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -203,14 +203,14 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!(await isValidUserID(id))) {
     logger.error("[400] Invalid user ID: " + id);
-    reply.status(400).send({ error: "Invalid user ID." });
+    reply.status(400).send({ error: "Bad Request", message: "Invalid user ID." });
     return;
   }
   const findUser = await User.findOne({ id: id }).populate<{ role: RoleDoc }>("role");
 
   if (!findUser) {
     logger.error(`[404] User not found, ID: ${id}`);
-    reply.status(404).send({ error: "User not found." });
+    reply.status(404).send({ error: "Not Found", message: "User not found." });
     return;
   }
 
@@ -230,7 +230,7 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
   let returnData: ReturnData = {} as ReturnData;
   if (!ability.can("read", findUser)) {
     logger.error("[403] User is not allowed to perform this action.");
-    reply.status(403).send({ error: "You are not allowed to perform this action" });
+    reply.status(403).send({ error: "Forbidden", message: "You are not allowed to perform this action." });
     return;
   } else {
     logger.info("[200] User found.");
@@ -281,7 +281,7 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!request.authUser) {
     logger.error("[401] User needs to log in.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
   const user = request.authUser;
@@ -289,7 +289,7 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
   const ValidUserID = await isValidUserID(id);
   if (!ValidUserID) {
     logger.error(`[400] Invalid User ID: ${id}`);
-    reply.status(400).send({ error: "Invalid User ID." });
+    reply.status(400).send({ error: "Bad Request", message: "Invalid User ID." });
     return;
   }
 
@@ -297,14 +297,14 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!updateUser) {
     logger.error(`[404] User not found, ID: ${id}`);
-    reply.status(404).send({ error: "User not found." });
+    reply.status(404).send({ error: "Not Found", message: "User not found." });
     return;
   }
 
   const userID = request.authUser.id;
   if (userID == null) {
     logger.error("[401] Authenticated user missing id.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -312,7 +312,7 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -322,7 +322,7 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
     logger.error(
       `[403] User ${user.username} is not allowed to update user with ID: ${id}`
     );
-    reply.status(403).send({ error: "You are not allowed to perform this action" });
+    reply.status(403).send({ error: "Forbidden", message: "You are not allowed to perform this action." });
     return;
   } else {
     try {
@@ -358,7 +358,7 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
       // changes string
     } catch (error) {
       logger.error(`[500] Error: User update failed with error:\n${error}`);
-      reply.status(500).send({ error: "User update failed." });
+      reply.status(500).send({ error: "Internal Server Error", message: "User update failed." });
     }
   }
 }
@@ -386,14 +386,14 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!request.authUser) {
     logger.error("[401] User needs to log in.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
   const userID = request.authUser.id;
   if (userID == null) {
     logger.error("[401] Authenticated user missing id.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -401,7 +401,7 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!dbUser) {
     logger.error("[401] Authenticated user not found or role not available.");
-    reply.status(401).send({ error: "You are not logged in." });
+    reply.status(401).send({ error: "Unauthorized", message: "You are not logged in." });
     return;
   }
 
@@ -409,7 +409,7 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!(await isValidUserID(id))) {
     logger.error(`[400] Invalid user ID: ${id}`);
-    reply.status(400).send({ error: "Invalid user ID." });
+    reply.status(400).send({ error: "Bad Request", message: "Invalid user ID." });
     return;
   }
 
@@ -417,7 +417,7 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!deleteUser) {
     logger.error(`[404] User not found, ID: ${id}`);
-    reply.status(404).send({ error: "User not found." });
+    reply.status(404).send({ error: "Not Found", message: "User not found." });
     return;
   }
 
@@ -425,7 +425,7 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
 
   if (!ability.can("delete", deleteUser)) {
     logger.error("[403] User is not allowed to delete this user.");
-    reply.status(403).send({ error: "You are not allowed to perform this action" });
+    reply.status(403).send({ error: "Forbidden", message: "You are not allowed to perform this action." });
     return;
   } else {
     try {
@@ -434,7 +434,7 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
       reply.status(200).send({ message: "User deleted." });
     } catch (error) {
       logger.error(`[500] Error: User deletion failed:\n${error}`);
-      reply.status(500).send({ error: "User deletion failed." });
+      reply.status(500).send({ error: "Internal Server Error", message: "User deletion failed." });
     }
   }
 }
