@@ -19,6 +19,19 @@ import {
 // Extract the param types
 type UserIdParams = Static<typeof UserIdParamSchema>;
 
+// Type for formatted user response matching GetUserResponseSchema
+interface FormattedUserResponse {
+  id: string;
+  firstName: string;
+  lastName: string;
+  about: string;
+  username: string;
+  email: string;
+  role: string;
+  dateRegistered: Date;
+  password?: string;
+}
+
 import createAbilityFor from "../../permissions/users.js";
 
 /**
@@ -70,14 +83,17 @@ async function getAllUsers(request: FastifyRequest, reply: FastifyReply) {
     logger.error("[403] User does not have permission to view all users.");
     reply.status(403).send({ error: "Forbidden", message: "You are not allowed to perform this action." });
   } else {
-    const users = await User.find().populate("role");
+    const users = await User.find().populate<{ role: RoleDoc }>("role");
 
-    if (!users) {
+    if (!users || users.length === 0) {
       // technically this should never happen as we are literally signing in with a user
       logger.error("[404] No users found in database.");
       reply.status(404).send({ error: "Not Found", message: "No users found in database." });
     } else {
-      reply.status(200).send(users);
+      // Format all users according to schema
+      const formattedUsers = users.map(user => formatUserResponse(user as UserDocWithRole, false));
+      
+      reply.status(200).send(formattedUsers);
       logger.info("[200] All users from database returned.");
     }
   }
@@ -215,40 +231,19 @@ async function getUserById(request: FastifyRequest, reply: FastifyReply) {
   }
 
   const ability = createAbilityFor(dbUser as UserDocWithRole);
-  interface ReturnData {
-    id: string;
-    firstName: string;
-    lastName: string;
-    about: string;
-    username: string;
-    email: string;
-    role: string;
-    dateRegistered: Date;
-    password?: string;
-  }
 
-  let returnData: ReturnData = {} as ReturnData;
   if (!ability.can("read", findUser)) {
     logger.error("[403] User is not allowed to perform this action.");
     reply.status(403).send({ error: "Forbidden", message: "You are not allowed to perform this action." });
     return;
   } else {
     logger.info("[200] User found.");
-    returnData = {
-      id: findUser.id,
-      firstName: findUser.firstName ?? "",
-      lastName: findUser.lastName ?? "",
-      about: findUser.about ?? "",
-      username: findUser.username,
-      email: findUser.email,
-      role: findUser.role.name,
-      dateRegistered: findUser.dateRegistered,
-    };
-
-    // if the user is allowed to read the password, return it
-    if (ability.can("read", "UserPassword")) {
-      returnData.password = findUser.password;
-    }
+    
+    // Check if the user is allowed to read the password
+    const includePassword = ability.can("read", "UserPassword");
+    
+    // Format user response using helper function
+    const returnData = formatUserResponse(findUser as UserDocWithRole, includePassword);
 
     reply.status(200).send(returnData);
   }
@@ -352,10 +347,23 @@ async function updateUserById(request: FastifyRequest, reply: FastifyReply) {
 
       await updateUser.save();
 
+      // Populate role to get complete user object
+      const updatedUserWithRole = await updateUser.populate<{ role: RoleDoc }>("role");
+
+      if (!updatedUserWithRole || !updatedUserWithRole.role) {
+        logger.error("[500] Failed to populate role after user update.");
+        reply.status(500).send({ error: "Internal Server Error", message: "User update failed." });
+        return;
+      }
+
+      // Format response according to schema
+      const formattedUser = formatUserResponse(updatedUserWithRole as UserDocWithRole);
+
       logger.info(`[200] User with ID ${id} updated successfully`);
-      const changes = ""; // would show the fields that have changes in them
-      reply.status(200).send({ message: `Edited fields for user with ID: ${id}` }); // fields would be replaced with the
-      // changes string
+      reply.status(200).send({ 
+        success: true, 
+        user: formattedUser 
+      });
     } catch (error) {
       logger.error(`[500] Error: User update failed with error:\n${error}`);
       reply.status(500).send({ error: "Internal Server Error", message: "User update failed." });
@@ -429,9 +437,26 @@ async function deleteUserById(request: FastifyRequest, reply: FastifyReply) {
     return;
   } else {
     try {
+      // Populate role before deleting to capture complete user info
+      const deleteUserWithRole = await deleteUser.populate<{ role: RoleDoc }>("role");
+
+      if (!deleteUserWithRole || !deleteUserWithRole.role) {
+        logger.error("[500] Failed to populate role before user deletion.");
+        reply.status(500).send({ error: "Internal Server Error", message: "User deletion failed." });
+        return;
+      }
+
+      // Format user response before deletion
+      const formattedUser = formatUserResponse(deleteUserWithRole as UserDocWithRole);
+
+      // Delete the user
       await User.deleteOne({ id: id });
+
       logger.info(`[200] User with ID ${id} deleted successfully`);
-      reply.status(200).send({ message: "User deleted." });
+      reply.status(200).send({ 
+        success: true, 
+        user: formattedUser 
+      });
     } catch (error) {
       logger.error(`[500] Error: User deletion failed:\n${error}`);
       reply.status(500).send({ error: "Internal Server Error", message: "User deletion failed." });
@@ -457,6 +482,37 @@ async function isValidUserID(id: string): Promise<boolean> {
   } else {
     return false;
   }
+}
+
+/**
+ * Formats a user document into the response schema format.
+ * 
+ * @function formatUserResponse
+ * 
+ * @param {UserDocWithRole} user - The user document with populated role.
+ * @param {boolean} includePassword - Whether to include the password field in the response.
+ * @returns {FormattedUserResponse} Formatted user object matching GetUserResponseSchema.
+ */
+function formatUserResponse(user: UserDocWithRole, includePassword: boolean = false): FormattedUserResponse {
+  const formattedUser: Omit<FormattedUserResponse, 'password'> = {
+    id: user.id.toString(),
+    firstName: user.firstName ?? "",
+    lastName: user.lastName ?? "",
+    about: user.about ?? "",
+    username: user.username,
+    email: user.email,
+    role: user.role.name,
+    dateRegistered: user.dateRegistered,
+  };
+
+  if (includePassword) {
+    return {
+      ...formattedUser,
+      password: user.password,
+    };
+  }
+
+  return formattedUser;
 }
 
 export { getAllUsers, createUser, getUserById, updateUserById, deleteUserById, isValidUserID };

@@ -12,21 +12,27 @@ export const UserIdParamSchema = Type.Object({
 
 // GET /users/:id response schema
 export const GetUserResponseSchema = Type.Object({
-  id: Type.String({ pattern: '^\\d+$' }),
-  username: Type.String(),
-  email: Type.Optional(Type.String()), // only if you expose it
+  id: Type.String({ pattern: '^\\d+$', description: 'User identifier (numeric string)' }),
+  firstName: Type.Optional(Type.String({ description: 'User first name' })),
+  lastName: Type.Optional(Type.String({ description: 'User last name' })),
+  about: Type.Optional(Type.String({ description: 'User bio/about section' })),
+  username: Type.String({ description: 'User username' }),
+  email: Type.String({ format: 'email', description: 'User email address' }),
+  role: Type.String({ description: 'User role name' }),
+  dateRegistered: Type.String({ format: 'date-time', description: 'User registration date' }),
+  password: Type.Optional(Type.String({ description: 'Hashed password (only if role has permission to read)' })),
 });
 
-// PUT /users/:id response schema (maybe more fields)
+// PUT /users/:id response schema - Returns success flag and updated user
 export const UpdateUserResponseSchema = Type.Object({
-  success: Type.Boolean(),
+  success: Type.Boolean({ description: 'Indicates if the update was successful' }),
   user: GetUserResponseSchema,
 });
 
-// DELETE /users/:id response schema
+// DELETE /users/:id response schema - Returns success flag and deleted user info
 export const DeleteUserResponseSchema = Type.Object({
-  success: Type.Boolean(),
-  message: Type.String(),
+  success: Type.Boolean({ description: 'Indicates if the deletion was successful' }),
+  user: GetUserResponseSchema,
 });
 
 // GET /users (getAllUsers) schema
