@@ -1,10 +1,13 @@
-// @ts-check
+import globals from "globals"
+import tseslint from "typescript-eslint"
+import { defineConfig } from "eslint/config"
+import eslintConfigPrettier from "eslint-config-prettier/flat"
 
-import eslint from '@eslint/js';
-import { defineConfig } from 'eslint/config';
-import tseslint from 'typescript-eslint';
-
-export default defineConfig(
-  eslint.configs.recommended,
-  tseslint.configs.recommended,
-);
+export default defineConfig([
+    {
+        files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
+        languageOptions: { globals: globals.browser },
+    },
+    tseslint.configs.recommended,
+    eslintConfigPrettier,
+])
