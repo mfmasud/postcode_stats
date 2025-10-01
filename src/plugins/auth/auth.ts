@@ -1,7 +1,7 @@
-import fp from 'fastify-plugin';
-import logger from '../../utils/logger.js';
+import fp from "fastify-plugin";
+import logger from "../../utils/logger.js";
 
-import type { FastifyPluginAsyncTypebox } from '@fastify/type-provider-typebox';
+import type { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox";
 
 import { LoginUserJWT } from './authhelper.js';
 import { LoginRouteSchema } from '../../schemas/authSchema.js';

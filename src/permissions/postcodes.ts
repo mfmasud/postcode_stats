@@ -11,7 +11,7 @@
 
 import { AbilityBuilder, createMongoAbility } from "@casl/ability";
 
-import logger from "../utils/logger.js";
+//import logger from "../utils/logger.js";
 
 import type { UserDocWithRole } from "../models/User.js";
 
@@ -31,7 +31,7 @@ import type { UserDocWithRole } from "../models/User.js";
 function defineAbilitiesFor(user: UserDocWithRole) {
   //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
-  const { can, cannot, build } = new AbilityBuilder(createMongoAbility);
+  const { can, build } = new AbilityBuilder(createMongoAbility);
 
   // non authenticated users
 

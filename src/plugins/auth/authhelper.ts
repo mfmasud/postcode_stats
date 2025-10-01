@@ -1,7 +1,6 @@
-import fp from 'fastify-plugin';
-import type { FastifyInstance, FastifyReply } from 'fastify';
-import User from '../../models/User.js';
-import logger from '../../utils/logger.js';
+import type { FastifyReply } from "fastify";
+import User from "../../models/User.js";
+import logger from "../../utils/logger.js";
 
 /**
  * Generates a JWT token for a given user id by performing a DB lookup

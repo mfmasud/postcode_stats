@@ -38,8 +38,8 @@ import logger from "../utils/logger.js";
 
 import User from "../models/User.js";
 import Role from "../models/Role.js";
-import Atco from "../models/Atco.js";
-import BusStop from "../models/BusStop.js";
+// import Atco from "../models/Atco.js";
+// import BusStop from "../models/BusStop.js";
 import Postcode from "../models/Postcode.js";
 import Nptg from "../models/Nptg.js";
 import Search from "../models/Search.js";
@@ -49,7 +49,7 @@ import Counter from "../models/Counter.js";
 
 import { saveAtcoList } from "./AtcoCodes.js";
 
-import { getScotlandLocations, getEnglandLocations, getWalesLocations, getNptgData } from "./locations.js";
+import { getScotlandLocations, /*getEnglandLocations, getWalesLocations,*/ getNptgData } from "./locations.js";
 
 
 const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file

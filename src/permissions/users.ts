@@ -12,7 +12,7 @@
 
 import { AbilityBuilder, createMongoAbility } from "@casl/ability";
 
-import logger from "../utils/logger.js";
+//import logger from "../utils/logger.js";
 
 import type { UserDocWithRole } from "../models/User.js";
 

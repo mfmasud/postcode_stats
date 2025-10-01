@@ -1,10 +1,10 @@
 import fp from "fastify-plugin";
-import type { FastifyInstance, FastifyPluginOptions, FastifyRequest, FastifyReply } from 'fastify';
-import type { AuthUser } from '../../models/User.js';
+import type { FastifyInstance, FastifyRequest, FastifyReply } from "fastify";
+import type { AuthUser } from "../../models/User.js";
 
-import User from '../../models/User.js';
+import User from "../../models/User.js";
 
-import logger from '../../utils/logger.js';
+import logger from "../../utils/logger.js";
 
 type JwtDecodedPayload = { _id?: string };
 
@@ -20,7 +20,7 @@ declare module "@fastify/jwt" {
  * Provides JWT authentication functionality including token generation and verification
  * Following @fastify/jwt best practices with enhanced security features
  */
-async function jwtPlugin(fastify: FastifyInstance, opts: FastifyPluginOptions) {
+async function jwtPlugin(fastify: FastifyInstance) {
   // Validate JWT secret
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {

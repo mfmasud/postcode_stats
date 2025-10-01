@@ -5,13 +5,13 @@ import logger from "../../utils/logger.js";
 
 import User from "../../models/User.js";
 import Role from "../../models/Role.js";
-import type { UserDoc, UserDocWithRole, AuthUser, UserInferredSchema } from "../../models/User.js";
+import type { UserDoc, UserDocWithRole } from "../../models/User.js";
 import type { RoleDoc } from "../../models/Role.js";
 
 import { 
   UserIdParamSchema,
-  CreateUserSchema, 
-  UpdateUserByIdSchema,
+  //CreateUserSchema, 
+  //UpdateUserByIdSchema,
   type CreateUserBody,
   type UpdateUserBody
 } from "../../schemas/userSchema.js";

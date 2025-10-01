@@ -1,5 +1,5 @@
 import fp from "fastify-plugin";
-import { connectDB, initUserDB, resetDataDB, initLocationDB, disconnectDB } from "../../helpers/database.js";
+import { connectDB, /*initUserDB, resetDataDB, initLocationDB,*/ disconnectDB } from "../../helpers/database.js";
 import type { FastifyInstance } from "fastify";
 
 export default fp(async (fastify: FastifyInstance) => {
