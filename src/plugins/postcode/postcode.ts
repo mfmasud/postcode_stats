@@ -33,7 +33,7 @@ const postcodeRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
     ) // authenticated users can retrieve a random postcode
     fastify.get(
         "/postcodes/:postcode",
-        { preHandler: [fastify.authenticate], schema: GetPostcodeRouteSchema },
+        { schema: GetPostcodeRouteSchema },
         getPostcodeRoute
     ) // anyone can search for a specific postcode
 }

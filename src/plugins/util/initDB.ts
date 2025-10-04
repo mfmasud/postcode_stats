@@ -2,14 +2,16 @@ import fp from "fastify-plugin"
 import {
     connectDB,
     initUserDB,
-    /*resetDataDB, initLocationDB,*/ disconnectDB,
+    resetDataDB,
+    //initLocationDB,
+    disconnectDB,
 } from "../../helpers/database.js"
 import type { FastifyInstance } from "fastify"
 
 export default fp(async (fastify: FastifyInstance) => {
     await connectDB(true)
     await initUserDB()
-    //await resetDataDB();
+    await resetDataDB()
     //await initLocationDB();
 
     fastify.log.info("✅ Databases initialised")

@@ -25,8 +25,8 @@ import createAbilityFor from "../../permissions/postcodes.js"
 import logger from "../../utils/logger.js"
 
 import Postcode, { type PostcodeDoc } from "../../models/Postcode.js"
-import User, { type UserDoc } from "../../models/User.js"
-import Role, { type RoleDoc } from "../../models/Role.js"
+import User, { type UserDocWithRole } from "../../models/User.js"
+import Role from "../../models/Role.js"
 
 import type { PostcodeParams } from "../../schemas/postcodeSchema.js"
 import type { LocationPair } from "../../types/postcode.js"
@@ -51,21 +51,26 @@ import type { LocationPair } from "../../types/postcode.js"
  *
  */
 async function getAllPostcodes(request: FastifyRequest, reply: FastifyReply) {
-    const { user } = cnx.state
-    if (!cnx.state.user) {
+    if (!request.authUser) {
         logger.error("[401] User needs to log in.")
-        cnx.throw(401, "You are not logged in.")
+        reply
+            .status(401)
+            .send({ error: "Unauthorized", message: "You are not logged in." })
         return
     }
-    const ability = createAbilityFor(user)
+
+    const user = request.authUser
+    const ability = createAbilityFor(user as UserDocWithRole)
 
     if (ability.can("readAll", "Postcode")) {
         const postcodes = await Postcode.find()
-        cnx.status = 200
-        cnx.body = postcodes
+        reply.status(200).send([postcodes])
     } else {
         logger.error("[403] User is not authorised to view this resource.")
-        cnx.throw(403, "You are not authorised to view this resource")
+        reply.status(403).send({
+            error: "Forbidden",
+            message: "You are not authorised to view this resource",
+        })
     }
 }
 
@@ -89,22 +94,27 @@ async function getRandomPostcodeRoute(
     request: FastifyRequest,
     reply: FastifyReply
 ) {
-    const { user } = cnx.state
-    if (!cnx.state.user) {
+    if (!request.authUser) {
         logger.error("[401] User needs to log in.")
-        cnx.throw(401, "You are not logged in.")
+        reply
+            .status(401)
+            .send({ error: "Unauthorized", message: "You are not logged in." })
         return
     }
-    const ability = createAbilityFor(user)
+
+    const user = request.authUser
+    const ability = createAbilityFor(user as UserDocWithRole)
 
     if (ability.can("read", "Postcode")) {
         const randompostcode = await getRandomPostcode()
-        cnx.status = 200
+        reply.status(200).send(randompostcode)
         logger.info(`returned postcode ${randompostcode.postcode}`)
-        cnx.body = randompostcode
     } else {
         logger.error("[403] User is not authorised to view this resource.")
-        cnx.throw(403, "You are not authorised to view this resource")
+        reply.status(403).send({
+            error: "Forbidden",
+            message: "You are not authorised to view this resource",
+        })
     }
 }
 
@@ -131,36 +141,41 @@ async function getPostcodeRoute(request: FastifyRequest, reply: FastifyReply) {
 
     if (!postcode) {
         logger.error("No postcode provided.")
-        reply
-            .status(400)
-            .send({
-                error: "Bad Request",
-                message: "Please provide a postcode.",
-            })
+        reply.status(400).send({
+            error: "Bad Request",
+            message: "Please provide a postcode.",
+        })
         return
     }
 
-    let { user } = cnx.state
+    let user = request.authUser
     if (!user) {
-        user = User({ role: await Role.findOne({ name: "none" }) })
+        user = new User({
+            role: await Role.findOne({ name: "none" }),
+        }) as UserDocWithRole // creating a new user and looking up a role to make an anon user - probably not the best way
     }
-    const ability = createAbilityFor(user)
+    const ability = createAbilityFor(user as UserDocWithRole)
 
     if (ability.can("read", "Postcode")) {
         const validPostcode = await validatePostcode(postcode)
 
         if (validPostcode) {
             const body = await getPostcode(postcode)
-            cnx.status = 200
+            reply.status(200).send(body)
             logger.info(`returned postcode ${body.postcode}`)
-            cnx.body = body
         } else {
             logger.error("Invalid postcode provided.")
-            cnx.throw(400, "Please provide a valid postcode.")
+            reply.status(400).send({
+                error: "Bad Request",
+                message: "Please provide a valid postcode.",
+            })
         }
     } else {
         logger.error("[403] User is not authorised to view this resource.")
-        cnx.throw(403, "You are not authorised to view this resource")
+        reply.status(403).send({
+            error: "Forbidden",
+            message: "You are not authorised to view this resource",
+        })
     }
 }
 
@@ -257,13 +272,13 @@ async function getRandomPostcode() {
  */
 async function getPostcode(validPostcodeString: string) {
     // check if postcode exists in db
-    const postcodeExists = await Postcode.findOne({
+    const postcodeExists = await Postcode.exists({
         postcode: validPostcodeString,
     })
 
     if (postcodeExists) {
         logger.info(`Postcode already exists in db: ${validPostcodeString}`)
-        return postcodeExists
+        return await Postcode.findOne({ postcode: validPostcodeString })
     }
 
     try {
@@ -322,6 +337,17 @@ async function validatePostcode(postcodeString: string) {
 async function processPostcode(postcodeObject: PostcodeDoc) {
     logger.info(`Processing: ${postcodeObject.postcode}`)
 
+    // Check if postcode already exists to avoid unnecessary processing
+    const existingPostcode = await Postcode.findOne({
+        postcode: postcodeObject.postcode,
+    })
+    if (existingPostcode) {
+        logger.info(
+            `Postcode ${postcodeObject.postcode} already exists in database, skipping save`
+        )
+        return
+    }
+
     // fields to save: postcode, eastings, northings, country, longitude, latitude, region (can be null)
     // parliamentary_constituency, admin_district, admin_ward, parish, admin_county (can be null too)
 
@@ -339,6 +365,15 @@ async function processPostcode(postcodeObject: PostcodeDoc) {
         parish,
         admin_county,
     } = postcodeObject
+
+    // Only save if we have the required coordinates - some postcodes don't -> IM3 1HL (Isle of Man)
+    // Ideally the coordinates could be found out another way e.g. another API
+    if (longitude == null || latitude == null) {
+        logger.warn(
+            `Skipping postcode ${postcode} - missing coordinates (longitude: ${longitude}, latitude: ${latitude})`
+        )
+        return
+    }
 
     const newPostcode = new Postcode({
         postcode: postcode,
@@ -359,8 +394,13 @@ async function processPostcode(postcodeObject: PostcodeDoc) {
         await newPostcode.save()
         logger.info(`Successfully saved postcode: ${postcodeObject.postcode}`)
     } catch (error) {
-        logger.error(error)
+        logger.error(`Failed to save postcode ${postcode}:`, error)
     }
 }
 
-export { getAllPostcodes, getRandomPostcodeRoute, getPostcodeRoute }
+export {
+    getAllPostcodes,
+    getRandomPostcodeRoute,
+    getPostcodeRoute,
+    findPostcodeFromWGS84,
+}

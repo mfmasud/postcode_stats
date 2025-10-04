@@ -42,8 +42,8 @@ export const GetPostcodeRouteSchema = Type.Object({
     response: Type.Object({
         200: GetPostcodeResponseSchema,
         400: ErrorResponseSchema, // Invalid postcode
-        401: ErrorResponseSchema, // Not logged in
-        403: ErrorResponseSchema, // Not allowed to read postcode
+        //401: ErrorResponseSchema, // Not logged in
+        //403: ErrorResponseSchema, // Not allowed to read postcode
         404: ErrorResponseSchema, // Postcode not found
     }),
 })

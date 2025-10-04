@@ -9,11 +9,11 @@
  * @exports defineAbilitiesFor
  */
 
-import { AbilityBuilder, createMongoAbility } from "@casl/ability";
+import { AbilityBuilder, createMongoAbility } from "@casl/ability"
 
 //import logger from "../utils/logger.js";
 
-import type { UserDocWithRole } from "../models/User.js";
+import type { UserDocWithRole } from "../models/User.js"
 
 /**
  * Defines the user's permissions for the /postcodes route.
@@ -29,30 +29,33 @@ import type { UserDocWithRole } from "../models/User.js";
  *
  */
 function defineAbilitiesFor(user: UserDocWithRole) {
-  //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
+    //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
-  const { can, build } = new AbilityBuilder(createMongoAbility);
+    const { can, build } = new AbilityBuilder(createMongoAbility)
 
-  // non authenticated users
+    // non authenticated users
+    if (user.role.name === "none") {
+        can("read", "Postcode")
+    }
 
-  // authenticated users
-  // standard users
-  if (user.role.name === "user") {
-    can("read", "Postcode");
-  }
+    // authenticated users
+    // standard users
+    if (user.role.name === "user") {
+        can("read", "Postcode")
+    }
 
-  // paid users
-  if (user.role.name === "paiduser") {
-    can("read", "Postcode");
-  }
+    // paid users
+    if (user.role.name === "paiduser") {
+        can("read", "Postcode")
+    }
 
-  // admin users
-  if (user.role.name === "admin") {
-    can("readAll", "Postcode");
-    can("read", "Postcode");
-  }
+    // admin users
+    if (user.role.name === "admin") {
+        can("readAll", "Postcode")
+        can("read", "Postcode")
+    }
 
-  return build();
+    return build()
 }
 
-export default defineAbilitiesFor;
+export default defineAbilitiesFor
