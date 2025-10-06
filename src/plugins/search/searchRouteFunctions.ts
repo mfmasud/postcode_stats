@@ -1,7 +1,7 @@
 import logger from "../../utils/logger.js"
 
 // models
-import User from "../../models/User.js"
+import User, { type UserDocWithRole } from "../../models/User.js"
 import Role from "../../models/Role.js"
 import Postcode from "../../models/Postcode.js"
 import Search from "../../models/Search.js"
@@ -114,11 +114,13 @@ async function searchArea(request: FastifyRequest, reply: FastifyReply) {
         return
     }
 
-    let { user } = cnx.state
+    let user = request.authUser
     if (!user) {
-        user = User({ role: await Role.findOne({ name: "none" }) })
+        user = new User({
+            role: await Role.findOne({ name: "none" }),
+        }) as UserDocWithRole // creating a new user and looking up a role to make an anon user - probably not the best way
     }
-    const ability = createAbilityFor(user)
+    const ability = createAbilityFor(user as UserDocWithRole)
 
     if (ability.can("create", "Search")) {
         // lookup lat long to postcode to generate data for postcode field, then search via postcode
@@ -176,11 +178,13 @@ async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
         return
     }
 
-    let { user } = cnx.state
+    let user = request.authUser
     if (!user) {
-        user = User({ role: await Role.findOne({ name: "none" }) })
+        user = new User({
+            role: await Role.findOne({ name: "none" }),
+        }) as UserDocWithRole // creating a new user and looking up a role to make an anon user - probably not the best way
     }
-    const ability = createAbilityFor(user)
+    const ability = createAbilityFor(user as UserDocWithRole)
 
     if (ability.can("create", "Search")) {
         const validPostcode = await validatePostcode(postcode)
@@ -261,12 +265,13 @@ async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
  *
  */
 async function searchRandom(request: FastifyRequest, reply: FastifyReply) {
-    let { user } = cnx.state
+    let user = request.authUser
     if (!user) {
-        // I could just return here, but this route might be accessible to other roles in the future.
-        user = User({ role: await Role.findOne({ name: "none" }) })
+        user = new User({
+            role: await Role.findOne({ name: "none" }),
+        }) as UserDocWithRole // creating a new user and looking up a role to make an anon user - probably not the best way
     }
-    const ability = createAbilityFor(user)
+    const ability = createAbilityFor(user as UserDocWithRole)
 
     if (ability.can("create", "RandomSearch")) {
         const processedPostcode = await getRandomPostcode()
