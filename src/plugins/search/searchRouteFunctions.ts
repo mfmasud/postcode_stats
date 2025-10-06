@@ -6,11 +6,6 @@ import Role from "../../models/Role.js"
 import Postcode from "../../models/Postcode.js"
 import Search from "../../models/Search.js"
 
-// schemas
-import latlongSchema from "../../schemas/latlong.json" with { type: "json" }
-import { Ajv } from "ajv"
-const ajv = new Ajv()
-const validateLatLong = ajv.compile(latlongSchema)
 import {
     type SearchAreaParams,
     type SearchPostcodeParams,
@@ -76,43 +71,11 @@ async function searchArea(request: FastifyRequest, reply: FastifyReply) {
         return
     }
 
-    try {
-        var latFloat = parseFloat(lat)
-        var longFloat = parseFloat(long)
-    } catch (error) {
-        logger.error(error)
-        reply.status(400).send({
-            error: "Bad Request",
-            message: "Please provide valid latitude and longitude values.",
-        })
-        return
-    }
-
+    const latFloat = parseFloat(lat)
+    const longFloat = parseFloat(long)
     const locationObj = { latitude: latFloat, longitude: longFloat }
     //logger.info(locationObj);
     //logger.info(validateLatLong(locationObj));
-
-    // Validate the lat/long values
-    if (!validateLatLong(locationObj)) {
-        const errorMessages = [
-            "Please provide valid latitude and longitude values:",
-        ]
-        for (const error of validateLatLong.errors) {
-            // dataPath below could change in the future
-            errorMessages.push(
-                `Value for ${error.dataPath.slice(1)} ${error.message}`
-            ) // "value for x should be <=y"
-        }
-
-        logger.error(
-            `Lat/Long validation error: ${JSON.stringify(validateLatLong.errors[0])}`
-        )
-        reply.status(400).send({
-            error: "Bad Request",
-            message: errorMessages.join("\n"),
-        })
-        return
-    }
 
     let user = request.authUser
     if (!user) {
