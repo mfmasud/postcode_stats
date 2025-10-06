@@ -12,8 +12,8 @@ import { Ajv } from "ajv"
 const ajv = new Ajv()
 const validateLatLong = ajv.compile(latlongSchema)
 import {
-    type searchAreaParams,
-    type searchPostcodeParams,
+    type SearchAreaParams,
+    type SearchPostcodeParams,
 } from "../../schemas/searchSchema.js"
 
 // permissions
@@ -59,7 +59,7 @@ async function searchArea(request: FastifyRequest, reply: FastifyReply) {
     // allows anyone to search via a lat and long in the body of the request
     // returns a list of property listings, transport nodes and crime.
 
-    const { latitude, longitude } = request.params as searchAreaParams
+    const { latitude, longitude } = request.params as SearchAreaParams
 
     const lat = latitude
     const long = longitude
@@ -165,7 +165,7 @@ async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
     // allows anyone to search via a postcode in the request body.
     // returns a list of property listings, transport nodes and crime data
 
-    const { postcode } = request.body as searchPostcodeParams
+    const { postcode } = request.body as SearchPostcodeParams
 
     if (!postcode) {
         logger.info("No postcode provided.")
