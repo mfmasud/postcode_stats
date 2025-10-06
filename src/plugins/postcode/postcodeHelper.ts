@@ -136,8 +136,11 @@ async function getRandomPostcodeRoute(
  * @see {@link validatePostcode} - validates the postcode using the postcode.io API.
  *
  */
-async function getPostcodeRoute(request: FastifyRequest, reply: FastifyReply) {
-    const { postcode } = request.params as PostcodeParams
+async function getPostcodeRoute(
+    request: FastifyRequest<{ Params: PostcodeParams }>,
+    reply: FastifyReply
+) {
+    const { postcode } = request.params
 
     if (!postcode) {
         logger.error("No postcode provided.")

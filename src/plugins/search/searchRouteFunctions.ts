@@ -49,12 +49,18 @@ import { type FastifyRequest, type FastifyReply } from "fastify"
  * @todo Update the reverseLookup property to be false if the postcode is found via this function.
  *
  */
-async function searchArea(request: FastifyRequest, reply: FastifyReply) {
+async function searchArea(
+    request: FastifyRequest<{
+        Params: SearchAreaParams
+        Body: Partial<SearchPostcodeParams>
+    }>,
+    reply: FastifyReply
+) {
     // GET request with latitude/longitude in query params
     // allows anyone to search via a lat and long in the body of the request
     // returns a list of property listings, transport nodes and crime.
 
-    const { latitude, longitude } = request.params as SearchAreaParams
+    const { latitude, longitude } = request.params
 
     const lat = latitude
     const long = longitude
@@ -96,7 +102,10 @@ async function searchArea(request: FastifyRequest, reply: FastifyReply) {
             })
         } else {
             request.body.postcode = findPostcode
-            await searchPostcode(request, reply)
+            await searchPostcode(
+                request as FastifyRequest<{ Body: SearchPostcodeParams }>,
+                reply
+            )
         }
     } else {
         logger.error("User does not have permission to perform this action.")
@@ -126,12 +135,15 @@ async function searchArea(request: FastifyRequest, reply: FastifyReply) {
  * @see {@link module:permissions/search} for the permissions applied to this route.
  *
  */
-async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
+async function searchPostcode(
+    request: FastifyRequest<{ Body: SearchPostcodeParams }>,
+    reply: FastifyReply
+) {
     // POST with postcode in the request body.
     // allows anyone to search via a postcode in the request body.
     // returns a list of property listings, transport nodes and crime data
 
-    const { postcode } = request.body as SearchPostcodeParams
+    const { postcode } = request.body
 
     if (!postcode) {
         logger.info("No postcode provided.")

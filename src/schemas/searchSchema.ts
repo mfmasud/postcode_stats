@@ -4,7 +4,7 @@ import { ErrorResponseSchema } from "./commonSchema.js"
 
 import { type PostcodeParamSchema } from "./postcodeSchema.js"
 
-export type SearchPostcodeParams = typeof PostcodeParamSchema
+export type SearchPostcodeParams = Static<typeof PostcodeParamSchema>
 
 // GET /api/v1/search/
 // POST /api/v1/search/
