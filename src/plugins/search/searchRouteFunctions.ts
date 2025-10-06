@@ -117,6 +117,7 @@ async function searchArea(request: FastifyRequest, reply: FastifyReply) {
  * @param {FastifyReply} reply - The Fastify reply object.
  * @throws {Error} 400 if the postcode is missing or invalid.
  * @throws {Error} 403 if the user does not have permission to search a location.
+ * @throws {Error} 404 if the postcode data is not found in the database.
  * @returns {undefined} the request is modified with a 200 status code and a body containing the search results.
  *
  * @see {@link validatePostcode} for postcode validation.
@@ -158,6 +159,17 @@ async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
                 postcode: processedPostcode.postcode,
             })
 
+            if (!dbPostcode) {
+                logger.error(
+                    `Postcode ${processedPostcode.postcode} not found in database`
+                )
+                reply.status(404).send({
+                    error: "Not Found",
+                    message: "Postcode data not available.",
+                })
+                return
+            }
+
             // check for existing search by comparing Postcode data
             const existingSearch = await Search.findOne({
                 Postcode: dbPostcode,
@@ -167,12 +179,12 @@ async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
                 logger.info("Saving new Search")
                 // save the search to the database
                 const newSearch = new Search({
-                    Postcode: dbPostcode,
+                    Postcode: dbPostcode!,
                     reverseLookup: true,
-                    latitude: dbPostcode.latitude,
-                    longitude: dbPostcode.longitude,
-                    Northing: dbPostcode.northings,
-                    Easting: dbPostcode.eastings,
+                    latitude: dbPostcode!.latitude,
+                    longitude: dbPostcode!.longitude,
+                    Northing: dbPostcode!.northings,
+                    Easting: dbPostcode!.eastings,
                 })
                 await newSearch.save()
                 await linkAtco(newSearch)
@@ -220,7 +232,8 @@ async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
  * @param {FastifyRequest} request - The Fastify request object.
  * @param {FastifyReply} reply - The Fastify reply object.
  * @throws {Error} 403 if the user does not have permission to search a location.
- * @returns {undefined} cnx is modified with a 200 status code and a body containing the random postcode search results.
+ * @throws {Error} 500 if the random postcode data is not found in the database.
+ * @returns {undefined} the request is modified with a 200 status code and a body containing the random postcode search results.
  *
  * @see {@link getRandomPostcode} for random postcode generation.
  * @see {@link module:model/Search} for the Search model used.
@@ -242,21 +255,32 @@ async function searchRandom(request: FastifyRequest, reply: FastifyReply) {
             postcode: processedPostcode.postcode,
         })
 
+        if (!dbPostcode) {
+            logger.error(
+                `Random postcode ${processedPostcode.postcode} not found in database`
+            )
+            reply.status(500).send({
+                error: "Internal Server Error",
+                message: "Unable to generate random postcode data.",
+            })
+            return
+        }
+
         // check for existing search by comparing Postcode data
         const existingSearch = await Search.findOne({
-            Postcode: dbPostcode,
+            Postcode: dbPostcode!,
         })
 
         if (!existingSearch) {
             logger.info("Saving new Random Search")
             // save the search to the database
             const newSearch = new Search({
-                Postcode: dbPostcode,
+                Postcode: dbPostcode!,
                 reverseLookup: true,
-                latitude: dbPostcode.latitude,
-                longitude: dbPostcode.longitude,
-                Northing: dbPostcode.northings,
-                Easting: dbPostcode.eastings,
+                latitude: dbPostcode!.latitude,
+                longitude: dbPostcode!.longitude,
+                Northing: dbPostcode!.northings,
+                Easting: dbPostcode!.eastings,
             })
 
             await newSearch.save()
@@ -270,7 +294,7 @@ async function searchRandom(request: FastifyRequest, reply: FastifyReply) {
         }
 
         const SearchModel = await Search.findOne({
-            latitude: dbPostcode.latitude,
+            latitude: dbPostcode!.latitude,
         }).populate(["Postcode", "queryBusStops", "queryCrimes"])
         const body = SearchModel
         reply.status(200).send(body)
