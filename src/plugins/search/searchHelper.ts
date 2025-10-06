@@ -18,13 +18,16 @@
  *
  */
 
-const Atco = require("../../models/Atco")
-const CrimeList = require("../../models/CrimeList")
+import logger from "../../utils/logger.js"
 
-const logger = require("../../utils/logger")
+import { queryAtcoAPI } from "../../helpers/AtcoCodes.js"
+import { getCrimeData } from "../../helpers/crime.js"
 
-const { queryAtcoAPI } = require("../../helpers/AtcoCodes")
-const { getCrimeData } = require("../../helpers/crime")
+// models
+import Atco from "../../models/Atco.js"
+import CrimeList from "../../models/CrimeList.js"
+import { type SearchDoc } from "../../models/Search.js"
+import { type PostcodeDoc } from "../../models/Postcode.js"
 
 /**
  * Links a `CrimeList` to the `Search` model by comparing the latitude value used by both.
@@ -41,7 +44,7 @@ const { getCrimeData } = require("../../helpers/crime")
  * @see {@link linkAtco} - links associated busstops to the `Search` model
  * @see {@link getRelatedCrimes} - Adds the `Crime`s to the `Search` model.
  */
-async function linkCrimeList(SearchModel) {
+async function linkCrimeList(SearchModel: SearchDoc) {
     // links crime list to search model
     // can be linked by latitude - assuming it is available. If not, this should have been calculated beforehand.
 
@@ -72,7 +75,7 @@ async function linkCrimeList(SearchModel) {
  * @see {@link getCrimeData} - fetches the crime data from the Police API, stores it as a `CrimeList` model.
  * @see {@link linkCrimeList} - links the `CrimeList` to the `Search` model for use in this function.
  */
-async function getRelatedCrimes(SearchModel) {
+async function getRelatedCrimes(SearchModel: SearchDoc) {
     const { latitude, longitude } = SearchModel
 
     if (SearchModel.Postcode.country === "Northern Ireland") {
@@ -113,7 +116,7 @@ async function getRelatedCrimes(SearchModel) {
  * @see {@link https://www.ubdc.ac.uk/data-services/data-catalogue/housing-data/zoopla-property-data/|Zoopla Property Data} provided by University of Glasgow's Urban Big Data Centre.
  *
  */
-async function getRelatedListings(SearchModel) {
+async function getRelatedListings(SearchModel: SearchDoc) {
     const { latitude, longitude } = SearchModel
     //await getPropertyData(latitude, longitude);
     return
@@ -138,8 +141,8 @@ async function getRelatedListings(SearchModel) {
  * @see {@link getScotlandLocations} - Generates the `Atco` model's `other_names` field for Scotland.
  * @see {@link getWalesLocations} - Generates the `Atco` model's `other_names` field for Wales.
  */
-async function searchAtco(PostcodeModel) {
-    var {
+async function searchAtco(PostcodeModel: PostcodeDoc) {
+    const {
         admin_county,
         admin_district,
         parliamentary_constituency,
@@ -149,7 +152,7 @@ async function searchAtco(PostcodeModel) {
     //logger.info(admin_county, admin_district, region);
 
     if (country === "Scotland") {
-        region = "Scotland"
+        const region = "Scotland"
     }
 
     const pc = parliamentary_constituency
@@ -163,25 +166,27 @@ async function searchAtco(PostcodeModel) {
             logger.info("No admin district")
         } else {
             // admin district exists
-            var AtcoToLink = await Atco.findOne({ location: admin_district })
+            const AtcoToLink = await Atco.findOne({ location: admin_district })
             if (!AtcoToLink) {
-                AtcoToLink = await Atco.findOne({ other_names: admin_district })
+                const AtcoToLink = await Atco.findOne({
+                    other_names: admin_district,
+                })
             }
 
             if (region === "London") {
                 /*
-        example: Lambeth - Local Authority / London Borough
+                example: Lambeth - Local Authority / London Borough
 
-        Postcode API data:
-        Region: London
-        admin_district: Lambeth
+                Postcode API data:
+                Region: London
+                admin_district: Lambeth
 
-        In the ATCO List, this is part of "Greater London".
-        In the future, this will be considered an altname for "London", generated from getEnglandLocations
+                In the ATCO List, this is part of "Greater London".
+                In the future, this will be considered an altname for "London", generated from getEnglandLocations
 
-        This also includes postcodes in the City of London (e.g. E1 7DA)
-        */
-                var AtcoToLink = await Atco.findOne({
+                This also includes postcodes in the City of London (e.g. E1 7DA)
+                */
+                const AtcoToLink = await Atco.findOne({
                     location: "Greater London",
                 })
             }
@@ -189,7 +194,7 @@ async function searchAtco(PostcodeModel) {
             if (!AtcoToLink && pc) {
                 // parlimentiary constituency, e.g. Poole (South West)
                 // Others like Bournemout East would be under Dorset (ceremonial country)
-                var AtcoToLink = await Atco.findOne({ location: pc })
+                const AtcoToLink = await Atco.findOne({ location: pc })
                 if (!AtcoToLink) {
                     AtcoToLink = await Atco.findOne({ other_names: pc })
                 }
@@ -197,9 +202,9 @@ async function searchAtco(PostcodeModel) {
         }
     } else {
         // admin county exists
-        var AtcoToLink = await Atco.findOne({ location: admin_county })
+        const AtcoToLink = await Atco.findOne({ location: admin_county })
         if (!AtcoToLink) {
-            AtcoToLink = await Atco.findOne({ other_names: admin_county })
+            const AtcoToLink = await Atco.findOne({ other_names: admin_county })
         }
     }
 
@@ -230,13 +235,13 @@ async function searchAtco(PostcodeModel) {
  * @see {@link searchAtco} - Finds the correct `Atco` model to be linked.
  *
  */
-async function linkAtco(SearchModel) {
+async function linkAtco(SearchModel: SearchDoc) {
     // links Search model to correct ATCO from available information.
     // Should be run when search is created / postcode is updated.
     // Does not return anything
     //logger.info("Looking to link Atco");
 
-    var linkedAtco
+    let linkedAtco
 
     if (SearchModel.Postcode.country === "Northern Ireland") {
         // Skip ATCO linking for northern irish postcodes e.g. BT23 6SA
@@ -270,12 +275,11 @@ async function linkAtco(SearchModel) {
  *
  * @see {@link linkAtco} - Links the `Atco` model to the `Search` model.
  */
-async function getRelatedStops(SearchModel, radius = 1000) {
+async function getRelatedStops(SearchModel: SearchDoc, radius: number = 1000) {
     // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
     const { longitude, latitude, Northing, Easting } = SearchModel
 
-    let linkedAtco = await SearchModel.populate("linkedATCO")
-    linkedAtco = linkedAtco.linkedATCO
+    const linkedAtco = (await SearchModel.populate("linkedATCO")).linkedATCO
 
     // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
     // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
@@ -296,17 +300,17 @@ async function getRelatedStops(SearchModel, radius = 1000) {
  * @async
  * @function updateLinks
  *
- * @param {Object} context - The Koa context object
+ * @param {FastifyRequest} request - The Fastify request object
  * @param {mongoose.Object} SearchModel - The `Search` model to add resource-describing links to.
  * @returns {undefined} Nothing, updates the Search model with the links.
  *
  * @see {@link https://en.wikipedia.org/wiki/HATEOAS} - HATEOAS compliant API responses.
  */
-async function updateLinks(context, SearchModel) {
-    let lat = SearchModel.latitude
-    let long = SearchModel.longitude
+async function updateLinks(request: FastifyRequest, SearchModel: SearchDoc) {
+    const lat = SearchModel.latitude
+    const long = SearchModel.longitude
     const postcode = SearchModel.Postcode.postcode
-    const hostname = context.req.headers.host
+    const hostname = request.host
 
     SearchModel._links = {}
 
@@ -329,9 +333,4 @@ async function updateLinks(context, SearchModel) {
     }
 }
 
-module.exports = {
-    getRelatedStops,
-    getRelatedCrimes,
-    linkAtco,
-    updateLinks,
-}
+export { getRelatedStops, getRelatedCrimes, linkAtco, updateLinks }

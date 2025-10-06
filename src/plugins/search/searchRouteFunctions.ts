@@ -1,63 +1,40 @@
-/**
- * @file Contains the main search routes for the API, allowing users to search for a postcode/lat-long pair and get related stops and crimes.
- * @module routes/search
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
- *
- * @requires @koa/router
- * @requires koa-bodyparser
- * @requires controllers/auth
- * @requires utils/logger
- * @requires ajv
- * @requires models/User
- * @requires models/Role
- * @requires models/Postcode
- * @requires models/Search
- * @requires schemas/latlong
- * @requires permissions/search
- * @requires helpers/postcode
- * @requires helpers/search
- *
- * @exports router
- */
+import logger from "../../utils/logger.js"
 
-const Router = require("@koa/router")
-const bodyParser = require("koa-bodyparser")
-const auth = require("../controllers/auth")
-const router = new Router({ prefix: "/api/v1/search" })
+// models
+import User from "../../models/User.js"
+import Role from "../../models/Role.js"
+import Postcode from "../../models/Postcode.js"
+import Search from "../../models/Search.js"
 
-const logger = require("../../utils/logger")
-const Ajv = require("ajv")
+// schemas
+import latlongSchema from "../../schemas/latlong.json" with { type: "json" }
+import { Ajv } from "ajv"
 const ajv = new Ajv()
-
-// models and json schemas
-const User = require("../../models/User")
-const Role = require("../../models/Role")
-const Postcode = require("../../models/Postcode")
-const Search = require("../../models/Search")
-const latlongSchema = require("../../schemas/latlong.json")
 const validateLatLong = ajv.compile(latlongSchema)
+import {
+    type searchAreaParams,
+    type searchPostcodeParams,
+} from "../../schemas/searchSchema.js"
 
 // permissions
-const createAbilityFor = require("../../permissions/search")
+import createAbilityFor from "../../permissions/search.js"
 
 // helpers
-const {
+import {
     findPostcodeFromWGS84,
     getPostcode,
     getRandomPostcode,
     validatePostcode,
-} = require("../helpers/postcode")
-const {
+} from "../postcode/postcodeHelper.js"
+import {
     getRelatedStops,
     getRelatedCrimes,
     linkAtco,
     updateLinks,
-} = require("../helpers/search")
+} from "./searchHelper.js"
 
-// routes
-router.get("/", auth, bodyParser(), searchArea) // GET - finds a postcode internally using latitude and longitude from the query parameters
-router.post("/", auth, bodyParser(), searchPostcode) // POST - verifies and searches using postcode from the request body
-router.get("/random", auth, searchRandom) // admins only - for testing
+// fastify
+import { type FastifyRequest, type FastifyReply } from "fastify"
 
 /**
  * A function which searches location data using a pair of latitude and longitude values in the query parameters.
@@ -65,24 +42,24 @@ router.get("/random", auth, searchRandom) // admins only - for testing
  * @async
  * @function searchArea
  *
- * @param {Object} cnx - The Koa context object containing the request and response information.
- * @param {Function} next - The next middleware to be called.
+ * @param {FastifyRequest} request - The Fastify request object.
+ * @param {FastifyReply} reply - The Fastify reply object.
  * @throws {Error} 400 if the latitude or longitude values are missing or invalid.
  * @throws {Error} 403 if the user does not have permission to search a location.
- * @returns {undefined} cnx is modified with a 200 status code and a body containing the search results.
- *
+ * @throws {Error} 404 if no postcode is found for the provided coordinates.
+
  * @see {@link findPostcodeFromWGS84} for more information on the function used to find the postcode from the lat-long pair.
  * @see {@link searchPostcode} for more information on the primary function used to search postcodes, used internally in this function.
  *
  * @todo Update the reverseLookup property to be false if the postcode is found via this function.
  *
  */
-async function searchArea(cnx, next) {
+async function searchArea(request: FastifyRequest, reply: FastifyReply) {
     // GET request with latitude/longitude in query params
     // allows anyone to search via a lat and long in the body of the request
     // returns a list of property listings, transport nodes and crime.
 
-    const { latitude, longitude } = cnx.query
+    const { latitude, longitude } = request.params as searchAreaParams
 
     const lat = latitude
     const long = longitude
@@ -92,7 +69,10 @@ async function searchArea(cnx, next) {
     // Check for empty values
     if (!lat || !long) {
         logger.error("No latitude / longitude value provided")
-        cnx.throw(400, "Please provide valid latitude and longitude values.")
+        reply.status(400).send({
+            error: "Bad Request",
+            message: "Please provide valid latitude and longitude values.",
+        })
         return
     }
 
@@ -101,7 +81,10 @@ async function searchArea(cnx, next) {
         var longFloat = parseFloat(long)
     } catch (error) {
         logger.error(error)
-        cnx.throw(400, "Please provide valid latitude and longitude values.")
+        reply.status(400).send({
+            error: "Bad Request",
+            message: "Please provide valid latitude and longitude values.",
+        })
         return
     }
 
@@ -124,8 +107,10 @@ async function searchArea(cnx, next) {
         logger.error(
             `Lat/Long validation error: ${JSON.stringify(validateLatLong.errors[0])}`
         )
-        cnx.status = 400
-        cnx.body = errorMessages.join("\n")
+        reply.status(400).send({
+            error: "Bad Request",
+            message: errorMessages.join("\n"),
+        })
         return
     }
 
@@ -140,15 +125,20 @@ async function searchArea(cnx, next) {
 
         const findPostcode = await findPostcodeFromWGS84(locationObj)
         if (!findPostcode) {
-            cnx.status = 200
-            cnx.body = "No postcode found for provided coordinates."
+            reply.status(404).send({
+                error: "Not Found",
+                message: "No postcode found for provided coordinates.",
+            })
         } else {
-            cnx.request.body.postcode = findPostcode
-            await searchPostcode(cnx, next)
+            request.body.postcode = findPostcode
+            await searchPostcode(request, reply)
         }
     } else {
         logger.error("User does not have permission to perform this action.")
-        cnx.throw(403, "You are not allowed to access this resource.")
+        reply.status(403).send({
+            error: "Forbidden",
+            message: "You are not allowed to access this resource.",
+        })
     }
 }
 
@@ -158,11 +148,11 @@ async function searchArea(cnx, next) {
  * @async
  * @function searchPostcode
  *
- * @param {Object} cnx - The Koa context object containing the request and response information.
- * @param {Function} next - The next middleware to be called.
+ * @param {FastifyRequest} request - The Fastify request object.
+ * @param {FastifyReply} reply - The Fastify reply object.
  * @throws {Error} 400 if the postcode is missing or invalid.
  * @throws {Error} 403 if the user does not have permission to search a location.
- * @returns {undefined} cnx is modified with a 200 status code and a body containing the search results.
+ * @returns {undefined} the request is modified with a 200 status code and a body containing the search results.
  *
  * @see {@link validatePostcode} for postcode validation.
  * @see {@link getPostcode} for postcode lookup using the postcodes.io API.
@@ -170,16 +160,19 @@ async function searchArea(cnx, next) {
  * @see {@link module:permissions/search} for the permissions applied to this route.
  *
  */
-async function searchPostcode(cnx, next) {
+async function searchPostcode(request: FastifyRequest, reply: FastifyReply) {
     // POST with postcode in the request body.
     // allows anyone to search via a postcode in the request body.
     // returns a list of property listings, transport nodes and crime data
 
-    let { postcode } = cnx.request.body
+    const { postcode } = request.body as searchPostcodeParams
 
     if (!postcode) {
         logger.info("No postcode provided.")
-        cnx.throw(400, "Please provide a valid postcode.")
+        reply.status(400).send({
+            error: "Bad Request",
+            message: "Please provide a valid postcode.",
+        })
         return
     }
 
@@ -218,29 +211,34 @@ async function searchPostcode(cnx, next) {
                 await linkAtco(newSearch)
                 await getRelatedStops(newSearch) // get all bus stops for location and link to search model
                 await getRelatedCrimes(newSearch) // get all crimes for location and link to search model
-                await updateLinks(cnx, newSearch) // add resource-describing links
+                await updateLinks(request, newSearch) // add resource-describing links
             } else {
                 logger.info(
                     `Existing search found, ID: ${existingSearch.searchID}`
                 )
-                await updateLinks(cnx, existingSearch)
+                await updateLinks(request, existingSearch)
             }
 
             const SearchModel = await Search.findOne({
                 latitude: dbPostcode.latitude,
             }).populate(["Postcode", "queryBusStops", "queryCrimes"])
             const body = SearchModel
-            cnx.status = 200
-            cnx.body = body
+            reply.status(200).send(body)
         } else {
             // invalid postcode
             logger.info("Invalid postcode provided.")
-            cnx.throw(400, "Please provide a valid postcode.")
+            reply.status(400).send({
+                error: "Bad Request",
+                message: "Please provide a valid postcode.",
+            })
             return
         }
     } else {
         logger.error("User does not have permission to perform this action.")
-        cnx.throw(403, "You are not allowed to access this resource.")
+        reply.status(403).send({
+            error: "Forbidden",
+            message: "You are not allowed to access this resource.",
+        })
         return
     }
 }
@@ -252,8 +250,8 @@ async function searchPostcode(cnx, next) {
  * @async
  * @function searchRandom
  *
- * @param {Object} cnx - The Koa context object containing the request and response information.
- * @param {Function} next - The next middleware to be called.
+ * @param {FastifyRequest} request - The Fastify request object.
+ * @param {FastifyReply} reply - The Fastify reply object.
  * @throws {Error} 403 if the user does not have permission to search a location.
  * @returns {undefined} cnx is modified with a 200 status code and a body containing the random postcode search results.
  *
@@ -262,10 +260,10 @@ async function searchPostcode(cnx, next) {
  * @see {@link module:permissions/search} for the permissions applied to this route.
  *
  */
-async function searchRandom(cnx, next) {
+async function searchRandom(request: FastifyRequest, reply: FastifyReply) {
     let { user } = cnx.state
     if (!user) {
-        // I could just return here, but this route might be possible for other roles in the future.
+        // I could just return here, but this route might be accessible to other roles in the future.
         user = User({ role: await Role.findOne({ name: "none" }) })
     }
     const ability = createAbilityFor(user)
@@ -297,21 +295,24 @@ async function searchRandom(cnx, next) {
             await linkAtco(newSearch)
             await getRelatedStops(newSearch) // get all bus stops for location and link to search model
             await getRelatedCrimes(newSearch) // get all crimes for location and link to search model
-            await updateLinks(cnx, newSearch)
+            await updateLinks(request, newSearch)
         } else {
             logger.info(`Existing search found, ID: ${existingSearch.searchID}`)
-            await updateLinks(cnx, existingSearch)
+            await updateLinks(request, existingSearch)
         }
 
         const SearchModel = await Search.findOne({
             latitude: dbPostcode.latitude,
         }).populate(["Postcode", "queryBusStops", "queryCrimes"])
         const body = SearchModel
-        cnx.status = 200
-        cnx.body = body
+        reply.status(200).send(body)
     } else {
         logger.error("User does not have permission to perform this action.")
-        cnx.throw(403, "You are not allowed to access this resource.")
+        reply.status(403).send({
+            error: "Forbidden",
+            message: "You are not allowed to access this resource.",
+        })
     }
 }
-module.exports = router
+
+export { searchArea, searchPostcode, searchRandom }

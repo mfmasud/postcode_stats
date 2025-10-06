@@ -403,4 +403,8 @@ export {
     getRandomPostcodeRoute,
     getPostcodeRoute,
     findPostcodeFromWGS84,
+    getPostcode,
+    getRandomPostcode,
+    validatePostcode,
+    processPostcode,
 }

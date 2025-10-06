@@ -3,7 +3,7 @@ import { Type, type Static } from "@sinclair/typebox"
 import { ErrorResponseSchema } from "./commonSchema.js"
 
 // postcode query params
-const PostcodeParamSchema = Type.Object({
+export const PostcodeParamSchema = Type.Object({
     postcode: Type.String({
         description: "Postcode to search for",
         pattern: "^[A-Z]{1,2}[0-9R][0-9A-Z]? [0-9][ABD-HJLNP-UW-Z]{2}$",
