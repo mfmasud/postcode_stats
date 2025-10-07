@@ -18,6 +18,7 @@
  *
  */
 
+import type { FastifyRequest } from "fastify"
 import logger from "../../utils/logger.js"
 
 import { queryAtcoAPI } from "../../helpers/AtcoCodes.js"
@@ -28,6 +29,8 @@ import Atco from "../../models/Atco.js"
 import CrimeList from "../../models/CrimeList.js"
 import { type SearchDoc } from "../../models/Search.js"
 import { type PostcodeDoc } from "../../models/Postcode.js"
+import { type AtcoDoc } from "../../models/Atco.js"
+import { type CrimeListDoc } from "../../models/CrimeList.js"
 
 /**
  * Links a `CrimeList` to the `Search` model by comparing the latitude value used by both.
@@ -48,18 +51,17 @@ async function linkCrimeList(SearchModel: SearchDoc) {
     // links crime list to search model
     // can be linked by latitude - assuming it is available. If not, this should have been calculated beforehand.
 
-    const linkedCrimes = await CrimeList.findOne({
+    const linkedCrimes = await CrimeList.findOne<CrimeListDoc>({
         latitude: SearchModel.latitude,
     })
-    if (linkedCrimes) {
-        SearchModel.linkedCrimeList = linkedCrimes
-        logger.info("Successfully linked crime list to search")
-    } else {
+    if (!linkedCrimes) {
         logger.error("Could not link crime list to search.")
         return
     }
-
+    SearchModel.linkedCrimeList = linkedCrimes._id
+    logger.info("Successfully linked crime list to search")
     await SearchModel.save()
+    return
 }
 
 /**
@@ -76,9 +78,11 @@ async function linkCrimeList(SearchModel: SearchDoc) {
  * @see {@link linkCrimeList} - links the `CrimeList` to the `Search` model for use in this function.
  */
 async function getRelatedCrimes(SearchModel: SearchDoc) {
+    await SearchModel.populate<{ Postcode: PostcodeDoc }>("Postcode")
     const { latitude, longitude } = SearchModel
 
-    if (SearchModel.Postcode.country === "Northern Ireland") {
+    const postcodeDoc = SearchModel.Postcode as PostcodeDoc | null
+    if (postcodeDoc && postcodeDoc.country === "Northern Ireland") {
         // NI not handled by policing API.
         logger.info("Cannot link NI CrimeList.")
         return
@@ -88,8 +92,17 @@ async function getRelatedCrimes(SearchModel: SearchDoc) {
         await getCrimeData(latitude, longitude) // fetches the Police API
         await linkCrimeList(SearchModel) // Links the CrimeList data to the Search model
         if (SearchModel.linkedCrimeList) {
-            logger.info("Added crimes to search")
-            SearchModel.queryCrimes = SearchModel.linkedCrimeList.crimes
+            // Populate the linked CrimeList to access crimes
+            const populatedSearch = await SearchModel.populate<{
+                linkedCrimeList: CrimeListDoc
+            }>("linkedCrimeList")
+            const crimeListDoc = populatedSearch.linkedCrimeList
+            if (crimeListDoc) {
+                logger.info("Added crimes to search")
+                SearchModel.queryCrimes = crimeListDoc.crimes // copy over list of Crime ObjectIds from the crimelist
+            } else {
+                SearchModel.queryCrimes = [] // empty to indicate not found
+            }
         } else {
             SearchModel.queryCrimes = [] // empty to indicate not found
         }
@@ -156,6 +169,7 @@ async function searchAtco(PostcodeModel: PostcodeDoc) {
     }
 
     const pc = parliamentary_constituency
+    let AtcoToLink
 
     // starting to look ugly - maybe use functions or switch/case
     if (!admin_county) {
@@ -166,9 +180,9 @@ async function searchAtco(PostcodeModel: PostcodeDoc) {
             logger.info("No admin district")
         } else {
             // admin district exists
-            const AtcoToLink = await Atco.findOne({ location: admin_district })
+            AtcoToLink = await Atco.findOne({ location: admin_district })
             if (!AtcoToLink) {
-                const AtcoToLink = await Atco.findOne({
+                AtcoToLink = await Atco.findOne({
                     other_names: admin_district,
                 })
             }
@@ -186,7 +200,7 @@ async function searchAtco(PostcodeModel: PostcodeDoc) {
 
                 This also includes postcodes in the City of London (e.g. E1 7DA)
                 */
-                const AtcoToLink = await Atco.findOne({
+                AtcoToLink = await Atco.findOne({
                     location: "Greater London",
                 })
             }
@@ -194,7 +208,7 @@ async function searchAtco(PostcodeModel: PostcodeDoc) {
             if (!AtcoToLink && pc) {
                 // parlimentiary constituency, e.g. Poole (South West)
                 // Others like Bournemout East would be under Dorset (ceremonial country)
-                const AtcoToLink = await Atco.findOne({ location: pc })
+                AtcoToLink = await Atco.findOne({ location: pc })
                 if (!AtcoToLink) {
                     AtcoToLink = await Atco.findOne({ other_names: pc })
                 }
@@ -202,9 +216,9 @@ async function searchAtco(PostcodeModel: PostcodeDoc) {
         }
     } else {
         // admin county exists
-        const AtcoToLink = await Atco.findOne({ location: admin_county })
+        AtcoToLink = await Atco.findOne({ location: admin_county })
         if (!AtcoToLink) {
-            const AtcoToLink = await Atco.findOne({ other_names: admin_county })
+            AtcoToLink = await Atco.findOne({ other_names: admin_county })
         }
     }
 
@@ -241,22 +255,24 @@ async function linkAtco(SearchModel: SearchDoc) {
     // Does not return anything
     //logger.info("Looking to link Atco");
 
+    await SearchModel.populate<{ Postcode: PostcodeDoc }>("Postcode")
+    const postcodeDoc = SearchModel.Postcode as PostcodeDoc | null
     let linkedAtco
 
-    if (SearchModel.Postcode.country === "Northern Ireland") {
+    if (postcodeDoc && postcodeDoc.country === "Northern Ireland") {
         // Skip ATCO linking for northern irish postcodes e.g. BT23 6SA
         // linkedAtco = linkOther(SearchModel.Postcode)
         logger.info("Cannot link NI Atco.")
         return
-    } else {
-        linkedAtco = await searchAtco(SearchModel.Postcode)
+    } else if (postcodeDoc) {
+        linkedAtco = await searchAtco(postcodeDoc)
     }
 
     if (!linkedAtco) {
         return
     }
 
-    SearchModel.linkedATCO = linkedAtco
+    SearchModel.linkedATCO = linkedAtco._id
     await SearchModel.save()
 }
 
@@ -279,14 +295,15 @@ async function getRelatedStops(SearchModel: SearchDoc, radius: number = 1000) {
     // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
     const { longitude, latitude, Northing, Easting } = SearchModel
 
-    const linkedAtco = (await SearchModel.populate("linkedATCO")).linkedATCO
+    await SearchModel.populate<{ linkedATCO: AtcoDoc }>("linkedATCO")
+    const linkedAtco = SearchModel.linkedATCO as AtcoDoc | null
 
     // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
     // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
     // just returning first 5 for now...
     // Need to convert BNG to lat/long for empty values or search using BNG instead. See https://github.com/chrisveness/geodesy/blob/master/osgridref.js to convert
 
-    if (linkedAtco) {
+    if (linkedAtco && linkedAtco.busstops) {
         SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5)
     }
 
@@ -307,10 +324,13 @@ async function getRelatedStops(SearchModel: SearchDoc, radius: number = 1000) {
  * @see {@link https://en.wikipedia.org/wiki/HATEOAS} - HATEOAS compliant API responses.
  */
 async function updateLinks(request: FastifyRequest, SearchModel: SearchDoc) {
+    await SearchModel.populate<{ Postcode: PostcodeDoc }>("Postcode")
     const lat = SearchModel.latitude
     const long = SearchModel.longitude
-    const postcode = SearchModel.Postcode.postcode
+    const postcodeDoc = SearchModel.Postcode as PostcodeDoc | null
     const hostname = request.host
+
+    const postcode = postcodeDoc?.postcode
 
     SearchModel._links = {}
 
