@@ -46,12 +46,8 @@
     "fastify": "^5.4.0",
     "fastify-plugin": "^5.0.1",
     "jsdom": "^26.1.0",
-    "jsonwebtoken": "^9.0.2",
     "logform": "^2.7.0",
     "mongoose": "^8.17.0",
-    "passport-anonymous": "^1.0.1",
-    "passport-http": "^0.3.0",
-    "passport-jwt": "^4.0.1",
     "validator": "^13.15.15",
     "winston": "^3.17.0"
   }
