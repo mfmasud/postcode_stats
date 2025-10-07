@@ -51,16 +51,16 @@ import { type FastifyRequest, type FastifyReply } from "fastify"
  */
 async function searchArea(
     request: FastifyRequest<{
-        Params: SearchAreaParams
+        Querystring: SearchAreaParams
         Body: Partial<SearchPostcodeParams>
     }>,
     reply: FastifyReply
 ) {
     // GET request with latitude/longitude in query params
-    // allows anyone to search via a lat and long in the body of the request
+    // allows anyone to search via a lat and long in the query parameters
     // returns a list of property listings, transport nodes and crime.
 
-    const { latitude, longitude } = request.params
+    const { latitude, longitude } = request.query
 
     const lat = latitude
     const long = longitude
@@ -77,8 +77,8 @@ async function searchArea(
         return
     }
 
-    const latFloat = parseFloat(lat)
-    const longFloat = parseFloat(long)
+    const latFloat = typeof lat === "number" ? lat : parseFloat(lat)
+    const longFloat = typeof long === "number" ? long : parseFloat(long)
     const locationObj = { latitude: latFloat, longitude: longFloat }
     //logger.info(locationObj);
     //logger.info(validateLatLong(locationObj));
