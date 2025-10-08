@@ -67,7 +67,7 @@ API Tests were implemented using **Mocha** and **Chai**. Below is an example of 
 
 ![Mocha Test Results](./docs/images/6003cem_mocha.png)
 
-The API endpoints were tested using Postman with some custom scripts, for example to set JWTs dynamically (in docs/notes/set_jwt.js)
+The API endpoints were tested using Postman with some custom scripts, for example to set JWTs dynamically (in `src/test/postman/set_jwt.js`)
 
 ![Postman Test Results](./docs/images/6003cem_postman.png)
 

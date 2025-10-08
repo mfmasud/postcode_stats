@@ -1,0 +1,2450 @@
+{
+	"info": {
+		"_postman_id": "b667ca9e-f9c9-4282-965e-30bb909e1dc4",
+		"name": "Fastify (api v2)",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26043613"
+	},
+	"item": [
+		{
+			"name": "special routes",
+			"item": [
+				{
+					"name": "API public page (anonymous)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API userdetails (anonymous)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/private",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"private"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API user temp route",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/user",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"user"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API userdetails (standard)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/private",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"private"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API userdetails (paid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_paid}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/private",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"private"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API userdetails (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/private",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"private"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "API userdetails (incorrect)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 401\", function () {\r",
+									"    pm.response.to.have.status(401);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "faketoken.exe",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/private",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"private"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "getTokenJWT (userid 1)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/login/?id=1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"login",
+								""
+							],
+							"query": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{v2_url}}/example",
+							"host": [
+								"{{v2_url}}"
+							],
+							"path": [
+								"example"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "users route",
+			"item": [
+				{
+					"name": "get all users (standard user)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get all users (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new user dupe (anyone)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"TestUser2\",\n    \"password\": \"password\",\n    \"email\": \"user2@test.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create new user valid (anyone) Copy",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"TestUser2\",\n    \"password\": \"password\",\n    \"email\": \"user2@test.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user 1 info (standard user)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user 1 info (admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user 3 info (standard user 1)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "get user 3 info (admin user)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "del user 3 info (standard user 1)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "del user 2 info (admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "del user 3 (admin account) (as admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/3",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user 1 (standard user)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Mr\",\n    \"lastName\": \"Update\",\n    \"password\": \"changed\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "change pw back (standard user 1)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Mr\",\n    \"lastName\": \"Update\",\n    \"password\": \"password\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user 2 (as standard user)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Mr\",\n    \"lastName\": \"Update\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/2",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "del user 1 info (standard user 1)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "update user 1 (as admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"Admin\",\n    \"lastName\": \"Power\",\n    \"password\": \"changed\",\n    \"email\": \"admin@update.net\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/users/1",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "postcodes route",
+			"item": [
+				{
+					"name": "read all postcodes (paid)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 403\", function () {\r",
+									"    pm.response.to.have.status(403);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_paid}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "read all postcodes (admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "random postcode (anonymous)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/random",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"random"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "random postcode (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/random",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"random"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "random postcode (standard)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/postcodes/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"postcodes",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 20 Mar 2023 14:13:22 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "981"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=MrgV2kc5UETqxagt+jQKeNK44fGlsSr8NMLxI0gT7SXlzRJy7Zd314LkT41s1fplCPt0RGgR9kPPof47mxRZI6xJF6xgUkL0y0oyLHvwUj8cx9XTF8IRCVidx1Vf; Expires=Mon, 27 Mar 2023 14:13:21 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=MrgV2kc5UETqxagt+jQKeNK44fGlsSr8NMLxI0gT7SXlzRJy7Zd314LkT41s1fplCPt0RGgR9kPPof47mxRZI6xJF6xgUkL0y0oyLHvwUj8cx9XTF8IRCVidx1Vf; Expires=Mon, 27 Mar 2023 14:13:21 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"postcode\": \"IP5 1DN\",\n    \"quality\": 1,\n    \"eastings\": 620278,\n    \"northings\": 246548,\n    \"country\": \"England\",\n    \"nhs_ha\": \"East of England\",\n    \"longitude\": 1.212851,\n    \"latitude\": 52.073459,\n    \"european_electoral_region\": \"Eastern\",\n    \"primary_care_trust\": \"Suffolk\",\n    \"region\": \"East of England\",\n    \"lsoa\": \"Suffolk Coastal 009E\",\n    \"msoa\": \"Suffolk Coastal 009\",\n    \"incode\": \"1DN\",\n    \"outcode\": \"IP5\",\n    \"parliamentary_constituency\": \"Central Suffolk and North Ipswich\",\n    \"admin_district\": \"East Suffolk\",\n    \"parish\": \"Rushmere St. Andrew\",\n    \"admin_county\": \"Suffolk\",\n    \"date_of_introduction\": \"199706\",\n    \"admin_ward\": \"Carlford & Fynn Valley\",\n    \"ced\": \"Kesgrave and Rushmere St. Andrew\",\n    \"ccg\": \"NHS Suffolk and North East Essex\",\n    \"nuts\": \"Suffolk CC\",\n    \"pfa\": \"Suffolk\",\n    \"codes\": {\n        \"admin_district\": \"E07000244\",\n        \"admin_county\": \"E10000029\",\n        \"admin_ward\": \"E05012737\",\n        \"parish\": \"E04009450\",\n        \"parliamentary_constituency\": \"E14000624\",\n        \"ccg\": \"E38000086\",\n        \"ccg_id\": \"06L\",\n        \"ced\": \"E58001427\",\n        \"nuts\": \"TLH14\",\n        \"lsoa\": \"E01030207\",\n        \"msoa\": \"E02006295\",\n        \"lau2\": \"E07000244\",\n        \"pfa\": \"E23000025\"\n    }\n}"
+						},
+						{
+							"name": "Wales",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/postcodes/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"postcodes",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 20 Mar 2023 14:22:14 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "961"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=xQ+UBWAzpu59KmWblOZK4luKHHRWfLZxmfGGeDpclaUTmNOqaaHn1Aao2jtS8w1aZ9Hp7yb12zWMzL46GULFAHAwD33m1Qa2QKI1i8FJa3vXMcAFrYWYCjHEUOuz; Expires=Mon, 27 Mar 2023 14:22:14 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=xQ+UBWAzpu59KmWblOZK4luKHHRWfLZxmfGGeDpclaUTmNOqaaHn1Aao2jtS8w1aZ9Hp7yb12zWMzL46GULFAHAwD33m1Qa2QKI1i8FJa3vXMcAFrYWYCjHEUOuz; Expires=Mon, 27 Mar 2023 14:22:14 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"postcode\": \"CH5 4BP\",\n    \"quality\": 1,\n    \"eastings\": 327955,\n    \"northings\": 371079,\n    \"country\": \"Wales\",\n    \"nhs_ha\": \"Betsi Cadwaladr University Health Board\",\n    \"longitude\": -3.080764,\n    \"latitude\": 53.231856,\n    \"european_electoral_region\": \"Wales\",\n    \"primary_care_trust\": \"Betsi Cadwaladr University Health Board\",\n    \"region\": null,\n    \"lsoa\": \"Flintshire 007C\",\n    \"msoa\": \"Flintshire 007\",\n    \"incode\": \"4BP\",\n    \"outcode\": \"CH5\",\n    \"parliamentary_constituency\": \"Alyn and Deeside\",\n    \"admin_district\": \"Flintshire\",\n    \"parish\": \"Connah's Quay\",\n    \"admin_county\": null,\n    \"date_of_introduction\": \"199712\",\n    \"admin_ward\": \"Connah's Quay: Golftyn\",\n    \"ced\": null,\n    \"ccg\": \"Betsi Cadwaladr University\",\n    \"nuts\": \"Flintshire and Wrexham\",\n    \"pfa\": \"North Wales\",\n    \"codes\": {\n        \"admin_district\": \"W06000005\",\n        \"admin_county\": \"W99999999\",\n        \"admin_ward\": \"W05001584\",\n        \"parish\": \"W04000185\",\n        \"parliamentary_constituency\": \"W07000043\",\n        \"ccg\": \"W11000023\",\n        \"ccg_id\": \"7A1\",\n        \"ced\": \"W99999999\",\n        \"nuts\": \"TLL23\",\n        \"lsoa\": \"W01000275\",\n        \"msoa\": \"W02000064\",\n        \"lau2\": \"W06000005\",\n        \"pfa\": \"W15000001\"\n    }\n}"
+						},
+						{
+							"name": "random postcode (standard)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/postcodes/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"postcodes",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 20 Mar 2023 14:23:57 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "992"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=bB73LezpfyIVgzgq6BI+2gVD4JHflqAchDS0zz+BEPYqQiBZCaWi6NjSo/4WBaKAb40us7ma1c9T8zCSDc26MSliVEKl7XpV9o7/z7v/KEmXfwnM9NWwhRTIyTsc; Expires=Mon, 27 Mar 2023 14:23:57 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=bB73LezpfyIVgzgq6BI+2gVD4JHflqAchDS0zz+BEPYqQiBZCaWi6NjSo/4WBaKAb40us7ma1c9T8zCSDc26MSliVEKl7XpV9o7/z7v/KEmXfwnM9NWwhRTIyTsc; Expires=Mon, 27 Mar 2023 14:23:57 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"postcode\": \"ST10 2DE\",\n    \"quality\": 1,\n    \"eastings\": 400787,\n    \"northings\": 346729,\n    \"country\": \"England\",\n    \"nhs_ha\": \"West Midlands\",\n    \"longitude\": -1.989718,\n    \"latitude\": 53.01786,\n    \"european_electoral_region\": \"West Midlands\",\n    \"primary_care_trust\": \"North Staffordshire\",\n    \"region\": \"West Midlands\",\n    \"lsoa\": \"Staffordshire Moorlands 010D\",\n    \"msoa\": \"Staffordshire Moorlands 010\",\n    \"incode\": \"2DE\",\n    \"outcode\": \"ST10\",\n    \"parliamentary_constituency\": \"Staffordshire Moorlands\",\n    \"admin_district\": \"Staffordshire Moorlands\",\n    \"parish\": \"Kingsley\",\n    \"admin_county\": \"Staffordshire\",\n    \"date_of_introduction\": \"198001\",\n    \"admin_ward\": \"Churnet\",\n    \"ced\": \"Churnet Valley\",\n    \"ccg\": \"NHS Staffordshire and Stoke-on-Trent\",\n    \"nuts\": \"Staffordshire CC\",\n    \"pfa\": \"Staffordshire\",\n    \"codes\": {\n        \"admin_district\": \"E07000198\",\n        \"admin_county\": \"E10000028\",\n        \"admin_ward\": \"E05007054\",\n        \"parish\": \"E04009049\",\n        \"parliamentary_constituency\": \"E14000966\",\n        \"ccg\": \"E38000126\",\n        \"ccg_id\": \"05G\",\n        \"ced\": \"E58001356\",\n        \"nuts\": \"TLG24\",\n        \"lsoa\": \"E01029796\",\n        \"msoa\": \"E02006213\",\n        \"lau2\": \"E07000198\",\n        \"pfa\": \"E23000015\"\n    }\n}"
+						},
+						{
+							"name": "random postcode (standard)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/postcodes/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"postcodes",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Tue, 28 Mar 2023 18:16:35 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "951"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=u/HsBBH8QlEFBuAAjmEGa9KA8cumy+4CtduJ+IPt78TaV/Ed+TQu1RTND4Md/KF15JgzeAPgsjWrs0Obiy/KlADxO+lUXbEAhS+vtlrUw4oZPzhTaKDLKkyNZqla; Expires=Tue, 04 Apr 2023 18:16:35 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=u/HsBBH8QlEFBuAAjmEGa9KA8cumy+4CtduJ+IPt78TaV/Ed+TQu1RTND4Md/KF15JgzeAPgsjWrs0Obiy/KlADxO+lUXbEAhS+vtlrUw4oZPzhTaKDLKkyNZqla; Expires=Tue, 04 Apr 2023 18:16:35 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"postcode\": \"KT22 0JJ\",\n    \"quality\": 1,\n    \"eastings\": 514682,\n    \"northings\": 160388,\n    \"country\": \"England\",\n    \"nhs_ha\": \"South East Coast\",\n    \"longitude\": -0.355289,\n    \"latitude\": 51.331034,\n    \"european_electoral_region\": \"South East\",\n    \"primary_care_trust\": \"Surrey\",\n    \"region\": \"South East\",\n    \"lsoa\": \"Elmbridge 018B\",\n    \"msoa\": \"Elmbridge 018\",\n    \"incode\": \"0JJ\",\n    \"outcode\": \"KT22\",\n    \"parliamentary_constituency\": \"Esher and Walton\",\n    \"admin_district\": \"Elmbridge\",\n    \"parish\": \"Elmbridge, unparished area\",\n    \"admin_county\": \"Surrey\",\n    \"date_of_introduction\": \"199912\",\n    \"admin_ward\": \"Oxshott & Stoke D'Abernon\",\n    \"ced\": \"Hinchley Wood, Claygate and Oxshott\",\n    \"ccg\": \"NHS Surrey Heartlands\",\n    \"nuts\": \"West Surrey\",\n    \"pfa\": \"Surrey\",\n    \"codes\": {\n        \"admin_district\": \"E07000207\",\n        \"admin_county\": \"E10000030\",\n        \"admin_ward\": \"E05011083\",\n        \"parish\": \"E43000136\",\n        \"parliamentary_constituency\": \"E14000697\",\n        \"ccg\": \"E38000246\",\n        \"ccg_id\": \"92A\",\n        \"ced\": \"E58001502\",\n        \"nuts\": \"TLJ25\",\n        \"lsoa\": \"E01030342\",\n        \"msoa\": \"E02006334\",\n        \"lau2\": \"E07000207\",\n        \"pfa\": \"E23000031\"\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "find LU1 5PP (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/LU1 5PP",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"LU1 5PP"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "find LU1 5PP (anon)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/LU1 5PP",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"LU1 5PP"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "find LU2 7EW (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/LU2 7EW",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"LU2 7EW"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "find HS6 5BQ (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/HS6 5BQ",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"HS6 5BQ"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "find DG1 1AA  (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/DG1 1AA ",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"DG1 1AA "
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "find IM3 1HL  (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/postcodes/IM3 1HL",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"postcodes",
+								"IM3 1HL"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "search route",
+			"item": [
+				{
+					"name": "search empty lat/long (anonymous)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search invalid lat/long (anonymous)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/?latitude=200&longitude=200",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "200"
+								},
+								{
+									"key": "longitude",
+									"value": "200"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search invalid lat",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/?latitude=200&longitude=25",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "200"
+								},
+								{
+									"key": "longitude",
+									"value": "25"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search invalid long",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/?latitude=20&longitude=190",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "20"
+								},
+								{
+									"key": "longitude",
+									"value": "190"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search valid lat/long not in uk (anonymous)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/?latitude=45&longitude=-90",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "45"
+								},
+								{
+									"key": "longitude",
+									"value": "-90"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search valid UK lat/long (anonymous)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/?latitude={{UK_Lat}}&longitude={{UK_long}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							],
+							"query": [
+								{
+									"key": "latitude",
+									"value": "{{UK_Lat}}"
+								},
+								{
+									"key": "longitude",
+									"value": "{{UK_long}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search postcode (empty) (anonymous)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search postcode (BH9 1TZ) (anonymous)",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"BH9 1TZ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search postcode (LU2 7EW) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"LU2 7EW\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search postcode (LU1 5PP) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"LU1 5PP\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search invalid (LU2 ABC) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"LU1 ABC\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search Northern Ireland (BT23 6SA) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"BT23 6SA\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search Northern Ireland 2 (BT19 7FJ) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"BT19 7FJ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search Wales (CH5 4BP) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"CH5 4BP\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search Scotland (HS6 5BQ) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"HS6 5BQ\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search City of London (E1 7DA) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"E1 7DA\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search London (SW9 8BH) (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"postcode\": \"SW9 8BH\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{base_url}}/search/",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								""
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search random (standard)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_standard}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/random",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								"random"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "search random (admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{JWT_admin}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/search/random",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"search",
+								"random"
+							]
+						}
+					},
+					"response": [
+						{
+							"name": "codio gateway timeout",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/search/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"search",
+										"random"
+									]
+								}
+							},
+							"status": "Gateway Time-out",
+							"code": 504,
+							"_postman_previewlanguage": "html",
+							"header": [
+								{
+									"key": "Server",
+									"value": "awselb/2.0"
+								},
+								{
+									"key": "Date",
+									"value": "Fri, 31 Mar 2023 18:08:48 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/html"
+								},
+								{
+									"key": "Content-Length",
+									"value": "132"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=4czBeiITbqNPlxsFIhgs13Of79WgKJOiS+DcTSFWRuyMQhmqo1jwe0lYqnatGk56MetIeW3cuoxia0t79WFxaJXFlTMUTd4WbwyCie3E3lBEHI7zO6OXjC+FzGbx; Expires=Fri, 07 Apr 2023 18:07:48 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=4czBeiITbqNPlxsFIhgs13Of79WgKJOiS+DcTSFWRuyMQhmqo1jwe0lYqnatGk56MetIeW3cuoxia0t79WFxaJXFlTMUTd4WbwyCie3E3lBEHI7zO6OXjC+FzGbx; Expires=Fri, 07 Apr 2023 18:07:48 GMT; Path=/; SameSite=None; Secure"
+								}
+							],
+							"cookie": [],
+							"body": "<html>\n    <head>\n        <title>504 Gateway Time-out</title>\n    </head>\n    <body>\n        <center>\n            <h1>504 Gateway Time-out</h1>\n        </center>\n    </body>\n</html>"
+						},
+						{
+							"name": "working random",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/search/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"search",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Fri, 31 Mar 2023 18:33:27 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "1728"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=TuTfOkTgjvhAAlg0axx18etSfUah0OksRzuTPdLOp/YyKqBR9Qr2gvI7GJ+b9UmyMuK76hvpJzEg6r1sV7eH0VrPJnRkg6OXWgL4VJQVkZcibrcFet7A7mIvWW2J; Expires=Fri, 07 Apr 2023 18:32:38 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=TuTfOkTgjvhAAlg0axx18etSfUah0OksRzuTPdLOp/YyKqBR9Qr2gvI7GJ+b9UmyMuK76hvpJzEg6r1sV7eH0VrPJnRkg6OXWgL4VJQVkZcibrcFet7A7mIvWW2J; Expires=Fri, 07 Apr 2023 18:32:38 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"64272746a2150eb703091656\",\n    \"latitude\": 54.686393,\n    \"longitude\": -1.229443,\n    \"Northing\": \"532644\",\n    \"Easting\": \"449774\",\n    \"reverseLookup\": true,\n    \"Postcode\": {\n        \"_id\": \"64272746a2150eb703091652\",\n        \"postcode\": \"TS26 8JU\",\n        \"eastings\": 449774,\n        \"northings\": 532644,\n        \"country\": \"England\",\n        \"longitude\": -1.229443,\n        \"latitude\": 54.686393,\n        \"region\": \"North East\",\n        \"parliamentary_constituency\": \"Hartlepool\",\n        \"admin_district\": \"Hartlepool\",\n        \"admin_ward\": \"Victoria\",\n        \"parish\": \"Hartlepool, unparished area\",\n        \"admin_county\": null,\n        \"__v\": 0\n    },\n    \"queryBusStops\": [\n        {\n            \"_id\": \"64272747a2150eb70309165d\",\n            \"ATCO_long\": \"075071001A\",\n            \"ATCO_short\": \"075\",\n            \"CommonName\": \"Lancaster Court\",\n            \"Street\": \"BROUGHAM TERRACE\",\n            \"Longitude\": \"-1.213597\",\n            \"Latitude\": \"54.693734\",\n            \"Northing\": \"533472\",\n            \"Easting\": \"450786\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"64272747a2150eb703091662\",\n            \"ATCO_long\": \"075071001B\",\n            \"ATCO_short\": \"075\",\n            \"CommonName\": \"Lancaster Court\",\n            \"Street\": \"BROUGHAM TERRACE\",\n            \"Longitude\": \"-1.213035\",\n            \"Latitude\": \"54.693854\",\n            \"Northing\": \"533485\",\n            \"Easting\": \"450823\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"64272747a2150eb703091667\",\n            \"ATCO_long\": \"075071002A\",\n            \"ATCO_short\": \"075\",\n            \"CommonName\": \"Parton Street\",\n            \"Street\": \"MILBANK ROAD\",\n            \"Longitude\": \"-1.215694\",\n            \"Latitude\": \"54.694668\",\n            \"Northing\": \"533574\",\n            \"Easting\": \"450650\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"64272747a2150eb70309166c\",\n            \"ATCO_long\": \"075071002B\",\n            \"ATCO_short\": \"075\",\n            \"CommonName\": \"Parton Street\",\n            \"Street\": \"MILBANK ROAD\",\n            \"Longitude\": \"-1.215866\",\n            \"Latitude\": \"54.695013\",\n            \"Northing\": \"533612\",\n            \"Easting\": \"450639\",\n            \"__v\": 0\n        },\n        {\n            \"_id\": \"64272747a2150eb703091671\",\n            \"ATCO_long\": \"075071003A\",\n            \"ATCO_short\": \"075\",\n            \"CommonName\": \"Amberton Road\",\n            \"Street\": \"Milbank Road\",\n            \"Longitude\": \"-1.215988\",\n            \"Latitude\": \"54.697174\",\n            \"Northing\": \"533853\",\n            \"Easting\": \"450628\",\n            \"__v\": 0\n        }\n    ],\n    \"queryCrimes\": [],\n    \"searchID\": 1,\n    \"__v\": 1,\n    \"linkedATCO\": \"6424ab0f8d8310dfd4ac11c5\"\n}"
+						},
+						{
+							"name": "northern ireland",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/search/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"search",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Sat, 01 Apr 2023 18:39:09 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "533"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=oPn5phQJxto05qcOWTfjXeUCa3k61M1XbR+26wsTcnKYVgUQM+6acJqy0BwhTuVmAzs6jrXifByZi3WC9yqChfuobTVu96zIqFBTujUaIwoIFesEln54q0Y/A35e; Expires=Sat, 08 Apr 2023 18:39:09 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=oPn5phQJxto05qcOWTfjXeUCa3k61M1XbR+26wsTcnKYVgUQM+6acJqy0BwhTuVmAzs6jrXifByZi3WC9yqChfuobTVu96zIqFBTujUaIwoIFesEln54q0Y/A35e; Expires=Sat, 08 Apr 2023 18:39:09 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"64287a4d26973af8fd525c66\",\n    \"latitude\": 54.491912,\n    \"longitude\": -5.732557,\n    \"Northing\": \"362753\",\n    \"Easting\": \"346972\",\n    \"reverseLookup\": true,\n    \"Postcode\": {\n        \"_id\": \"64287a4d26973af8fd525c62\",\n        \"postcode\": \"BT23 6SA\",\n        \"eastings\": 346972,\n        \"northings\": 362753,\n        \"country\": \"Northern Ireland\",\n        \"longitude\": -5.732557,\n        \"latitude\": 54.491912,\n        \"region\": null,\n        \"parliamentary_constituency\": \"Strangford\",\n        \"admin_district\": \"Ards and North Down\",\n        \"admin_ward\": \"Killinchy\",\n        \"parish\": null,\n        \"admin_county\": null,\n        \"__v\": 0\n    },\n    \"queryBusStops\": [],\n    \"queryCrimes\": [],\n    \"searchID\": 2,\n    \"__v\": 0\n}"
+						},
+						{
+							"name": "Greater Manchester (pfa)",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/search/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"search",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Wed, 05 Apr 2023 15:07:48 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "559"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=ES++F4sTjHqPqQk6JgiRKigmGHl/wTBbziTMXDs0/2jJdmgB6MMI3p66h+zx/1smKwZ/RKwEpHuUoDn0f7FwFWd6cdv90ygT1Um3sH6RhqhmiSl3NXQNpu+RBAtr; Expires=Wed, 12 Apr 2023 15:07:31 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=ES++F4sTjHqPqQk6JgiRKigmGHl/wTBbziTMXDs0/2jJdmgB6MMI3p66h+zx/1smKwZ/RKwEpHuUoDn0f7FwFWd6cdv90ygT1Um3sH6RhqhmiSl3NXQNpu+RBAtr; Expires=Wed, 12 Apr 2023 15:07:31 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"642d8eb4c0a4468e7b1fd799\",\n    \"latitude\": 53.524692,\n    \"longitude\": -2.411843,\n    \"Northing\": \"403193\",\n    \"Easting\": \"372794\",\n    \"reverseLookup\": true,\n    \"Postcode\": {\n        \"_id\": \"642d8eb4c0a4468e7b1fd795\",\n        \"postcode\": \"M28 0RX\",\n        \"eastings\": 372794,\n        \"northings\": 403193,\n        \"country\": \"England\",\n        \"longitude\": -2.411843,\n        \"latitude\": 53.524692,\n        \"region\": \"North West\",\n        \"parliamentary_constituency\": \"Worsley and Eccles South\",\n        \"admin_district\": \"Salford\",\n        \"admin_ward\": \"Little Hulton\",\n        \"parish\": \"Salford, unparished area\",\n        \"admin_county\": null,\n        \"__v\": 0\n    },\n    \"queryBusStops\": [],\n    \"queryCrimes\": [],\n    \"searchID\": 1,\n    \"__v\": 0\n}"
+						},
+						{
+							"name": "no ATCO found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/search/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"search",
+										"random"
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 10 Apr 2023 17:50:03 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "564"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=ymi1QEvDZWvMkfZ7ACs8vbSYnLg1w+H7VM6oTKMRimdkYnjeyfIS/Cp0JdU3+mQZg6gBavdcEDHzqUNPGXhv6NCsBMbTcXyLq2qM+Sa/Wm31fP0FMK54YcP+K3pB; Expires=Mon, 17 Apr 2023 17:50:02 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=ymi1QEvDZWvMkfZ7ACs8vbSYnLg1w+H7VM6oTKMRimdkYnjeyfIS/Cp0JdU3+mQZg6gBavdcEDHzqUNPGXhv6NCsBMbTcXyLq2qM+Sa/Wm31fP0FMK54YcP+K3pB; Expires=Mon, 17 Apr 2023 17:50:02 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"_id\": \"64344c4b358ec3e908519ac6\",\n    \"latitude\": 54.838952,\n    \"longitude\": -1.867733,\n    \"Northing\": \"549356\",\n    \"Easting\": \"408593\",\n    \"reverseLookup\": true,\n    \"Postcode\": {\n        \"_id\": \"64344c4b358ec3e908519ac2\",\n        \"postcode\": \"DH8 8DE\",\n        \"eastings\": 408593,\n        \"northings\": 549356,\n        \"country\": \"England\",\n        \"longitude\": -1.867733,\n        \"latitude\": 54.838952,\n        \"region\": \"North East\",\n        \"parliamentary_constituency\": \"North West Durham\",\n        \"admin_district\": \"County Durham\",\n        \"admin_ward\": \"Consett South\",\n        \"parish\": \"County Durham, unparished area\",\n        \"admin_county\": null,\n        \"__v\": 0\n    },\n    \"queryBusStops\": [],\n    \"queryCrimes\": [],\n    \"searchID\": 6,\n    \"__v\": 0\n}"
+						},
+						{
+							"name": "Isle Of Man (IM3 1HL) - SERVER STILL WORKS",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{base_url}}/search/random",
+									"host": [
+										"{{base_url}}"
+									],
+									"path": [
+										"search",
+										"random"
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "plain",
+							"header": [
+								{
+									"key": "Date",
+									"value": "Mon, 10 Apr 2023 17:50:48 GMT"
+								},
+								{
+									"key": "Content-Type",
+									"value": "text/plain; charset=utf-8"
+								},
+								{
+									"key": "Content-Length",
+									"value": "21"
+								},
+								{
+									"key": "Connection",
+									"value": "keep-alive"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALB=+jigTLET3Wz9aOjPukeh89OVBdJWt4jCtDv1ZbQFR5SaNyg1OUoYqkU/bcLrkX46S133vdMdjeFqUfF3gBkKvW3HHAXTz8YtF5iHXewfngF3YO/jO22fbuNRiV7m; Expires=Mon, 17 Apr 2023 17:50:48 GMT; Path=/"
+								},
+								{
+									"key": "Set-Cookie",
+									"value": "AWSALBCORS=+jigTLET3Wz9aOjPukeh89OVBdJWt4jCtDv1ZbQFR5SaNyg1OUoYqkU/bcLrkX46S133vdMdjeFqUfF3gBkKvW3HHAXTz8YtF5iHXewfngF3YO/jO22fbuNRiV7m; Expires=Mon, 17 Apr 2023 17:50:48 GMT; Path=/; SameSite=None; Secure"
+								},
+								{
+									"key": "Server",
+									"value": "openresty/1.19.3.1"
+								}
+							],
+							"cookie": [],
+							"body": "Internal Server Error"
+						}
+					]
+				}
+			],
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{JWT_standard}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "ping",
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{v2_url}}/ping",
+					"host": [
+						"{{v2_url}}"
+					],
+					"path": [
+						"ping"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "set jwts",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"/* \r",
+							"Small script to set JWT tokens for the 3 users using postman.\r",
+							"\r",
+							"These can then be used in the authorisation header for requests by setting\r",
+							"the auth tab to Bearer token and entering the token like this: \"{{JWT_standard}}\"\r",
+							"\r",
+							"These are set as collection variables so they can be used in any request in\r",
+							"the collection e.g. For testing searches or modifying users.\r",
+							"\r",
+							"Requires {{base_url}} to be set e.g. pm.environment.set(\"base_url\", \"http://localhost:3000/api/v1\");\r",
+							"\r",
+							"*/\r",
+							"\r",
+							"\r",
+							"function setJWT(user) {\r",
+							"  const { id, name } = user;\r",
+							"  var url = `${pm.environment.get(\"base_url\")}/login/?id=${id}`;\r",
+							"\r",
+							"  pm.sendRequest(url, (error, response) => {\r",
+							"    if (error) {\r",
+							"      console.log(error);\r",
+							"    } else {\r",
+							"      var jwt = response.json().jwt;\r",
+							"      pm.environment.set(`JWT_${name}`, jwt);\r",
+							"\r",
+							"      // Set jwt_token in environment\r",
+							"      if (id === 3) {\r",
+							"        pm.environment.set(\"jwt_token\", jwt);\r",
+							"      }\r",
+							"    }\r",
+							"  });\r",
+							"}\r",
+							"\r",
+							"const users = [\r",
+							"  { id: 1, name: \"standard\" },\r",
+							"  { id: 2, name: \"paid\" },\r",
+							"  { id: 3, name: \"admin\" }\r",
+							"];\r",
+							"\r",
+							"for (const user of users) {\r",
+							"  setJWT(user);\r",
+							"}\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{JWT_standard}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/private",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"private"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "JWT_standard",
+			"value": ""
+		},
+		{
+			"key": "JWT_admin",
+			"value": ""
+		},
+		{
+			"key": "JWT_paid",
+			"value": ""
+		}
+	]
+}
