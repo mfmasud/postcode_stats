@@ -1,41 +1,44 @@
 # postcode_stats
 
-> ⚠️ **MIGRATION IN PROGRESS** ⚠️  
-> This project is currently undergoing a major architectural migration from Koa to Fastify with TypeScript. Some routes may be temporarily unavailable or incomplete during this transition period.
-
-> note: rather than maintaining two sets of dependencies (Koa + Fastify) and serving both via something like nginx or caddy, I am implementing things one by one directly.
-
 This repository holds my improvements to my POR submission for the module **6003CEM - Web API Development**. The original submission can be found here: https://github.coventry.ac.uk/masudm6/improved_POR
 
-Now that I have an infinite amount of time, I can work on the feedback provided by my lecturer:
+It is a Fastify ReST API which offers a JWT-signed users to look up bus stops and crime information for a given pair of coordinates or a UK postcode.
+
+## Updates
+
+My initial implementation in Koa and JavaScript has been updated to use Fastfy and TypeScript. The original version was given feedback by my lecturer which I have tried to implement:
 
 1. **Testing**: Increase the robustness of tests by:
-   - Generating coverage reports to identify untested lines of code.
-   - Implementing mocking to conduct fine-grained checks on function arguments.
+    - Generating coverage reports to identify untested lines of code.
+    - Implementing mocking to conduct fine-grained checks on function arguments.
 
 2. **Caching**: Improve the efficiency and responsiveness of the application by:
-   - Implementing cache header setting/checking.
-   - Utilising HTTP cache response codes, such as 304 (Not Modified), where appropriate.
+    - Implementing cache header setting/checking.
+    - Utilising HTTP cache response codes, such as 304 (Not Modified), where appropriate.
 
 3. **Security**: Enhance the security of the application by:
-   - Implementing JWT (JSON Web Token) or other token-based authentication (replacing the current basic authentication approach).
+    - Implementing JWT (JSON Web Token) or other token-based authentication (replacing the current basic authentication approach).
 
-In addition to working on the feedback, this project also will also be moving to TypeScript and experiment with other API backends such as Fastify or NestJS. Other improvements that could improve the project, such as continuous integration/deployment, background jobs and test automation will also be experimented with.
+Other improvements that could improve the project, such as continuous integration/deployment, background jobs and test automation will also be experimented with.
 
 ## Installation
 
 ### Prerequisites
+
 Below are instructions on how to clone and prepare this repository for the project.  
 The commands are valid for a system running **Ubuntu 24.04** with `pnpm` and `node` installed. To install, see [`fnm`](https://github.com/Schniz/fnm) (a node version manager) and [`pnpm docs`](https://pnpm.io/installation).
 
-This project uses these versions of `node` and `pnpm`:  
+This project uses these versions of `node` and `pnpm`:
+
 - **Node v24.4.1**
 - **pnpm 10.13.1**.
 
 As part of my project, I also use `MongoDB Atlas`. This provides a mongodb database online (for free), but a local one can also be used for this project. See step 3 below.
 
 ### Instructions
+
 To start the server from scratch, open a terminal and follow these instructions:
+
 1. Clone the repository  
    Copy and paste `git clone https://github.com/mfmasud/postcode_stats.git` into the terminal.  
    This uses HTTPS, but you can also use SSH.
@@ -51,14 +54,15 @@ To start the server from scratch, open a terminal and follow these instructions:
 The server is now accessible on the port defined in the `.env` file, **3000** by default.  
 **Note:** The initial startup may take time as the data is being initialized for the first time. This can take up to **10 minutes**, as the `Nptg` collection takes time to process. To reduce the time taken to load this, it can safely be commented out from `helpers/database~initLocationDB` (`await getNptgData();`) as it is not necessary for this project to run. However, atco codes will need to be fetched (and cached) once a query for the region is received.
 
-
 ### MongoDB Atlas Bugfixing
+
 - To get the database connection string on **MongoDB Atlas**, select `Database > Connect > Drivers` and copy the string starting with `mongodb+srv://`. Make sure to fill the username and password fields.
 - The codio box's public IP address needs to be whitelisted in order to connect to the database. Use `curl ifconfig.me -w "\n"` to return the IP address and add it under `MongoDB Atlas > Security > Network Access`.
 
 ## Gallery
 
 ## Testing
+
 API Tests were implemented using **Mocha** and **Chai**. Below is an example of the test results:
 
 ![Mocha Test Results](./docs/images/6003cem_mocha.png)
@@ -68,6 +72,7 @@ The API endpoints were tested using Postman with some custom scripts, for exampl
 ![Postman Test Results](./docs/images/6003cem_postman.png)
 
 ## API Documentation
+
 The API includes an **OpenAPI Specification** and Swagger UI.
 
 ![OpenAPI Documentation](./docs/images/6003cem_openapi_specification.png)
