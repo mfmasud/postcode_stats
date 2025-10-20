@@ -1,21 +1,19 @@
-import type { FastifyInstance, FastifyRequest } from 'fastify';
+import type { FastifyInstance } from "fastify"
 
 /**
  * @param {FastifyInstance} fastify
- * @param {Object} options
  */
 async function rootRoutes(fastify: FastifyInstance) {
-
-    fastify.get('/', async (request: FastifyRequest) => {
-      return Welcome(request);
-    });
+    fastify.get("/", async () => {
+        return Welcome()
+    })
 }
 
 // This function is independent of Fastify's route registration
 export function Welcome() {
     return {
-      message: 'Hello and welcome to the UK Location API!',
-    };
-  }
+        message: "Hello and welcome to the UK Location API!",
+    }
+}
 
-export default rootRoutes;
+export default rootRoutes
