@@ -1,292 +1,292 @@
 openapi: 3.0.0
 info:
-  version: 1.0.0
-  title: UK Location API!
-  description: >
-    A UK Location data API for my 6003CEM Portfolio coursework.  
-    Provides crime and transport details for a given postcode or WGS84 coordinate pair.
-  contact:
-    name: Mohammed Fardhin Masud
-    email: masudm6@coventry.ac.uk
+    version: 1.0.0
+    title: UK Location API!
+    description: >
+        A UK Location data API for my 6003CEM Portfolio coursework.  
+        Provides crime and transport details for a given postcode or WGS84 coordinate pair.
+    contact:
+        name: Mohammed Fardhin Masud
+        email: fardhinmasud@gmail.com
 servers:
-  - url: https://firstrespect-zippergriffin-3000.codio-box.uk/api/v1
-    description: Codio Development Server
+    - url: https://firstrespect-zippergriffin-3000.codio-box.uk/api/v1
+      description: Codio Development Server
 tags:
-  - name: Users
-    description: API endpoints for user management.
-  - name: Postcodes
-    description: API endpoints for Postcode collection operations.
-  - name: Searches
-    description: API endpoints to search data for locations.
-  - name: Specials
-    description: API endpoints for special operations. Primarily meant for testing.
+    - name: Users
+      description: API endpoints for user management.
+    - name: Postcodes
+      description: API endpoints for Postcode collection operations.
+    - name: Searches
+      description: API endpoints to search data for locations.
+    - name: Specials
+      description: API endpoints for special operations. Primarily meant for testing.
 paths:
-  /users/{id}:
-    parameters:
-      - in: path
-        name: id
-        schema:
-          type: integer
-        required: true
-        description: Numeric id of the user to perform actions against
-    description: >
-      This resource represents the ability to perform actions on users via their
-      ID.
-    get:
-      summary: View details for a single user
-      tags:
-        - Users
-      description: Get user by id.
-      responses:
-        "200":
-          description: View user details.
-        "400":
-          description: Invalid ID supplied.
-        "401":
-          description: User needs to log in.
-        "404":
-          description: User was not found in the DB.
-    put:
-      summary: Update user details
-      tags:
-        - Users
-      description: Update user by ID.
-      requestBody:
-        description: Edit fields with the names matching "firstName, lastName, about, password, email, role"
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                firstName:
+    /users/{id}:
+        parameters:
+            - in: path
+              name: id
+              schema:
+                  type: integer
+              required: true
+              description: Numeric id of the user to perform actions against
+        description: >
+            This resource represents the ability to perform actions on users via their
+            ID.
+        get:
+            summary: View details for a single user
+            tags:
+                - Users
+            description: Get user by id.
+            responses:
+                "200":
+                    description: View user details.
+                "400":
+                    description: Invalid ID supplied.
+                "401":
+                    description: User needs to log in.
+                "404":
+                    description: User was not found in the DB.
+        put:
+            summary: Update user details
+            tags:
+                - Users
+            description: Update user by ID.
+            requestBody:
+                description: Edit fields with the names matching "firstName, lastName, about, password, email, role"
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                firstName:
+                                    type: string
+                                lastName:
+                                    type: string
+                                about:
+                                    type: string
+                                password:
+                                    type: string
+                                email:
+                                    type: string
+                                role:
+                                    type: string
+            responses:
+                "200":
+                    description: Update confirmation showing a message with updated fields.
+                "400":
+                    description: Invalid ID supplied.
+                "401":
+                    description: User needs to log in.
+                "403":
+                    description: User does not have permission to access this resource or perform this action.
+                "500":
+                    description: User update failed.
+        delete:
+            summary: Delete a user by ID
+            tags:
+                - Users
+            description: Delete user by ID.
+            responses:
+                "200":
+                    description: User deletion confirmation.
+                "400":
+                    description: Invalid ID supplied.
+                "401":
+                    description: User needs to log in.
+                "403":
+                    description: User does not have permission to access this resource or perform this action.
+                "500":
+                    description: User deletion failed.
+    /users:
+        description: Register new users and view all users
+        post:
+            summary: Create a new user
+            tags:
+                - Users
+            description: Create a new user.
+            requestBody:
+                description: User registration data
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: object
+                            properties:
+                                firstName:
+                                    type: string
+                                lastName:
+                                    type: string
+                                username:
+                                    type: string
+                                about:
+                                    type: string
+                                password:
+                                    type: string
+                                email:
+                                    type: string
+                                role:
+                                    type: string
+            responses:
+                "201":
+                    description: User created.
+                "400":
+                    description: User already exists, or invalid data was entered.
+                "500":
+                    description: User creation failed.
+        get:
+            summary: View all users in the Users collection
+            tags:
+                - Users
+            description: View all users
+            responses:
+                "200":
+                    description: View details for all users
+                "401":
+                    description: User needs to log in to view all users.
+                "403":
+                    description: User does not have permission to access this resource.
+                "404":
+                    description: No users were found in the DB (should never happen).
+    /postcodes:
+        description: Get all postcodes from the Postcodes collection. Admins only.
+        get:
+            summary: View all postcodes in the Postcode collection
+            tags:
+                - Postcodes
+            description: View all postcodes in the mongoDB Postcodes collection.
+            responses:
+                "200":
+                    description: View all postcodes.
+                "401":
+                    description: Only admin users can view all postcodes.
+                "403":
+                    description: User does not have permission to access this resource.
+    /postcodes/{postcode}:
+        parameters:
+            - in: path
+              name: postcode
+              schema:
                   type: string
-                lastName:
-                  type: string
-                about:
-                  type: string
-                password:
-                  type: string
-                email:
-                  type: string
-                role:
-                  type: string
-      responses:
-        "200":
-          description: Update confirmation showing a message with updated fields.
-        "400":
-          description: Invalid ID supplied.
-        "401":
-          description: User needs to log in.
-        "403":
-          description: User does not have permission to access this resource or perform this action.
-        "500":
-          description: User update failed.
-    delete:
-      summary: Delete a user by ID
-      tags:
-        - Users
-      description: Delete user by ID.
-      responses:
-        "200":
-          description: User deletion confirmation.
-        "400":
-          description: Invalid ID supplied.
-        "401":
-          description: User needs to log in.
-        "403":
-          description: User does not have permission to access this resource or perform this action.
-        "500":
-          description: User deletion failed.
-  /users:
-    description: Register new users and view all users
-    post:
-      summary: Create a new user
-      tags:
-        - Users
-      description: Create a new user.
-      requestBody:
-        description: User registration data
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                firstName:
-                  type: string
-                lastName:
-                  type: string
-                username:
-                  type: string
-                about:
-                  type: string
-                password:
-                  type: string
-                email:
-                  type: string
-                role:
-                  type: string
-      responses:
-        "201":
-          description: User created.
-        "400":
-          description: User already exists, or invalid data was entered.
-        "500":
-          description: User creation failed.
-    get:
-      summary: View all users in the Users collection
-      tags:
-        - Users
-      description: View all users
-      responses:
-        "200":
-          description: View details for all users
-        "401":
-          description: User needs to log in to view all users.
-        "403":
-          description: User does not have permission to access this resource.
-        "404":
-          description: No users were found in the DB (should never happen).
-  /postcodes:
-    description: Get all postcodes from the Postcodes collection. Admins only.
-    get:
-      summary: View all postcodes in the Postcode collection
-      tags:
-        - Postcodes
-      description: View all postcodes in the mongoDB Postcodes collection.
-      responses:
-        "200":
-          description: View all postcodes.
-        "401":
-          description: Only admin users can view all postcodes.
-        "403":
-          description: User does not have permission to access this resource.
-  /postcodes/{postcode}:
-    parameters:
-      - in: path
-        name: postcode
-        schema:
-          type: string
-        required: true
-        description: Postcode to search for.
-    description: >
-      This resource represents the ability to collect information for a given postcode.
-      The postcode is validated using the postcodes.io API and is stored in a condensed form as a Postcode model.
-      The full details are returned in this route, but in the searches route, only the condensed form is used.
-    get:
-      summary: Look for a specific postcode
-      tags:
-        - Postcodes
-      description: Get postcode by validating the postcode in the URL.
-      responses:
-        "200":
-          description: View postcode details for given postcode.
-        "400":
-          description: Postcode entered is invalid.
-        "403":
-          description: User does not have permission to access this resource.
-  /postcodes/random:
-    description: Get a random postcode using the postcodes.io API
-    get:
-      summary: Look for a random postcode
-      tags:
-        - Postcodes
-      description: Get a random postcode using the postcodes.io API
-      responses:
-        "200":
-          description: View postcode details for given postcode.
-        "401":
-          description: User has not logged in.
-        "403":
-          description: User does not have permission to access this resource.
-  /search:
-    description: Search for a details of a location using a postcode or WGS84 coordinate pair.
-    get:
-      summary: Search using a pair of coordinates
-      tags:
-        - Searches
-      parameters:
-        - in: query
-          name: latitude
-          schema:
-            type: number
-          required: true
-          description: Latitude value to search for.
-        - in: query
-          name: longitude
-          schema:
-            type: number
-          required: true
-          description: Longitude value to search for.
-      description: Search for a location using a WGS84 coordinate pair (latitude and longitude).
-      responses:
-        "200":
-          description: View transport and crime details for the location.
-        "400":
-          description: Invalid coordinates entered.
-        "403":
-          description: User does not have permission to access this resource.
-    post:
-      tags:
-        - Searches
-      summary: Search using a postcode
-      requestBody:
-        description: Search for a location using a postcode.
-        required: true
-        content:
-          application/json:
-            schema:
-              type: string
-              example:
-                postcode: LU2 7EW
-      responses:
-        "200":
-          description: View transport and crime details for the location.
-        "400":
-          description: Invalid postcode entered.
-        "403":
-          description: User does not have permission to access this resource.
-  /search/random:
-    description: Get a random location using the postcodes.io API and search for details for that location.
-    get:
-      summary: Search a random postcode
-      tags:
-        - Searches
-      description: Get a random location using the postcodes.io API and search for details of that location.
-      responses:
-        "200":
-          description: View transport and crime details for the location.
-        "401":
-          description: User has not logged in.
-        "403":
-          description: User does not have permission to access this resource.
-  /:
-    description: Return a welcome message from the API.
-    get:
-      summary: Return a welcome message from the API's public homepage
-      tags:
-        - Specials
-      description: Return a welcome message from the API.
-      responses:
-        "200":
-          description: Successfully returns "Hello and welcome to the UK Location API!".
-  /private:
-    description: View the current user's details. Used for testing authentication.
-    get:
-      summary: View the current user's details
-      tags:
-        - Specials
-      description: View the current user's details. Used for testing authentication.
-      responses:
-        "200":
-          description: View ALL the current user's details, including role, dates and passwords.
-        "401":
-          description: User needs to log in.
+              required: true
+              description: Postcode to search for.
+        description: >
+            This resource represents the ability to collect information for a given postcode.
+            The postcode is validated using the postcodes.io API and is stored in a condensed form as a Postcode model.
+            The full details are returned in this route, but in the searches route, only the condensed form is used.
+        get:
+            summary: Look for a specific postcode
+            tags:
+                - Postcodes
+            description: Get postcode by validating the postcode in the URL.
+            responses:
+                "200":
+                    description: View postcode details for given postcode.
+                "400":
+                    description: Postcode entered is invalid.
+                "403":
+                    description: User does not have permission to access this resource.
+    /postcodes/random:
+        description: Get a random postcode using the postcodes.io API
+        get:
+            summary: Look for a random postcode
+            tags:
+                - Postcodes
+            description: Get a random postcode using the postcodes.io API
+            responses:
+                "200":
+                    description: View postcode details for given postcode.
+                "401":
+                    description: User has not logged in.
+                "403":
+                    description: User does not have permission to access this resource.
+    /search:
+        description: Search for a details of a location using a postcode or WGS84 coordinate pair.
+        get:
+            summary: Search using a pair of coordinates
+            tags:
+                - Searches
+            parameters:
+                - in: query
+                  name: latitude
+                  schema:
+                      type: number
+                  required: true
+                  description: Latitude value to search for.
+                - in: query
+                  name: longitude
+                  schema:
+                      type: number
+                  required: true
+                  description: Longitude value to search for.
+            description: Search for a location using a WGS84 coordinate pair (latitude and longitude).
+            responses:
+                "200":
+                    description: View transport and crime details for the location.
+                "400":
+                    description: Invalid coordinates entered.
+                "403":
+                    description: User does not have permission to access this resource.
+        post:
+            tags:
+                - Searches
+            summary: Search using a postcode
+            requestBody:
+                description: Search for a location using a postcode.
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            type: string
+                            example:
+                                postcode: LU2 7EW
+            responses:
+                "200":
+                    description: View transport and crime details for the location.
+                "400":
+                    description: Invalid postcode entered.
+                "403":
+                    description: User does not have permission to access this resource.
+    /search/random:
+        description: Get a random location using the postcodes.io API and search for details for that location.
+        get:
+            summary: Search a random postcode
+            tags:
+                - Searches
+            description: Get a random location using the postcodes.io API and search for details of that location.
+            responses:
+                "200":
+                    description: View transport and crime details for the location.
+                "401":
+                    description: User has not logged in.
+                "403":
+                    description: User does not have permission to access this resource.
+    /:
+        description: Return a welcome message from the API.
+        get:
+            summary: Return a welcome message from the API's public homepage
+            tags:
+                - Specials
+            description: Return a welcome message from the API.
+            responses:
+                "200":
+                    description: Successfully returns "Hello and welcome to the UK Location API!".
+    /private:
+        description: View the current user's details. Used for testing authentication.
+        get:
+            summary: View the current user's details
+            tags:
+                - Specials
+            description: View the current user's details. Used for testing authentication.
+            responses:
+                "200":
+                    description: View ALL the current user's details, including role, dates and passwords.
+                "401":
+                    description: User needs to log in.
 components:
-  securitySchemes:
-    Basic:
-      type: http
-      scheme: basic
+    securitySchemes:
+        Basic:
+            type: http
+            scheme: basic
 security:
-  - Basic: []
+    - Basic: []

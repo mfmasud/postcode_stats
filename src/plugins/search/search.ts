@@ -1,7 +1,7 @@
 /**
  * @file Contains the main search routes for the API, allowing users to search for a postcode/lat-long pair and get related stops and crimes.
  * @module plugins/search/newsearch
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires fastify
  * @requires @fastify/type-provider-typebox

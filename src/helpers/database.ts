@@ -1,7 +1,7 @@
 /**
  * @file Contains functions for connecting to and initialising database collections.
  * @module helpers/database
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires dotenv
  * @requires mongoose
@@ -26,33 +26,34 @@
  *
  */
 
-import dotenv from "dotenv";
-dotenv.config();
+import dotenv from "dotenv"
+dotenv.config()
 
-import mongoose from "mongoose";
-mongoose.set("strictQuery", true);
+import mongoose from "mongoose"
+mongoose.set("strictQuery", true)
 //mongoose.set("debug", true);
 
-import logger from "../utils/logger.js";
+import logger from "../utils/logger.js"
 
-
-import User from "../models/User.js";
-import Role from "../models/Role.js";
+import User from "../models/User.js"
+import Role from "../models/Role.js"
 // import Atco from "../models/Atco.js";
 // import BusStop from "../models/BusStop.js";
-import Postcode from "../models/Postcode.js";
-import Nptg from "../models/Nptg.js";
-import Search from "../models/Search.js";
-import CrimeList from "../models/CrimeList.js";
-import Crime from "../models/Crime.js";
-import Counter from "../models/Counter.js";
+import Postcode from "../models/Postcode.js"
+import Nptg from "../models/Nptg.js"
+import Search from "../models/Search.js"
+import CrimeList from "../models/CrimeList.js"
+import Crime from "../models/Crime.js"
+import Counter from "../models/Counter.js"
 
-import { saveAtcoList } from "./AtcoCodes.js";
+import { saveAtcoList } from "./AtcoCodes.js"
 
-import { getScotlandLocations, /*getEnglandLocations, getWalesLocations,*/ getNptgData } from "./locations.js";
+import {
+    getScotlandLocations,
+    /*getEnglandLocations, getWalesLocations,*/ getNptgData,
+} from "./locations.js"
 
-
-const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it is to mongodb atlas in the .env file
+const MONGO_URI = process.env.DB_STRING // mongodb connection - in this case it is to mongodb atlas in the .env file
 
 /**
  * Connect to the mongodb server. The connection string is stored in the MONGO_URI parameter.
@@ -66,18 +67,22 @@ const MONGO_URI = process.env.DB_STRING; // mongodb connection - in this case it
  *
  */
 async function connectDB(output: boolean = false) {
-  try {
-    if (!MONGO_URI) {
-      throw new Error('Database connection string not found in environment variables');
-    }
-    await mongoose.connect(MONGO_URI);
+    try {
+        if (!MONGO_URI) {
+            throw new Error(
+                "Database connection string not found in environment variables"
+            )
+        }
+        await mongoose.connect(MONGO_URI)
 
-    if (output) {
-      logger.info("Connected to database!");
+        if (output) {
+            logger.info("Connected to database!")
+        }
+    } catch (error) {
+        logger.error(
+            `Error connecting to database:\n\n${error instanceof Error ? error.message : "Unknown error"}`
+        )
     }
-  } catch (error) {
-    logger.error(`Error connecting to database:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
 }
 
 /**
@@ -92,15 +97,17 @@ async function connectDB(output: boolean = false) {
  *
  */
 async function disconnectDB(output: boolean = false) {
-  try {
-    await mongoose.connection.close();
+    try {
+        await mongoose.connection.close()
 
-    if (output) {
-      logger.info("Disconnected from database!");
+        if (output) {
+            logger.info("Disconnected from database!")
+        }
+    } catch (error) {
+        logger.error(
+            `Error disconnecting from database:\n\n${error instanceof Error ? error.message : "Unknown error"}`
+        )
     }
-  } catch (error) {
-    logger.error(`Error disconnecting from database:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
 }
 
 /**
@@ -114,71 +121,73 @@ async function disconnectDB(output: boolean = false) {
  *
  */
 async function initUserDB() {
-  logger.info("Resetting User data...");
+    logger.info("Resetting User data...")
 
-  try {
-    // Delete all documents in each collection
-    await User.deleteMany();
-    await Role.deleteMany();
-    await Counter.deleteOne({counterName: "user"});
+    try {
+        // Delete all documents in each collection
+        await User.deleteMany()
+        await Role.deleteMany()
+        await Counter.deleteOne({ counterName: "user" })
 
-    // Create roles
-    const AdminRole = await Role.create({
-      name: "admin",
-    });
+        // Create roles
+        const AdminRole = await Role.create({
+            name: "admin",
+        })
 
-    const PaidUser = await Role.create({
-      name: "paiduser",
-    });
+        const PaidUser = await Role.create({
+            name: "paiduser",
+        })
 
-    const UserRole = await Role.create({
-      name: "user",
-    });
+        const UserRole = await Role.create({
+            name: "user",
+        })
 
-    await Role.create({
-      name: "none",
-    });
+        await Role.create({
+            name: "none",
+        })
 
-    // Create sample documents for each collection
+        // Create sample documents for each collection
 
-    await User.create({
-      firstName: "Test",
-      lastName: "User",
-      username: "TestUser1",
-      about: "about section about me a standard user",
-      password: "password",
-      passwordSalt: "salt",
-      email: "TestUser1@test.com",
-      role: UserRole,
-      id: 1,
-    });
+        await User.create({
+            firstName: "Test",
+            lastName: "User",
+            username: "TestUser1",
+            about: "about section about me a standard user",
+            password: "password",
+            passwordSalt: "salt",
+            email: "TestUser1@test.com",
+            role: UserRole,
+            id: 1,
+        })
 
-    await User.create({
-      firstName: "Paid",
-      lastName: "User",
-      username: "PaidUser1",
-      about: "about section about me I have paid to get more access",
-      password: "password",
-      passwordSalt: "salt",
-      email: "PaidUser1@test.com",
-      role: PaidUser,
-    });
+        await User.create({
+            firstName: "Paid",
+            lastName: "User",
+            username: "PaidUser1",
+            about: "about section about me I have paid to get more access",
+            password: "password",
+            passwordSalt: "salt",
+            email: "PaidUser1@test.com",
+            role: PaidUser,
+        })
 
-    await User.create({
-      firstName: "Test",
-      lastName: "Admin",
-      username: "TestAdmin1",
-      about: "about section about me the admin",
-      password: "password",
-      passwordSalt: "salt",
-      email: "TestAdmin1@test.com",
-      role: AdminRole,
-    });
+        await User.create({
+            firstName: "Test",
+            lastName: "Admin",
+            username: "TestAdmin1",
+            about: "about section about me the admin",
+            password: "password",
+            passwordSalt: "salt",
+            email: "TestAdmin1@test.com",
+            role: AdminRole,
+        })
 
-    logger.info("Reset user data successfully!");
-  } catch (error) {
-    logger.error(`Error resetting user data:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
+        logger.info("Reset user data successfully!")
+    } catch (error) {
+        logger.error(
+            `Error resetting user data:\n\n${error instanceof Error ? error.message : "Unknown error"}`
+        )
+    }
 }
 
 /**
@@ -193,24 +202,26 @@ async function initUserDB() {
  *
  */
 async function resetDataDB() {
-  logger.info("Resetting location data...");
+    logger.info("Resetting location data...")
 
-  try {
-    // Delete all documents in each collection
-    //await Atco.deleteMany();
-    //await BusStop.deleteMany();
-    await Postcode.deleteMany();
-    // await Nptg.deleteMany();
-    await Search.deleteMany();
-    await Crime.deleteMany();
-    await CrimeList.deleteMany();
-    await Counter.deleteOne({counterName: "crimeList"});
-    await Counter.deleteOne({counterName: "search"});
+    try {
+        // Delete all documents in each collection
+        //await Atco.deleteMany();
+        //await BusStop.deleteMany();
+        await Postcode.deleteMany()
+        // await Nptg.deleteMany();
+        await Search.deleteMany()
+        await Crime.deleteMany()
+        await CrimeList.deleteMany()
+        await Counter.deleteOne({ counterName: "crimeList" })
+        await Counter.deleteOne({ counterName: "search" })
 
-    logger.info("Reset location data successfully!");
-  } catch (error) {
-    logger.error(`Error resetting location data:\n\n${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
+        logger.info("Reset location data successfully!")
+    } catch (error) {
+        logger.error(
+            `Error resetting location data:\n\n${error instanceof Error ? error.message : "Unknown error"}`
+        )
+    }
 }
 
 /**
@@ -224,17 +235,18 @@ async function resetDataDB() {
  *
  */
 async function initNptg() {
-  try {
-    await Nptg.collection.createIndex(
-      { NptgLocalityCode: 1 },
-      { unique: true }
-    );
-    logger.info("Initialised NPTG Collection successfully!");
-  } catch (error) {
-    logger.error(`Error initialising NPTG Collection: ${error instanceof Error ? error.message : 'Unknown error'}`);
-  }
+    try {
+        await Nptg.collection.createIndex(
+            { NptgLocalityCode: 1 },
+            { unique: true }
+        )
+        logger.info("Initialised NPTG Collection successfully!")
+    } catch (error) {
+        logger.error(
+            `Error initialising NPTG Collection: ${error instanceof Error ? error.message : "Unknown error"}`
+        )
+    }
 }
-
 
 /**
  * Initialises the location database collections. Adds the `Nptg` data if not cached already.
@@ -247,26 +259,25 @@ async function initNptg() {
  *
  */
 async function initLocationDB() {
-  
-  // Download and process NPTG data from NAPTAN
-  await initNptg(); // set up the NPTG collection on the database
-  await getNptgData(); // 1 time download of NPTG locality database ~ 5mb csv. Is cached after first run.
+    // Download and process NPTG data from NAPTAN
+    await initNptg() // set up the NPTG collection on the database
+    await getNptgData() // 1 time download of NPTG locality database ~ 5mb csv. Is cached after first run.
 
-  // Get and process ATCO codes master list into the Atco collection
-  await saveAtcoList();
+    // Get and process ATCO codes master list into the Atco collection
+    await saveAtcoList()
 
-  await getScotlandLocations(); // adds alternative names to scottish location names
-  // await getEnglandLocations();
-  // await getWalesLocations();
+    await getScotlandLocations() // adds alternative names to scottish location names
+    // await getEnglandLocations();
+    // await getWalesLocations();
 
-  logger.info("Successfully initialised Location Data");
+    logger.info("Successfully initialised Location Data")
 }
 
 export {
-  connectDB,
-  disconnectDB,
-  initUserDB,
-  resetDataDB,
-  initLocationDB,
-  initNptg,
-};
+    connectDB,
+    disconnectDB,
+    initUserDB,
+    resetDataDB,
+    initLocationDB,
+    initNptg,
+}

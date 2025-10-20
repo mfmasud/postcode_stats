@@ -1,7 +1,7 @@
 /**
  * @file Contains the Role model schema which is used by the User model to assign access levels to users.
  * @module models/Role
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires mongoose
  *
@@ -11,23 +11,28 @@
  *
  */
 
-import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
+import {
+    Schema,
+    model,
+    type InferSchemaType,
+    type HydratedDocument,
+} from "mongoose"
 
 const RoleSchema = new Schema({
-  name: {
-    type: String,
-    required: true,
-    default: "user",
-    enum: ["none", "user", "paiduser", "admin"],
-  },
-  description: {
-    type: String,
-  },
-});
+    name: {
+        type: String,
+        required: true,
+        default: "user",
+        enum: ["none", "user", "paiduser", "admin"],
+    },
+    description: {
+        type: String,
+    },
+})
 
-export type RoleInferredSchema = InferSchemaType<typeof RoleSchema>;
-export type RoleDoc = HydratedDocument<RoleInferredSchema>;
+export type RoleInferredSchema = InferSchemaType<typeof RoleSchema>
+export type RoleDoc = HydratedDocument<RoleInferredSchema>
 
-const Role = model<RoleInferredSchema>('Role', RoleSchema);
+const Role = model<RoleInferredSchema>("Role", RoleSchema)
 
-export default Role;
+export default Role

@@ -1,7 +1,7 @@
 /**
  * @file Contains the functions to link data related to a search to the Search model.
  * @module helpers/search
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires models/Atco
  * @requires models/CrimeList

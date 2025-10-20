@@ -1,7 +1,7 @@
 /**
  * @file Contains the mongoose Crime model schema. This model is used to store the results of a query made to the Police API into the Crimes collection.
  * @module models/Crime
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires mongoose
  *
@@ -12,37 +12,42 @@
  *
  */
 
-import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
+import {
+    Schema,
+    model,
+    type InferSchemaType,
+    type HydratedDocument,
+} from "mongoose"
 
 const crimeSchema = new Schema({
-  crimeID: {
-    type: Number,
-  },
-  latitude: {
-    type: Number,
-    required: true,
-  },
-  longitude: {
-    type: Number,
-    required: true,
-  },
-  crime_category: {
-    type: String,
-  },
-  crime_date: {
-    type: String,
-  },
-  outcome_category: {
-    type: String,
-  },
-  outcome_date: {
-    type: String,
-  },
-});
+    crimeID: {
+        type: Number,
+    },
+    latitude: {
+        type: Number,
+        required: true,
+    },
+    longitude: {
+        type: Number,
+        required: true,
+    },
+    crime_category: {
+        type: String,
+    },
+    crime_date: {
+        type: String,
+    },
+    outcome_category: {
+        type: String,
+    },
+    outcome_date: {
+        type: String,
+    },
+})
 
-export type CrimeInferredSchema = InferSchemaType<typeof crimeSchema>;
-export type CrimeDoc = HydratedDocument<CrimeInferredSchema>;
+export type CrimeInferredSchema = InferSchemaType<typeof crimeSchema>
+export type CrimeDoc = HydratedDocument<CrimeInferredSchema>
 
-const Crime = model<CrimeInferredSchema>('Crime', crimeSchema);
+const Crime = model<CrimeInferredSchema>("Crime", crimeSchema)
 
-export default Crime;
+export default Crime

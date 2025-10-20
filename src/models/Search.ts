@@ -1,7 +1,7 @@
 /**
  * @file Contains the mongoose schema for the Search model. This model is used to store the results of a search query.
  * @module models/Search
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires mongoose
  *
@@ -18,101 +18,102 @@
  */
 
 import {
-  Schema,
-  model,
-  type InferSchemaType,
-  type HydratedDocument,
-} from 'mongoose';
+    Schema,
+    model,
+    type InferSchemaType,
+    type HydratedDocument,
+} from "mongoose"
 
-import Counter from './Counter.js';
+import Counter from "./Counter.js"
 
 const searchSchema = new Schema({
-  searchID: {
-    type: Number,
-    required: true,
-    unique: true,
-    index: true,
-    immutable: true,
-  },
-  latitude: {
-    type: Number,
-    required: true,
-  },
-  longitude: {
-    type: Number,
-    required: true,
-  },
-  Northing: {
-    type: String,
-    required: true,
-  },
-  Easting: {
-    type: String,
-    required: true,
-  },
-  reverseLookup: {
-    type: Boolean,
-    default: false,
-  },
-  Postcode: {
-    type: Schema.Types.ObjectId,
-    ref: "Postcode",
-  },
-  queryBusStops: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "BusStop",
+    searchID: {
+        type: Number,
+        required: true,
+        unique: true,
+        index: true,
+        immutable: true,
     },
-  ],
-  queryCrimes: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Crime",
+    latitude: {
+        type: Number,
+        required: true,
     },
-  ],
-  linkedATCO: {
-    type: Schema.Types.ObjectId,
-    ref: "Atco",
-  },
-  linkedCrimeList: {
-    type: Schema.Types.ObjectId,
-    ref: "CrimeList",
-  },
-  _links: {
-    self: {
-      href: {
+    longitude: {
+        type: Number,
+        required: true,
+    },
+    Northing: {
         type: String,
-      },
+        required: true,
     },
-    postcode: {
-      href: {
+    Easting: {
         type: String,
-      },
+        required: true,
     },
-    alternate: {
-      href: {
-        type: String,
-      },
+    reverseLookup: {
+        type: Boolean,
+        default: false,
     },
-  },
-});
+    Postcode: {
+        type: Schema.Types.ObjectId,
+        ref: "Postcode",
+    },
+    queryBusStops: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "BusStop",
+        },
+    ],
+    queryCrimes: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Crime",
+        },
+    ],
+    linkedATCO: {
+        type: Schema.Types.ObjectId,
+        ref: "Atco",
+    },
+    linkedCrimeList: {
+        type: Schema.Types.ObjectId,
+        ref: "CrimeList",
+    },
+    _links: {
+        self: {
+            href: {
+                type: String,
+            },
+        },
+        postcode: {
+            href: {
+                type: String,
+            },
+        },
+        alternate: {
+            href: {
+                type: String,
+            },
+        },
+    },
+})
 
-export type SearchInferredSchema = InferSchemaType<typeof searchSchema>;
-export type SearchDoc = HydratedDocument<SearchInferredSchema>;
+export type SearchInferredSchema = InferSchemaType<typeof searchSchema>
+export type SearchDoc = HydratedDocument<SearchInferredSchema>
 
 searchSchema.pre("validate", async function save(this: SearchDoc) {
-  // if the document is not new, do not set a new ID
-  if (!this.isNew || this.searchID != null) return;
+    // if the document is not new, do not set a new ID
+    if (!this.isNew || this.searchID != null) return
 
-  let newID = await Counter.next('search'); // get the next ID
+    let newID = await Counter.next("search") // get the next ID
 
-  while (await Search.exists({ searchID: newID })) { // if the ID already exists, try again
-    newID = await Counter.next('search'); // increment the ID and try again
-  }
+    while (await Search.exists({ searchID: newID })) {
+        // if the ID already exists, try again
+        newID = await Counter.next("search") // increment the ID and try again
+    }
 
-  this.searchID = newID; // set the new ID
-});
+    this.searchID = newID // set the new ID
+})
 
-const Search = model<SearchInferredSchema>('Search', searchSchema);
+const Search = model<SearchInferredSchema>("Search", searchSchema)
 
-export default Search;
+export default Search

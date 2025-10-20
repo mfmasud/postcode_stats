@@ -1,7 +1,7 @@
 /**
  * @file Defines the CASL ability for users accessing the /postcodes route.
  * @module permissions/postcodes
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires @casl/ability
  * @requires utils/logger

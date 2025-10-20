@@ -1,7 +1,7 @@
 /**
  * @file Contains the Atco model schema.
  * @module models/Atco
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires mongoose
  *
@@ -13,41 +13,46 @@
  *
  */
 
-import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
+import {
+    Schema,
+    model,
+    type InferSchemaType,
+    type HydratedDocument,
+} from "mongoose"
 
 const atcoSchema = new Schema({
-  code: {
-    type: String,
-    required: true,
-  },
-  location: {
-    type: String,
-    required: true,
-  },
-  region: {
-    type: String,
-    required: true,
-  },
-  busstops: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: 'BusStop',
+    code: {
+        type: String,
+        required: true,
     },
-  ],
-  AllProcessed: {
-    type: Boolean,
-    required: true,
-  },
-  other_names: [
-    {
-      type: String,
+    location: {
+        type: String,
+        required: true,
     },
-  ],
-});
+    region: {
+        type: String,
+        required: true,
+    },
+    busstops: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "BusStop",
+        },
+    ],
+    AllProcessed: {
+        type: Boolean,
+        required: true,
+    },
+    other_names: [
+        {
+            type: String,
+        },
+    ],
+})
 
-export type AtcoInferredSchema = InferSchemaType<typeof atcoSchema>;
-export type AtcoDoc = HydratedDocument<AtcoInferredSchema>;
+export type AtcoInferredSchema = InferSchemaType<typeof atcoSchema>
+export type AtcoDoc = HydratedDocument<AtcoInferredSchema>
 
-const Atco = model<AtcoInferredSchema>('Atco', atcoSchema);
+const Atco = model<AtcoInferredSchema>("Atco", atcoSchema)
 
-export default Atco;
+export default Atco

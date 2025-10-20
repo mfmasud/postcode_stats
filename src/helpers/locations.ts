@@ -1,7 +1,7 @@
 /**
  * @file This file contains the functions for getting location data from online sources and saving NPTG API data.
  * @module helpers/locations
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires models/Nptg
  * @requires models/Atco
@@ -17,14 +17,14 @@
  *
  */
 
-import Nptg from "../models/Nptg.js";
-import Atco from "../models/Atco.js";
+import Nptg from "../models/Nptg.js"
+import Atco from "../models/Atco.js"
 
-import logger from "../utils/logger.js";
+import logger from "../utils/logger.js"
 
-import axios from "axios";
-import { JSDOM } from "jsdom";
-import csvtojson from "csvtojson";
+import axios from "axios"
+import { JSDOM } from "jsdom"
+import csvtojson from "csvtojson"
 
 /**
  * Processes the names for the 32 local goverments of Scotland in order to match the names from the government Atco list.
@@ -39,105 +39,105 @@ import csvtojson from "csvtojson";
  *
  */
 async function getScotlandLocations() {
-  const url = "https://en.wikipedia.org/wiki/Local_government_in_Scotland";
-  const response = await axios.get(url);
-  const dom = new JSDOM(response.data);
+    const url = "https://en.wikipedia.org/wiki/Local_government_in_Scotland"
+    const response = await axios.get(url)
+    const dom = new JSDOM(response.data)
 
-  const locations = dom.window.document.querySelectorAll("ol li a");
+    const locations = dom.window.document.querySelectorAll("ol li a")
 
-  const names = [];
+    const names = []
 
-  for (let index = 0; index < 32; index++) {
-    const place = locations[index];
-    let text = place?.textContent?.trim();
-    if (!text) {
-      logger.error(`No text content found for place: "${place}"`);
-      continue;
+    for (let index = 0; index < 32; index++) {
+        const place = locations[index]
+        let text = place?.textContent?.trim()
+        if (!text) {
+            logger.error(`No text content found for place: "${place}"`)
+            continue
+        }
+
+        // add alt names to ATCO list. e.g. other_names: Na h-Eileanan Siar
+        // make this into a function? normalname - altnames
+        if (text === "Orkney") {
+            const altname = "Orkney Islands"
+            const altAtco = await Atco.findOne({ location: altname })
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    { $addToSet: { other_names: { $each: [text, "Orkney"] } } }
+                )
+            }
+            text = altname
+        } else if (text === "Shetland") {
+            const altname = "Shetland Islands"
+            const altAtco = await Atco.findOne({ location: altname })
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: { $each: [text, "Shetland"] },
+                        },
+                    }
+                )
+            }
+            text = altname
+        } else if (text === "Na h-Eileanan Siar") {
+            const altname = "Western Isles"
+            const altAtco = await Atco.findOne({ location: altname })
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: {
+                                $each: [
+                                    text,
+                                    "Western Islands",
+                                    "Outer Hebrides",
+                                    "Comhairle nan Eilean Siar",
+                                ],
+                            },
+                        },
+                    }
+                )
+            }
+            text = altname
+        } else if (text === "Argyll and Bute") {
+            const altname = "Argyll & Bute"
+            const altAtco = await Atco.findOne({ location: altname })
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: { $each: [text, "Argyll and Bute"] },
+                        },
+                    }
+                )
+            }
+            text = altname
+        } else if (text === "Dumfries and Galloway") {
+            const altname = "Dumfries & Galloway"
+            const altAtco = await Atco.findOne({ location: altname })
+            if (altAtco) {
+                await Atco.findOneAndUpdate(
+                    { location: altname },
+                    {
+                        $addToSet: {
+                            other_names: {
+                                $each: [text, "Dumfries and Galloway"],
+                            },
+                        },
+                    }
+                )
+            }
+            text = altname
+        }
+
+        names.push(text)
     }
 
-    // add alt names to ATCO list. e.g. other_names: Na h-Eileanan Siar
-    // make this into a function? normalname - altnames
-    if (text === "Orkney") {
-      const altname = "Orkney Islands";
-      const altAtco = await Atco.findOne({ location: altname });
-      if (altAtco) {
-        await Atco.findOneAndUpdate(
-          { location: altname },
-          { $addToSet: { other_names: { $each: [text, "Orkney"] } } }
-        );
-      }
-      text = altname;
-    } else if (text === "Shetland") {
-      const altname = "Shetland Islands";
-      const altAtco = await Atco.findOne({ location: altname });
-      if (altAtco) {
-        await Atco.findOneAndUpdate(
-          { location: altname },
-          {
-            $addToSet: {
-              other_names: { $each: [text, "Shetland"] },
-            },
-          }
-        );
-      }
-      text = altname;
-    } else if (text === "Na h-Eileanan Siar") {
-      const altname = "Western Isles";
-      const altAtco = await Atco.findOne({ location: altname });
-      if (altAtco) {
-        await Atco.findOneAndUpdate(
-          { location: altname },
-          {
-            $addToSet: {
-              other_names: {
-                $each: [
-                  text,
-                  "Western Islands",
-                  "Outer Hebrides",
-                  "Comhairle nan Eilean Siar",
-                ],
-              },
-            },
-          }
-        );
-      }
-      text = altname;
-    } else if (text === "Argyll and Bute") {
-      const altname = "Argyll & Bute";
-      const altAtco = await Atco.findOne({ location: altname });
-      if (altAtco) {
-        await Atco.findOneAndUpdate(
-          { location: altname },
-          {
-            $addToSet: {
-              other_names: { $each: [text, "Argyll and Bute"] },
-            },
-          }
-        );
-      }
-      text = altname;
-    } else if (text === "Dumfries and Galloway") {
-      const altname = "Dumfries & Galloway";
-      const altAtco = await Atco.findOne({ location: altname });
-      if (altAtco) {
-        await Atco.findOneAndUpdate(
-          { location: altname },
-          {
-            $addToSet: {
-              other_names: {
-                $each: [text, "Dumfries and Galloway"],
-              },
-            },
-          }
-        );
-      }
-      text = altname;
-    }
-
-    names.push(text);
-  }
-
-  return names;
+    return names
 }
 
 /**
@@ -154,33 +154,33 @@ async function getScotlandLocations() {
  *
  */
 async function getEnglandLocations() {
-  // unitary authorities
-  const UA_url =
-    "https://www.ons.gov.uk/aboutus/transparencyandgovernance/freedomofinformationfoi/alistofunitaryauthoritiesinenglandwithageographicalmap";
-  const UA_response = await axios.get(UA_url);
-  const UA_data = new JSDOM(UA_response.data);
+    // unitary authorities
+    const UA_url =
+        "https://www.ons.gov.uk/aboutus/transparencyandgovernance/freedomofinformationfoi/alistofunitaryauthoritiesinenglandwithageographicalmap"
+    const UA_response = await axios.get(UA_url)
+    const UA_data = new JSDOM(UA_response.data)
 
-  // Example: Bournemouth, Christchurch and Poole
-  // Bournemouth and Poole are separate in the ATCO list, so not foolproof yet.
+    // Example: Bournemouth, Christchurch and Poole
+    // Bournemouth and Poole are separate in the ATCO list, so not foolproof yet.
 
-  // ceremnonial counties
-  // https://raw.githubusercontent.com/ideal-postcodes/postcodes.io/master/data/counties.json
-  const county_url =
-    "https://en.wikipedia.org/wiki/Ceremonial_counties_of_England";
-  const county_response = await axios.get(county_url);
-  const county_data = new JSDOM(county_response.data);
+    // ceremnonial counties
+    // https://raw.githubusercontent.com/ideal-postcodes/postcodes.io/master/data/counties.json
+    const county_url =
+        "https://en.wikipedia.org/wiki/Ceremonial_counties_of_England"
+    const county_response = await axios.get(county_url)
+    const county_data = new JSDOM(county_response.data)
 
-  // to be added to Greater London altnames
-  // Also includes City of London as a borough.
-  const london_url = "https://en.wikipedia.org/wiki/London_boroughs";
-  const london_response = await axios.get(london_url);
-  const london_data = new JSDOM(london_response.data);
+    // to be added to Greater London altnames
+    // Also includes City of London as a borough.
+    const london_url = "https://en.wikipedia.org/wiki/London_boroughs"
+    const london_response = await axios.get(london_url)
+    const london_data = new JSDOM(london_response.data)
 
-  const english_places: string[] = [];
+    const english_places: string[] = []
 
-  logger.info(english_places);
+    logger.info(english_places)
 
-  return english_places;
+    return english_places
 }
 
 /**
@@ -196,30 +196,30 @@ async function getEnglandLocations() {
  *
  */
 async function getWalesLocations() {
-  // https://en.wikipedia.org/wiki/Local_government_in_Wales#Principal_areas
+    // https://en.wikipedia.org/wiki/Local_government_in_Wales#Principal_areas
 
-  const url =
-    "https://en.wikipedia.org/wiki/Local_government_in_Wales#Principal_areas";
-  const response = await axios.get(url);
-  const dom = new JSDOM(response.data);
+    const url =
+        "https://en.wikipedia.org/wiki/Local_government_in_Wales#Principal_areas"
+    const response = await axios.get(url)
+    const dom = new JSDOM(response.data)
 
-  const tabledata = dom.window.document.querySelectorAll(
-    "table.wikitable li a"
-  );
+    const tabledata = dom.window.document.querySelectorAll(
+        "table.wikitable li a"
+    )
 
-  const names: string[] = [];
+    const names: string[] = []
 
-  for (const li of tabledata) {
-    const name = li?.textContent?.trim();
-    if (name) {
-      names.push(name);
-    } else {
-      logger.error(`No text content found for li: "${li}"`);
+    for (const li of tabledata) {
+        const name = li?.textContent?.trim()
+        if (name) {
+            names.push(name)
+        } else {
+            logger.error(`No text content found for li: "${li}"`)
+        }
     }
-  }
 
-  //logger.info(names)
-  return names.slice(0, 22);
+    //logger.info(names)
+    return names.slice(0, 22)
 }
 
 /**
@@ -232,13 +232,13 @@ async function getWalesLocations() {
  *
  */
 async function getNptgData() {
-  // Nptg could potentially be used as a fallback for finding location names
-  const url = "https://naptan.api.dft.gov.uk/v1/nptg/localities";
+    // Nptg could potentially be used as a fallback for finding location names
+    const url = "https://naptan.api.dft.gov.uk/v1/nptg/localities"
 
-  const response = await axios.get(url);
-  const data = response.data;
+    const response = await axios.get(url)
+    const data = response.data
 
-  await processNptgCSV(data);
+    await processNptgCSV(data)
 }
 
 /**
@@ -257,51 +257,53 @@ async function getNptgData() {
  *
  */
 async function processNptgCSV(rawdata: string) {
-  // check if Nptg collection is empty
-  const count = await Nptg.estimatedDocumentCount();
-  if (count >= 43876) {
-    logger.info(`Nptg data already saved. All ${count} records found.`);
-    return;
-  } else {
-    logger.info(`${count}/43876 records found. Processing Nptg data...`);
-  }
-
-  // adatped from AtcoCodes.processCSV()
-  const data = await csvtojson().fromString(rawdata);
-
-  // filter through columns
-  const columns = [
-    "NptgLocalityCode",
-    "LocalityName",
-    "ParentLocalityName",
-    "Northing",
-    "Easting",
-    "QualifierName",
-  ];
-
-  const NptgBulk = data.map(row => {
-    const doc = Object.fromEntries(columns.map(col => [col, row[col]]));
-
-    return new Nptg(doc);
-  });
-
-  try {
-    await Nptg.insertMany(NptgBulk, { ordered: false });
-  } catch (error: any) {
-    if (error.code === 11000) {
-      logger.info("Duplicate NPTG locality codes found. Skipping duplicates.");
+    // check if Nptg collection is empty
+    const count = await Nptg.estimatedDocumentCount()
+    if (count >= 43876) {
+        logger.info(`Nptg data already saved. All ${count} records found.`)
+        return
     } else {
-      logger.error(error);
+        logger.info(`${count}/43876 records found. Processing Nptg data...`)
     }
-  }
 
-  const finalCount = await Nptg.estimatedDocumentCount();
-  logger.info(`NPTG data processed. Found ${finalCount} records.`);
+    // adatped from AtcoCodes.processCSV()
+    const data = await csvtojson().fromString(rawdata)
+
+    // filter through columns
+    const columns = [
+        "NptgLocalityCode",
+        "LocalityName",
+        "ParentLocalityName",
+        "Northing",
+        "Easting",
+        "QualifierName",
+    ]
+
+    const NptgBulk = data.map((row) => {
+        const doc = Object.fromEntries(columns.map((col) => [col, row[col]]))
+
+        return new Nptg(doc)
+    })
+
+    try {
+        await Nptg.insertMany(NptgBulk, { ordered: false })
+    } catch (error: any) {
+        if (error.code === 11000) {
+            logger.info(
+                "Duplicate NPTG locality codes found. Skipping duplicates."
+            )
+        } else {
+            logger.error(error)
+        }
+    }
+
+    const finalCount = await Nptg.estimatedDocumentCount()
+    logger.info(`NPTG data processed. Found ${finalCount} records.`)
 }
 
 export {
-  getScotlandLocations,
-  getEnglandLocations,
-  getWalesLocations,
-  getNptgData,
-};
+    getScotlandLocations,
+    getEnglandLocations,
+    getWalesLocations,
+    getNptgData,
+}

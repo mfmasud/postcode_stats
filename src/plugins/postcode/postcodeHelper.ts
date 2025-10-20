@@ -1,7 +1,7 @@
 /**
  * @file Contains functions for interacting with the postcodes.io API and processing and saving the data returned.
  * @module helpers/postcode
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires axios
  * @requires utils/logger

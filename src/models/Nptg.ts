@@ -1,7 +1,7 @@
 /**
  * @file Defines the Nptg model schema, condensed from the National Public Transport Gazetteer (NPTG). Can only be used for Scotland, England and Wales.
  * @module models/Nptg
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires mongoose
  *
@@ -12,37 +12,42 @@
  *
  */
 
-import { Schema, model, type InferSchemaType, type HydratedDocument } from 'mongoose';
+import {
+    Schema,
+    model,
+    type InferSchemaType,
+    type HydratedDocument,
+} from "mongoose"
 
 const NptgSchema = new Schema({
-  NptgLocalityCode: {
-    type: String,
-    required: true,
-    unique: true,
-  },
-  Easting: {
-    type: Number,
-    required: true,
-  },
-  Northing: {
-    type: Number,
-    required: true,
-  },
-  LocalityName: {
-    type: String,
-    required: true,
-  },
-  QualifierName: {
-    type: String,
-  },
-  ParentLocalityName: {
-    type: String,
-  },
-});
+    NptgLocalityCode: {
+        type: String,
+        required: true,
+        unique: true,
+    },
+    Easting: {
+        type: Number,
+        required: true,
+    },
+    Northing: {
+        type: Number,
+        required: true,
+    },
+    LocalityName: {
+        type: String,
+        required: true,
+    },
+    QualifierName: {
+        type: String,
+    },
+    ParentLocalityName: {
+        type: String,
+    },
+})
 
-export type NptgInferredSchema = InferSchemaType<typeof NptgSchema>;
-export type NptgDoc = HydratedDocument<NptgInferredSchema>;
+export type NptgInferredSchema = InferSchemaType<typeof NptgSchema>
+export type NptgDoc = HydratedDocument<NptgInferredSchema>
 
-const Nptg = model<NptgInferredSchema>('Nptg', NptgSchema);
+const Nptg = model<NptgInferredSchema>("Nptg", NptgSchema)
 
-export default Nptg;
+export default Nptg

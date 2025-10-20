@@ -1,7 +1,7 @@
 /**
  * @file Contains the functions to retrieve and process crime data from the Police API.
  * @module helpers/crime
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires utils/logger
  * @requires axios

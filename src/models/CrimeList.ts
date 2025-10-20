@@ -1,7 +1,7 @@
 /**
  * @file Contains the mongoose CrimeList model schema. Sums up the results of a query made to the Police API so that it can be used by and linked to the Search model.
  * @module models/CrimeList
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires mongoose
  *
@@ -14,65 +14,66 @@
  */
 
 import {
-  Schema,
-  model,
-  type InferSchemaType,
-  type HydratedDocument,
-} from 'mongoose';
+    Schema,
+    model,
+    type InferSchemaType,
+    type HydratedDocument,
+} from "mongoose"
 
-import Counter from './Counter.js';
+import Counter from "./Counter.js"
 
 const crimeListSchema = new Schema({
-  crimeListID: {
-    type: Number,
-    required: true,
-    unique: true,
-    index: true,
-    immutable: true,
-  },
-  latitude: {
-    type: Number,
-    required: true,
-  },
-  longitude: {
-    type: Number,
-    required: true,
-  },
-  count: {
-    type: Number,
-    default: 0,
-  },
-  crimes: [
-    {
-      type: Schema.Types.ObjectId,
-      ref: "Crime",
+    crimeListID: {
+        type: Number,
+        required: true,
+        unique: true,
+        index: true,
+        immutable: true,
     },
-  ],
-  date: {
-    type: String, // Move to a datetime in the future
-  },
-  emptydata: {
-    type: Boolean,
-    default: false,
-  },
-});
+    latitude: {
+        type: Number,
+        required: true,
+    },
+    longitude: {
+        type: Number,
+        required: true,
+    },
+    count: {
+        type: Number,
+        default: 0,
+    },
+    crimes: [
+        {
+            type: Schema.Types.ObjectId,
+            ref: "Crime",
+        },
+    ],
+    date: {
+        type: String, // Move to a datetime in the future
+    },
+    emptydata: {
+        type: Boolean,
+        default: false,
+    },
+})
 
-export type CrimeListInferredSchema = InferSchemaType<typeof crimeListSchema>;
-export type CrimeListDoc = HydratedDocument<CrimeListInferredSchema>;
+export type CrimeListInferredSchema = InferSchemaType<typeof crimeListSchema>
+export type CrimeListDoc = HydratedDocument<CrimeListInferredSchema>
 
-crimeListSchema.pre('validate', async function (this: CrimeListDoc) {
-  // if the document is not new, do not set a new ID
-  if (!this.isNew || this.crimeListID != null) return;
+crimeListSchema.pre("validate", async function (this: CrimeListDoc) {
+    // if the document is not new, do not set a new ID
+    if (!this.isNew || this.crimeListID != null) return
 
-  let newID = await Counter.next('crimeList'); // get the next ID
+    let newID = await Counter.next("crimeList") // get the next ID
 
-  while (await CrimeList.exists({ crimeListID: newID })) { // if the ID already exists,
-    newID = await Counter.next('crimeList'); // increment the ID and try again
-  }
+    while (await CrimeList.exists({ crimeListID: newID })) {
+        // if the ID already exists,
+        newID = await Counter.next("crimeList") // increment the ID and try again
+    }
 
-  this.crimeListID = newID; // set the new ID
-});
+    this.crimeListID = newID // set the new ID
+})
 
-const CrimeList = model<CrimeListInferredSchema>('CrimeList', crimeListSchema);
+const CrimeList = model<CrimeListInferredSchema>("CrimeList", crimeListSchema)
 
-export default CrimeList;
+export default CrimeList

@@ -1,7 +1,7 @@
 /**
  * @file Responsible for defining the abilities users have on the /search route.
  * @module permissions/search
- * @author Mohammed Fardhin Masud <masudm6@coventry.ac.uk>
+ * @author Mohammed Fardhin Masud <fardhinmasud@gmail.com>
  *
  * @requires @casl/ability
  * @requires utils/logger
@@ -9,11 +9,11 @@
  * @exports defineAbilitiesFor
  */
 
-import { AbilityBuilder, createMongoAbility } from "@casl/ability";
+import { AbilityBuilder, createMongoAbility } from "@casl/ability"
 
 //import logger from "../utils/logger.js";
 
-import type { UserDocWithRole } from "../models/User.js";
+import type { UserDocWithRole } from "../models/User.js"
 
 /**
  * Defines the user's permissions for the /search route.
@@ -38,33 +38,33 @@ import type { UserDocWithRole } from "../models/User.js";
  * }
  */
 function defineAbilitiesFor(user: UserDocWithRole) {
-  // can use Search Model in the future.
-  //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
+    // can use Search Model in the future.
+    //logger.info(`current user: ${user.username}\nrole: ${user.role.name}`)
 
-  const { can, build } = new AbilityBuilder(createMongoAbility);
+    const { can, build } = new AbilityBuilder(createMongoAbility)
 
-  // non authenticated users
-  can("read", "Search");
-  can("create", "Search");
+    // non authenticated users
+    can("read", "Search")
+    can("create", "Search")
 
-  // authenticated users
-  // standard users
-  if (user.role.name === "user") {
-    //carry on permissions from non authenticated users
-  }
+    // authenticated users
+    // standard users
+    if (user.role.name === "user") {
+        //carry on permissions from non authenticated users
+    }
 
-  // paid users
-  if (user.role.name === "paiduser") {
-    //carry on permissions from non authenticated users
-  }
+    // paid users
+    if (user.role.name === "paiduser") {
+        //carry on permissions from non authenticated users
+    }
 
-  // admin users
-  if (user.role.name === "admin") {
-    //add admin specific permissions on top of other permissions
-    can("create", "RandomSearch");
-  }
+    // admin users
+    if (user.role.name === "admin") {
+        //add admin specific permissions on top of other permissions
+        can("create", "RandomSearch")
+    }
 
-  return build();
+    return build()
 }
 
-export default defineAbilitiesFor;
+export default defineAbilitiesFor
