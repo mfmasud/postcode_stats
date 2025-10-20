@@ -1,0 +1,39 @@
+services:
+    fastify_app:
+        env_file: .env
+        build:
+            context: .
+            dockerfile: ./docker/fastify.Dockerfile
+        restart: unless-stopped
+        expose:
+            - "${PORT}"
+        healthcheck:
+            test: ["CMD", "curl", "-f", "http://localhost:${PORT}/health"]
+            start_period: 10s
+            interval: 30s
+            timeout: 5s
+            retries: 3
+        networks:
+            - webnet
+    caddy:
+        env_file: .env
+        depends_on:
+            fastify_app:
+                condition: service_healthy
+        image: caddy:2.10.2
+        restart: unless-stopped
+        ports:
+            - "80:80"
+            - "443:443"
+            - "443:443/udp"
+        volumes:
+            - ./docker/Caddyfile:/etc/caddy/Caddyfile
+            - caddy_data:/data
+            - caddy_config:/config
+        networks:
+            - webnet
+networks:
+    webnet:
+volumes:
+    caddy_data:
+    caddy_config:

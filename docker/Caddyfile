@@ -1,0 +1,4 @@
+{$DOMAIN} {
+    reverse_proxy fastify_app:{$PORT}
+    encode zstd gzip
+}
