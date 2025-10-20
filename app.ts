@@ -14,6 +14,7 @@ const __filename = fileURLToPath(import.meta.url)
 const __dirname = dirname(__filename)
 
 async function buildServer(): Promise<FastifyInstance> {
+    console.log("Building server... [1/3]")
     const app = fastify({ ignoreTrailingSlash: true })
         .setValidatorCompiler(TypeBoxValidatorCompiler)
         .withTypeProvider<TypeBoxTypeProvider>()
@@ -22,6 +23,7 @@ async function buildServer(): Promise<FastifyInstance> {
         return "pong\n"
     })
 
+    console.log("Registering plugins... [2/3]")
     app.register(
         async (instance) => {
             instance.register(autoLoad, {
@@ -34,6 +36,7 @@ async function buildServer(): Promise<FastifyInstance> {
     )
 
     await app.ready()
+    console.log("Server ready. [3/3]")
     logger.info(app.printRoutes())
 
     return app

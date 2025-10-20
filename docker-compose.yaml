@@ -8,7 +8,13 @@ services:
         expose:
             - "${PORT}"
         healthcheck:
-            test: ["CMD", "curl", "-f", "http://localhost:${PORT}/health"]
+            test:
+                [
+                    "CMD",
+                    "curl",
+                    "-f",
+                    "http://localhost:${PORT:-8080}/api/v2/health",
+                ]
             start_period: 10s
             interval: 30s
             timeout: 5s

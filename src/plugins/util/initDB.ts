@@ -8,16 +8,25 @@ import {
 } from "../../helpers/database.js"
 import type { FastifyInstance } from "fastify"
 
+import logger from "../../utils/logger.js"
+
 export default fp(async (fastify: FastifyInstance) => {
-    await connectDB(true)
-    await initUserDB()
-    await resetDataDB()
-    //await initLocationDB();
+    try {
+        await connectDB(true)
+        await initUserDB()
+        await resetDataDB()
+        //await initLocationDB();
 
-    fastify.log.info("✅ Databases initialised")
-
-    fastify.addHook("onClose", async () => {
-        fastify.log.info("🛑 Closing DB connections...")
-        await disconnectDB(true)
-    })
+        logger.info("Databases initialised")
+    } catch (error) {
+        logger.warn(
+            `Database initialization failed: ${error instanceof Error ? error.message : "Unknown error"}`
+        )
+        logger.warn("Continuing without database connection...")
+    } finally {
+        fastify.addHook("onClose", async () => {
+            logger.info("Closing DB connections...")
+            await disconnectDB(true)
+        })
+    }
 })
