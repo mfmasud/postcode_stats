@@ -12,6 +12,7 @@ const port = parseInt(process.env.PORT || "8080")
  * @param port The port to listen on for incoming requests.
  */
 async function startServer(port: number) {
+    console.log("Starting server on port", port)
     try {
         // start Fastify server
         const address = await server.listen({ port, host: "0.0.0.0" })

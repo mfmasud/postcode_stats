@@ -5,9 +5,10 @@ FROM node:24-alpine AS builder
 
 # Set working directory
 WORKDIR /app
+ENV NODE_ENV=development
 
-# Enable Corepack for pnpm support
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install pnpm
+RUN npm i -g pnpm@10.18.3
 
 # Install deps first for caching
 COPY package.json pnpm-lock.yaml ./
@@ -28,9 +29,13 @@ RUN pnpm run build
 FROM node:24-alpine AS production
 
 WORKDIR /app
+ENV NODE_ENV=production
 
-# Enable Corepack for pnpm support
-RUN corepack enable && corepack prepare pnpm@latest --activate
+# Install curl for health checks
+RUN apk add --no-cache curl
+# Install pnpm
+RUN npm i -g pnpm@10.18.3
+
 
 # Copy only built code + minimal dependencies
 COPY package.json pnpm-lock.yaml ./
