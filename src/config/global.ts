@@ -1,1 +1,1 @@
-export const v2apiPrefix = "/api/v2"
+export const apiPrefix = "/api/v2"
