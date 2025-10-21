@@ -167,6 +167,18 @@ async function searchPostcode(
 
         if (validPostcode) {
             const processedPostcode = await getPostcode(postcode)
+
+            if (!processedPostcode) {
+                logger.error(
+                    `Failed to retrieve postcode data for: ${postcode}`
+                )
+                reply.status(500).send({
+                    error: "Internal Server Error",
+                    message: "Unable to retrieve postcode data.",
+                })
+                return
+            }
+
             const dbPostcode = await Postcode.findOne({
                 postcode: processedPostcode.postcode,
             })
@@ -263,6 +275,16 @@ async function searchRandom(request: FastifyRequest, reply: FastifyReply) {
 
     if (ability.can("create", "RandomSearch")) {
         const processedPostcode = await getRandomPostcode()
+
+        if (!processedPostcode) {
+            logger.error("Failed to retrieve random postcode data")
+            reply.status(500).send({
+                error: "Internal Server Error",
+                message: "Unable to generate random postcode data.",
+            })
+            return
+        }
+
         const dbPostcode = await Postcode.findOne({
             postcode: processedPostcode.postcode,
         })
