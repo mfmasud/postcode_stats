@@ -29,7 +29,30 @@ import User, { type UserDocWithRole } from "../../models/User.js"
 import Role from "../../models/Role.js"
 
 import type { PostcodeParams } from "../../schemas/postcodeSchema.js"
-import type { LocationPair } from "../../types/postcode.js"
+import type {
+    LocationPair,
+    ExtAPIPostcodeResponse,
+} from "../../types/postcode.js"
+
+// === Utility Functions ===
+
+/**
+ * Performs preliminary normalisation of postcode input to improve database query matching.
+ * This handles basic formatting issues like whitespace and case differences.
+ * The postcodes.io API provides the definitive normalised format.
+ *
+ * @function normalisePostcodeInput
+ *
+ * @param {string} postcodeInput - The raw postcode string from user input
+ * @returns {string} A preliminarily normalised postcode string (trimmed and uppercased)
+ *
+ * @example
+ * normalisePostcodeInput("dg1 1aa ") // returns "DG1 1AA"
+ * normalisePostcodeInput("  LU2 7EW") // returns "LU2 7EW"
+ */
+function normalisePostcodeInput(postcodeInput: string): string {
+    return postcodeInput.trim().toUpperCase()
+}
 
 // === Routing ===
 
@@ -300,22 +323,31 @@ async function getRandomPostcode(): Promise<PostcodeDoc | null | undefined> {
 async function getPostcode(
     validPostcodeString: string
 ): Promise<PostcodeDoc | null | undefined> {
-    // check if postcode exists in db
+    // Normalise input to improve database query matching (handles whitespace/case variations)
+    const normalisedInput = normalisePostcodeInput(validPostcodeString)
+
+    // check if postcode exists in db using normalised input
     const postcodeExists = await Postcode.exists({
-        postcode: validPostcodeString,
+        postcode: normalisedInput,
     })
 
     if (postcodeExists) {
-        logger.info(`Postcode already exists in db: ${validPostcodeString}`)
-        return await Postcode.findOne({ postcode: validPostcodeString })
+        logger.info(`Postcode already exists in db: ${normalisedInput}`)
+        return await Postcode.findOne({ postcode: normalisedInput })
     }
 
     try {
         const response = await axios.get(
-            `https://api.postcodes.io/postcodes/${validPostcodeString}`
+            `https://api.postcodes.io/postcodes/${normalisedInput}`
         )
+
+        // Process and save the postcode
         await processPostcode(response.data.result)
-        return await Postcode.findOne({ postcode: validPostcodeString })
+
+        // Query using the API's normalised postcode (definitive format from postcodes.io)
+        return await Postcode.findOne({
+            postcode: response.data.result.postcode,
+        })
     } catch (error) {
         logger.error(error)
     }
@@ -333,14 +365,15 @@ async function getPostcode(
  * @see getPostcode
  */
 async function validatePostcode(postcodeString: string) {
+    // Normalise input before validation
+    const normalisedInput = normalisePostcodeInput(postcodeString)
+
     try {
         const response = await axios.get(
-            `https://api.postcodes.io/postcodes/
-      ${postcodeString}
-      /validate`
+            `https://api.postcodes.io/postcodes/${normalisedInput}/validate`
         )
 
-        logger.info(`${postcodeString} is valid: ${response.data.result}`)
+        logger.info(`${normalisedInput} is valid: ${response.data.result}`)
 
         if (response.data.result === true) {
             return true
@@ -349,6 +382,7 @@ async function validatePostcode(postcodeString: string) {
         }
     } catch (error) {
         logger.error(error)
+        return false
     }
 }
 
@@ -358,23 +392,25 @@ async function validatePostcode(postcodeString: string) {
  * @async
  * @function processPostcode
  *
- * @param {Object} postcodeObject - A mongoose object containing the details of a postcode.
- * @returns {undefined} Nothing, the postcode is just saved to the database.
+ * @param {ExtAPIPostcodeResponse} postcodeObject - The details of a postcode fetched from hte postcodes.io API.
+ * @returns {Promise<PostcodeDoc>} A Postcode document, after it has been saved.
  *
  * @see getPostcode
  */
-async function processPostcode(postcodeObject: PostcodeDoc) {
+async function processPostcode(
+    postcodeObject: ExtAPIPostcodeResponse
+): Promise<PostcodeDoc | null | undefined> {
     logger.info(`Processing: ${postcodeObject.postcode}`)
 
     // Check if postcode already exists to avoid unnecessary processing
-    const existingPostcode = await Postcode.findOne({
+    const existingPostcode = await Postcode.exists({
         postcode: postcodeObject.postcode,
     })
     if (existingPostcode) {
         logger.info(
-            `Postcode ${postcodeObject.postcode} already exists in database, skipping save`
+            `Postcode ${postcodeObject.postcode} already exists in database, returning existing postcode`
         )
-        return
+        return await Postcode.findOne({ postcode: postcodeObject.postcode })
     }
 
     // fields to save: postcode, eastings, northings, country, longitude, latitude, region (can be null)
@@ -422,8 +458,10 @@ async function processPostcode(postcodeObject: PostcodeDoc) {
     try {
         await newPostcode.save()
         logger.info(`Successfully saved postcode: ${postcodeObject.postcode}`)
+        return newPostcode
     } catch (error) {
         logger.error(`Failed to save postcode ${postcode}:`, error)
+        return
     }
 }
 
