@@ -107,6 +107,16 @@ async function getRandomPostcodeRoute(
 
     if (ability.can("read", "Postcode")) {
         const randompostcode = await getRandomPostcode()
+
+        if (!randompostcode) {
+            logger.error("Failed to retrieve random postcode")
+            reply.status(500).send({
+                error: "Internal Server Error",
+                message: "Failed to retrieve random postcode",
+            })
+            return
+        }
+
         reply.status(200).send(randompostcode)
         logger.info(`returned postcode ${randompostcode.postcode}`)
     } else {
@@ -163,9 +173,19 @@ async function getPostcodeRoute(
         const validPostcode = await validatePostcode(postcode)
 
         if (validPostcode) {
-            const body = await getPostcode(postcode)
-            reply.status(200).send(body)
-            logger.info(`returned postcode ${body.postcode}`)
+            const API_Postcode = await getPostcode(postcode)
+
+            if (!API_Postcode) {
+                logger.error(`Failed to retrieve postcode: ${postcode}`)
+                reply.status(404).send({
+                    error: "Not Found",
+                    message: "Postcode could not be retrieved",
+                })
+                return
+            }
+
+            reply.status(200).send(API_Postcode)
+            logger.info(`returned postcode ${API_Postcode.postcode}`)
         } else {
             logger.error("Invalid postcode provided.")
             reply.status(400).send({
@@ -222,19 +242,19 @@ async function findPostcodeFromWGS84(location: LocationPair) {
 }
 
 /**
- * Gets a random UK postcode from the postcodes.io API.
+ * Gets a random UK postcode from the postcodes.io API and saves it to the database.
  * Postcodes are guaranteed to be valid as they are retreived from the API directly.
  *
  * @async
  * @function getRandomPostcode
  *
- * @returns {*} An object containing the details of the postcode.
+ * @returns {Promise<PostcodeDoc | null | undefined>} A MongoDB document containing the postcode details, or null/undefined if not found or an error occurred.
  *
- * @see https://postcodes.io/docs for documentation of the returned object.
+ * @see https://postcodes.io/docs for documentation of the API response.
  * @see getPostcode
  * @see getRandomPostcodeRoute
  */
-async function getRandomPostcode() {
+async function getRandomPostcode(): Promise<PostcodeDoc | null | undefined> {
     try {
         const response = await axios.get(
             "https://api.postcodes.io/random/postcodes"
@@ -249,31 +269,37 @@ async function getRandomPostcode() {
             logger.info(
                 `Postcode already exists in db: ${response.data.result.postcode}`
             )
-            return postcodeExists
+            return await Postcode.findOne({
+                postcode: response.data.result.postcode,
+            })
         }
 
         await processPostcode(response.data.result)
-        return response.data.result
+        return await Postcode.findOne({
+            postcode: response.data.result.postcode,
+        })
     } catch (error) {
         logger.error(error)
     }
 }
 
 /**
- * Gets a UK postcode from the postcodes.io API.
+ * Gets a UK postcode from the postcodes.io API and saves it to the database.
  * If the postcode is already in the database, it will return the existing Postcode document instead.
  *
  * @async
  * @function getPostcode
  *
  * @param {String} validPostcodeString - A valid UK postcode.
- * @returns {*} An object containing the details of the postcode.
+ * @returns {Promise<PostcodeDoc | null | undefined>} A MongoDB document containing the postcode details, or null/undefined if not found or an error occurred.
  *
- * @see https://postcodes.io/docs for documentation of the returned object.
+ * @see https://postcodes.io/docs for documentation of the API response.
  * @see getRandomPostcode
  * @see validatePostcode
  */
-async function getPostcode(validPostcodeString: string) {
+async function getPostcode(
+    validPostcodeString: string
+): Promise<PostcodeDoc | null | undefined> {
     // check if postcode exists in db
     const postcodeExists = await Postcode.exists({
         postcode: validPostcodeString,
@@ -289,7 +315,7 @@ async function getPostcode(validPostcodeString: string) {
             `https://api.postcodes.io/postcodes/${validPostcodeString}`
         )
         await processPostcode(response.data.result)
-        return response.data.result
+        return await Postcode.findOne({ postcode: validPostcodeString })
     } catch (error) {
         logger.error(error)
     }
