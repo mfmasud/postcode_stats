@@ -20,6 +20,7 @@
 
 import type { FastifyRequest } from "fastify"
 import logger from "../../utils/logger.js"
+import { apiPrefix } from "../../config/global.js"
 
 import { queryAtcoAPI } from "../../helpers/AtcoCodes.js"
 import { getCrimeData } from "../../helpers/crime.js"
@@ -334,14 +335,14 @@ async function updateLinks(request: FastifyRequest, SearchModel: SearchDoc) {
 
     SearchModel._links = {}
 
-    // SearchModel._links.alternate = `${hostname}/api/v1/search/${searchModel.searchID}`;
+    // SearchModel._links.alternate = `${hostname}/api/v2/search/${searchModel.searchID}`;
     SearchModel._links.postcode = {
-        href: `https://${hostname}/api/v1/postcodes/${postcode}`,
+        href: `https://${hostname}${apiPrefix}/postcodes/${postcode}`,
     }
 
     if (lat && long) {
         SearchModel._links.self = {
-            href: `https://${hostname}/api/v1/search/?latitude=${lat}&longitude=${long}`,
+            href: `https://${hostname}${apiPrefix}/search/?latitude=${lat}&longitude=${long}`,
         }
     }
 

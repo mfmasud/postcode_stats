@@ -2,7 +2,7 @@
 import { Type, type Static } from "@sinclair/typebox"
 import { ErrorResponseSchema } from "./commonSchema.js"
 
-// Query parameters for GET /api/v1/search/ (searchArea)
+// Query parameters for GET /api/v2/search/ (searchArea)
 export const SearchAreaQuerySchema = Type.Object({
     latitude: Type.Number({
         description: "Latitude coordinate in WGS84 format",
@@ -16,7 +16,7 @@ export const SearchAreaQuerySchema = Type.Object({
     }),
 })
 
-// Body for POST /api/v1/search/ (searchPostcode)
+// Body for POST /api/v2/search/ (searchPostcode)
 export const SearchPostcodeBodySchema = Type.Object({
     postcode: Type.String({
         description: "UK postcode to search for",
@@ -30,7 +30,7 @@ const SearchResponseSchema = Type.Object({
     // This will be populated by the handlers
 })
 
-// GET /api/v1/search/ (searchArea) schema
+// GET /api/v2/search/ (searchArea) schema
 export const SearchAreaRouteSchema = Type.Object({
     querystring: SearchAreaQuerySchema,
     response: Type.Object({
@@ -41,7 +41,7 @@ export const SearchAreaRouteSchema = Type.Object({
     }),
 })
 
-// POST /api/v1/search/ (searchPostcode) schema
+// POST /api/v2/search/ (searchPostcode) schema
 export const SearchPostcodeRouteSchema = Type.Object({
     body: SearchPostcodeBodySchema,
     response: Type.Object({
@@ -52,7 +52,7 @@ export const SearchPostcodeRouteSchema = Type.Object({
     }),
 })
 
-// GET /api/v1/search/random (searchRandom) schema
+// GET /api/v2/search/random (searchRandom) schema
 export const SearchRandomRouteSchema = Type.Object({
     response: Type.Object({
         200: SearchResponseSchema,
