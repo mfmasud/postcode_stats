@@ -1,6 +1,9 @@
 // schemas/searchSchema.ts
 import { Type, type Static } from "@sinclair/typebox"
 import { ErrorResponseSchema } from "./commonSchema.js"
+import { PostcodeResponseSchema } from "./postcodeSchema.js"
+import { BusStopResponseSchema } from "./busStopSchema.js"
+import { CrimeResponseSchema } from "./crimeSchema.js"
 
 // Query parameters for GET /api/v2/search/ (searchArea)
 export const SearchAreaQuerySchema = Type.Object({
@@ -24,10 +27,70 @@ export const SearchPostcodeBodySchema = Type.Object({
     }),
 })
 
+// HATEOAS link structure
+const LinkSchema = Type.Object({
+    href: Type.String({
+        description: "URL of the linked resource",
+    }),
+})
+
+// Links object for HATEOAS compliance
+const LinksSchema = Type.Object({
+    self: Type.Optional(LinkSchema),
+    postcode: Type.Optional(LinkSchema),
+    alternate: Type.Optional(LinkSchema),
+})
+
 // Common search response structure
-const SearchResponseSchema = Type.Object({
-    // Define the search response structure based on Search model
-    // This will be populated by the handlers
+// Based on the Search Mongoose model with populated references
+// @see {@link module:models/Search}
+export const SearchResponseSchema = Type.Object({
+    _id: Type.String({
+        description: "MongoDB ObjectId of the search record",
+    }),
+    searchID: Type.Number({
+        description: "Unique sequential search identifier",
+    }),
+    latitude: Type.Number({
+        description: "Latitude coordinate in WGS84 format",
+    }),
+    longitude: Type.Number({
+        description: "Longitude coordinate in WGS84 format",
+    }),
+    Northing: Type.String({
+        description: "British National Grid Northing coordinate",
+    }),
+    Easting: Type.String({
+        description: "British National Grid Easting coordinate",
+    }),
+    reverseLookup: Type.Boolean({
+        description: "Whether this search was performed via reverse geocoding",
+    }),
+    Postcode: PostcodeResponseSchema,
+    queryBusStops: Type.Array(BusStopResponseSchema, {
+        description: "Array of nearby bus stops (up to 5)",
+    }),
+    queryCrimes: Type.Array(CrimeResponseSchema, {
+        description: "Array of crimes in the area",
+    }),
+    linkedATCO: Type.Optional(
+        Type.String({
+            description:
+                "MongoDB ObjectId reference to the linked ATCO code (not populated)",
+        })
+    ),
+    linkedCrimeList: Type.Optional(
+        Type.String({
+            description:
+                "MongoDB ObjectId reference to the linked CrimeList (not populated)",
+        })
+    ),
+    _links: Type.Optional(LinksSchema),
+    __v: Type.Optional(
+        Type.Number({
+            description: "Mongoose version key",
+        })
+    ),
 })
 
 // GET /api/v2/search/ (searchArea) schema

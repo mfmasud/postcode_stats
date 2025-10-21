@@ -11,9 +11,71 @@ export const PostcodeParamSchema = Type.Object({
 })
 
 // Common postcode return structure
-const GetPostcodeResponseSchema = Type.Object({
-    // map things according to how they are returned in the final function
+// Based on the Postcode Mongoose model
+// @see {@link module:models/Postcode}
+export const PostcodeResponseSchema = Type.Object({
+    _id: Type.String({
+        description: "MongoDB ObjectId of the postcode",
+    }),
+    postcode: Type.String({
+        description: "UK postcode in normalized format",
+    }),
+    eastings: Type.Optional(
+        Type.Number({
+            description: "Ordnance Survey Easting coordinate",
+        })
+    ),
+    northings: Type.Optional(
+        Type.Number({
+            description: "Ordnance Survey Northing coordinate",
+        })
+    ),
+    country: Type.String({
+        description:
+            "Country name (England, Scotland, Wales, Northern Ireland)",
+    }),
+    longitude: Type.Number({
+        description: "Longitude coordinate in WGS84 format",
+    }),
+    latitude: Type.Number({
+        description: "Latitude coordinate in WGS84 format",
+    }),
+    region: Type.Optional(
+        Type.String({
+            description: "Region name",
+        })
+    ),
+    parliamentary_constituency: Type.Optional(
+        Type.String({
+            description: "Parliamentary constituency name",
+        })
+    ),
+    admin_district: Type.Optional(
+        Type.String({
+            description: "Administrative district name",
+        })
+    ),
+    admin_ward: Type.Optional(
+        Type.String({
+            description: "Administrative ward name",
+        })
+    ),
+    parish: Type.Optional(
+        Type.String({
+            description: "Parish name",
+        })
+    ),
+    admin_county: Type.Union([Type.String(), Type.Null()], {
+        description: "Administrative county name (can be null)",
+    }),
+    __v: Type.Optional(
+        Type.Number({
+            description: "Mongoose version key",
+        })
+    ),
 })
+
+const GetPostcodeResponseSchema = PostcodeResponseSchema
 
 // GET /postcode (getAllPostcodes) schema
 export const GetAllPostcodesSchema = Type.Object({
@@ -50,6 +112,7 @@ export const GetPostcodeRouteSchema = Type.Object({
 
 // Types
 export type PostcodeParams = Static<typeof PostcodeParamSchema>
+export type PostcodeResponse = Static<typeof PostcodeResponseSchema>
 
 export type GetAllPostcodesResponse = Static<typeof GetAllPostcodesSchema>
 export type GetRandomPostcodeResponse = Static<typeof GetRandomPostcodeSchema>
