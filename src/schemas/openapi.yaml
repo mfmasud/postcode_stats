@@ -1,6 +1,6 @@
 openapi: 3.0.0
 info:
-    version: 1.0.0
+    version: 2.0.0
     title: UK Location API!
     description: >
         A UK Location data API for my 6003CEM Portfolio coursework.  
@@ -8,9 +8,6 @@ info:
     contact:
         name: Mohammed Fardhin Masud
         email: fardhinmasud@gmail.com
-servers:
-    - url: https://firstrespect-zippergriffin-3000.codio-box.uk/api/v1
-      description: Codio Development Server
 tags:
     - name: Users
       description: API endpoints for user management.
