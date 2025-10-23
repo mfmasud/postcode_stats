@@ -110,10 +110,31 @@ export const GetPostcodeRouteSchema = Type.Object({
     }),
 })
 
+export const ValidatePostcodeBodySchema = Type.Object({
+    postcode: Type.String({
+        description: "UK postcode to validate",
+    }),
+})
+
+// POST /postcodes/validate
+export const ValidatePostcodeResponseSchema = Type.Object({
+    body: ValidatePostcodeBodySchema,
+    response: Type.Object({
+        200: Type.Boolean({
+            description: "Whether the postcode is valid",
+        }),
+        400: ErrorResponseSchema, // Invalid or no postcode
+    }),
+})
+
 // Types
 export type PostcodeParams = Static<typeof PostcodeParamSchema>
 export type PostcodeResponse = Static<typeof PostcodeResponseSchema>
+export type ValidatePostcodeBody = Static<typeof ValidatePostcodeBodySchema>
 
 export type GetAllPostcodesResponse = Static<typeof GetAllPostcodesSchema>
 export type GetRandomPostcodeResponse = Static<typeof GetRandomPostcodeSchema>
 export type GetPostcodeResponse = Static<typeof GetPostcodeResponseSchema>
+export type ValidatePostcodeResponse = Static<
+    typeof ValidatePostcodeResponseSchema
+>

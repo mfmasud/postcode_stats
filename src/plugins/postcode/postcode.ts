@@ -11,12 +11,16 @@
  */
 
 import type { FastifyPluginAsyncTypebox } from "@fastify/type-provider-typebox"
-import { GetPostcodeRouteSchema } from "../../schemas/postcodeSchema.js"
+import {
+    GetPostcodeRouteSchema,
+    ValidatePostcodeResponseSchema,
+} from "../../schemas/postcodeSchema.js"
 
 import {
     getAllPostcodes,
     getRandomPostcodeRoute,
     getPostcodeRoute,
+    validatePostcodeRoute,
 } from "./postcodeHelper.js"
 
 const postcodeRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
@@ -25,7 +29,6 @@ const postcodeRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
         { preHandler: [fastify.authenticate] },
         getAllPostcodes
     ) // only admins can view all postcodes
-
     fastify.get(
         "/postcodes/random",
         { preHandler: [fastify.authenticate] },
@@ -36,6 +39,11 @@ const postcodeRoutes: FastifyPluginAsyncTypebox = async (fastify) => {
         { schema: GetPostcodeRouteSchema },
         getPostcodeRoute
     ) // anyone can search for a specific postcode
+    fastify.post(
+        "/postcodes/validate",
+        { schema: ValidatePostcodeResponseSchema },
+        validatePostcodeRoute
+    ) // anyone can validate a specific postcode
 }
 
 export default postcodeRoutes

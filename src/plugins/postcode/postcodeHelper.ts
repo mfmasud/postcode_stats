@@ -28,7 +28,10 @@ import Postcode, { type PostcodeDoc } from "../../models/Postcode.js"
 import User, { type UserDocWithRole } from "../../models/User.js"
 import Role from "../../models/Role.js"
 
-import type { PostcodeParams } from "../../schemas/postcodeSchema.js"
+import type {
+    PostcodeParams,
+    ValidatePostcodeBody,
+} from "../../schemas/postcodeSchema.js"
 import type {
     LocationPair,
     ExtAPIPostcodeResponse,
@@ -221,6 +224,63 @@ async function getPostcodeRoute(
         reply.status(403).send({
             error: "Forbidden",
             message: "You are not authorised to view this resource",
+        })
+    }
+}
+
+/**
+ * Route handler to validate a UK postcode externally to check if it is a real postcode.
+ * Accepts a postcode in the request body and returns a boolean indicating validity.
+ *
+ * @async
+ * @function validatePostcodeRoute
+ *
+ * @param {FastifyRequest} request - The Fastify request object containing a postcode in its body section.
+ * @param {FastifyReply} reply - The Fastify reply object.
+ * @throws {Error} 400 if the postcode is not provided or is invalid.
+ * @returns {undefined} Nothing, updates the response body with a boolean validation result.
+ *
+ * @see {@link validatePostcode} - validates the postcode using the postcode.io API.
+ * @see {@link normalisePostcodeInput} - normalises the postcode input.
+ *
+ */
+async function validatePostcodeRoute(
+    request: FastifyRequest<{ Body: ValidatePostcodeBody }>,
+    reply: FastifyReply
+) {
+    const { postcode } = request.body
+
+    if (!postcode) {
+        logger.error("No postcode provided for validation.")
+        reply.status(400).send({
+            error: "Bad Request",
+            message: "Please provide a postcode to validate.",
+        })
+        return
+    }
+
+    const normalisedPostcode = normalisePostcodeInput(postcode)
+
+    if (normalisedPostcode.length === 0) {
+        logger.error("Empty postcode provided for validation.")
+        reply.status(400).send({
+            error: "Bad Request",
+            message: "Postcode cannot be empty.",
+        })
+        return
+    }
+
+    try {
+        const isValid = await validatePostcode(normalisedPostcode)
+        reply.status(200).send(isValid)
+        logger.info(
+            `Validation result for ${normalisedPostcode}: ${isValid ? "valid" : "invalid"}`
+        )
+    } catch (error) {
+        logger.error(`Error validating postcode ${normalisedPostcode}:`, error)
+        reply.status(400).send({
+            error: "Bad Request",
+            message: "Failed to validate postcode.",
         })
     }
 }
@@ -469,6 +529,7 @@ export {
     getAllPostcodes,
     getRandomPostcodeRoute,
     getPostcodeRoute,
+    validatePostcodeRoute,
     findPostcodeFromWGS84,
     getPostcode,
     getRandomPostcode,
