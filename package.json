@@ -12,6 +12,7 @@
         "start": "node dist/index.js",
         "dev": "FASTIFY_AUTOLOAD_TYPESCRIPT=1 tsx watch index.ts",
         "db:init-location-data": "tsx scripts/init-location-data.ts",
+        "db:seed-users": "tsx scripts/seed-user-data.ts"
     },
     "author": "",
     "license": "ISC",
