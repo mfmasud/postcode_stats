@@ -250,12 +250,17 @@ async function initNptg() {
 
 /**
  * Initialises the location database collections. Adds the `Nptg` data if not cached already.
- * Assigns `Atco` codes for Scoltand,England and Wales and related names for Scotland.
+ * Assigns `Atco` codes for Scotland, England and Wales, and related (localised) names for Scotland.
+ *
+ * Called by the init-location-data script during database setup.
  *
  * @async
  * @function initLocationDB
  *
  * @see resetDataDB
+ * @see initNptg
+ * @see module:helpers/locations~getNptgData
+ * @see module:helpers/AtcoCodes~saveAtcoList
  *
  */
 async function initLocationDB() {
