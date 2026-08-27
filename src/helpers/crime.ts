@@ -84,8 +84,7 @@ async function processCrimeData(
     // logger.info(rawCrimeData); // can be empty
     if (rawCrimeData.length === 0) {
         logger.info("No crime data.")
-        CrimeList.create({
-            crimeListID: 1,
+        await CrimeList.create({
             latitude: lat,
             longitude: long,
             count: 0,
@@ -99,7 +98,6 @@ async function processCrimeData(
     const crimedate = rawCrimeData[0]?.month ?? ""
 
     const newCrimeList = new CrimeList({
-        crimeListID: 1,
         latitude: lat,
         longitude: long,
         count: rawCrimeData.length,
