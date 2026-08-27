@@ -27,11 +27,13 @@ import { getCrimeData } from "../../helpers/crime.js"
 
 // models
 import Atco from "../../models/Atco.js"
+import BusStop from "../../models/BusStop.js"
 import CrimeList from "../../models/CrimeList.js"
 import { type SearchDoc } from "../../models/Search.js"
 import { type PostcodeDoc } from "../../models/Postcode.js"
 import { type AtcoDoc } from "../../models/Atco.js"
 import { type CrimeListDoc } from "../../models/CrimeList.js"
+import { findNearestWithinRadius } from "../../helpers/distance.js"
 
 /**
  * Links a `CrimeList` to the `Search` model by comparing the latitude value used by both.
@@ -280,33 +282,58 @@ async function linkAtco(SearchModel: SearchDoc) {
 /**
  * Finds the related bus stops to a `Search` model.
  * This is done by first finding and linking the associated `Atco` model using `linkAtco`.
- * After this, the distance is calculated from `Atco.busstops` - the closest 5 `BusStop`s to the `Search` model's `latitute` and `longitude` fields.
- * For now, only the first 5 `BusStop`s are returned as nothing is being calculated.
+ * After this, the closest 5 `BusStop`s inside the requested radius are linked.
  *
  * @async
  * @function getRelatedStops
  *
  * @param {mongoose.Object} SearchModel - The `Search` model to find the related bus stops for.
  * @param {number} radius - The radius in metres to search for bus stops in. Defaults to 1000m.
- * @returns nothing, adds the `BusStop` models to the `Search` model's `relatedStops` field.
+ * @returns nothing, adds the `BusStop` models to the `Search` model's `queryBusStops` field.
  *
  * @see {@link linkAtco} - Links the `Atco` model to the `Search` model.
  */
 async function getRelatedStops(SearchModel: SearchDoc, radius: number = 1000) {
-    // bus stops around a 1km radius from a given point. maximum returned should be 4 points (arbitrary numbers)
     const { longitude, latitude, Northing, Easting } = SearchModel
 
     await SearchModel.populate<{ linkedATCO: AtcoDoc }>("linkedATCO")
     const linkedAtco = SearchModel.linkedATCO as AtcoDoc | null
 
-    // for java : https://stackoverflow.com/questions/22063842/check-if-a-latitude-and-longitude-is-within-a-circle
-    // first check if there are latitude/ longitude for the query bus stop then search within the radius from SearchModel.latitude / longitude
-    // just returning first 5 for now...
-    // Need to convert BNG to lat/long for empty values or search using BNG instead. See https://github.com/chrisveness/geodesy/blob/master/osgridref.js to convert
-
-    if (linkedAtco && linkedAtco.busstops) {
-        SearchModel.queryBusStops = linkedAtco.busstops.slice(0, 5)
+    if (!linkedAtco?.busstops.length) {
+        SearchModel.queryBusStops = []
+        await SearchModel.save()
+        return
     }
+
+    // Fetch only the fields needed for ranking. The full documents are populated
+    // later when the search response is assembled.
+    const busStops = await BusStop.find({
+        _id: { $in: linkedAtco.busstops },
+    })
+        .select("_id Easting Northing Latitude Longitude")
+        .lean()
+
+    const nearestBusStops = findNearestWithinRadius(
+        {
+            easting: Easting,
+            northing: Northing,
+            latitude,
+            longitude,
+        },
+        busStops.map((busStop) => ({
+            value: busStop,
+            coordinates: {
+                easting: busStop.Easting,
+                northing: busStop.Northing,
+                latitude: busStop.Latitude,
+                longitude: busStop.Longitude,
+            },
+        })),
+        radius,
+        5
+    )
+
+    SearchModel.queryBusStops = nearestBusStops.map((busStop) => busStop._id)
 
     await SearchModel.save()
 }

@@ -219,6 +219,7 @@ async function searchPostcode(
                 logger.info(
                     `Existing search found, ID: ${existingSearch.searchID}`
                 )
+                await getRelatedStops(existingSearch)
                 await updateLinks(request, existingSearch)
             }
 
@@ -324,6 +325,7 @@ async function searchRandom(request: FastifyRequest, reply: FastifyReply) {
             await updateLinks(request, newSearch)
         } else {
             logger.info(`Existing search found, ID: ${existingSearch.searchID}`)
+            await getRelatedStops(existingSearch)
             await updateLinks(request, existingSearch)
         }
 
